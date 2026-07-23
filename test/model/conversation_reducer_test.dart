@@ -4,7 +4,7 @@ import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation_reducer.dart';
 
 BaseEvent _sync() =>
-    CustomEvent(name: 'pocketcoder:sync', value: {'mode': 'replace'});
+    const CustomEvent(name: 'pocketcoder:sync', value: {'mode': 'replace'});
 
 StateDeltaEvent _delta(String path, {String op = 'add', dynamic value}) {
   return StateDeltaEvent(delta: [

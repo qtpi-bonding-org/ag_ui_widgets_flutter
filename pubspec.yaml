@@ -1,0 +1,25 @@
+name: ag_ui_widgets_flutter
+description: Shared Flutter chat UI for AG-UI-protocol agent sessions.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ag_ui: 0.3.0
+  flutter_chat_core: ^2.9.0
+  flutter_chat_ui: ^2.11.1
+  flyer_chat_text_stream_message: ^2.3.0
+  freezed_annotation: ^3.1.0
+  meta: ^1.17.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.13
+  freezed: ^3.2.3

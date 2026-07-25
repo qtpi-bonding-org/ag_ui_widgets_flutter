@@ -5,6 +5,19 @@ part 'conversation.freezed.dart';
 
 enum ChatMessageKind { text, reasoning }
 
+/// One diff hunk from a tool call's result — the full before/after text for
+/// one file. [oldText] is empty for new-file diffs (the backend's ACP-facing
+/// `ToolDiff.OldText` uses `omitempty`, so a new-file event never carries an
+/// `oldText` key at all).
+@freezed
+abstract class ToolDiff with _$ToolDiff {
+  const factory ToolDiff({
+    required String path,
+    @Default('') String oldText,
+    required String newText,
+  }) = _ToolDiff;
+}
+
 /// One item in the ordered conversation timeline: text/reasoning prose, an
 /// in-progress streaming reply, a tool invocation, or an inline
 /// permission/elicitation position marker. Built by [ConversationReducer]
@@ -37,6 +50,7 @@ sealed class TimelineItem with _$TimelineItem {
     required String name,
     @Default('') String args,
     String? result,
+    @Default(<ToolDiff>[]) List<ToolDiff> diffs,
   }) = ToolCallTimelineItem;
 
   /// A pending permission — position marker only. The actual request

@@ -63,6 +63,70 @@ void main() {
     });
   });
 
+  group('tool call diffs', () {
+    BaseEvent diffEvent(String toolCallId, String path,
+            {String? oldText, required String newText}) =>
+        CustomEvent(name: 'pocketcoder:diff', value: {
+          'toolCallId': toolCallId,
+          'path': path,
+          if (oldText != null) 'oldText': oldText,
+          'newText': newText,
+        });
+
+    test('pocketcoder:diff event appends a ToolDiff to the matching tool call', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'edit_file'))
+        ..apply(diffEvent('t1', 'lib/foo.dart', oldText: 'a', newText: 'b'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.diffs, hasLength(1));
+      expect(item.diffs.single.path, 'lib/foo.dart');
+      expect(item.diffs.single.oldText, 'a');
+      expect(item.diffs.single.newText, 'b');
+    });
+
+    test('a second diff event for the same tool call appends rather than replaces', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'multi_edit'))
+        ..apply(diffEvent('t1', 'lib/a.dart', newText: 'a2'))
+        ..apply(diffEvent('t1', 'lib/b.dart', newText: 'b2'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.diffs, hasLength(2));
+      expect(item.diffs[0].path, 'lib/a.dart');
+      expect(item.diffs[1].path, 'lib/b.dart');
+    });
+
+    test('diff event for an unknown toolCallId creates an orphan entry, same as args/result would', () {
+      final r = ConversationReducer()..apply(diffEvent('unknown', 'lib/c.dart', newText: 'c'));
+
+      expect(r.current.timeline, hasLength(1));
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.id, 'unknown');
+      expect(item.name, '');
+      expect(item.diffs.single.path, 'lib/c.dart');
+    });
+
+    test('new-file diff (no oldText in the event) defaults oldText to empty string', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'write_file'))
+        ..apply(diffEvent('t1', 'lib/new.dart', newText: 'content'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.diffs.single.oldText, '');
+    });
+
+    test('a malformed diff event (missing newText) is ignored, not crashed on', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'edit_file'))
+        ..apply(const CustomEvent(
+            name: 'pocketcoder:diff', value: {'toolCallId': 't1', 'path': 'lib/x.dart'}));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.diffs, isEmpty);
+    });
+  });
+
   group('permission/elicitation via state delta', () {
     test('permission sub-path add inserts a marker after its correlated tool call', () {
       final r = ConversationReducer()

@@ -123,6 +123,22 @@ class ConversationReducer {
       case ag_ui.ToolCallEndEvent():
         break; // terminal state is "has a result"; nothing to flip here.
 
+      case ag_ui.CustomEvent(name: 'pocketcoder:diff'):
+        final value = event.value;
+        if (value is Map) {
+          final toolCallId = value['toolCallId'];
+          final path = value['path'];
+          final newText = value['newText'];
+          if (toolCallId is String && path is String && newText is String) {
+            final diff = ToolDiff(
+              path: path,
+              oldText: (value['oldText'] as String?) ?? '',
+              newText: newText,
+            );
+            _updateTool(toolCallId, (t) => t.copyWith(diffs: [...t.diffs, diff]));
+          }
+        }
+
       case ag_ui.StateSnapshotEvent():
         final snapshot = event.snapshot;
         _pocketcoder.clear();

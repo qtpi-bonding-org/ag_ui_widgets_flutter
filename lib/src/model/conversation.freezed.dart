@@ -13,6 +13,320 @@ part of 'conversation.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$ToolDiff {
+  String get path;
+  String get oldText;
+  String get newText;
+
+  /// Create a copy of ToolDiff
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ToolDiffCopyWith<ToolDiff> get copyWith =>
+      _$ToolDiffCopyWithImpl<ToolDiff>(this as ToolDiff, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ToolDiff &&
+            (identical(other.path, path) || other.path == path) &&
+            (identical(other.oldText, oldText) || other.oldText == oldText) &&
+            (identical(other.newText, newText) || other.newText == newText));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, path, oldText, newText);
+
+  @override
+  String toString() {
+    return 'ToolDiff(path: $path, oldText: $oldText, newText: $newText)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ToolDiffCopyWith<$Res> {
+  factory $ToolDiffCopyWith(ToolDiff value, $Res Function(ToolDiff) _then) =
+      _$ToolDiffCopyWithImpl;
+  @useResult
+  $Res call({String path, String oldText, String newText});
+}
+
+/// @nodoc
+class _$ToolDiffCopyWithImpl<$Res> implements $ToolDiffCopyWith<$Res> {
+  _$ToolDiffCopyWithImpl(this._self, this._then);
+
+  final ToolDiff _self;
+  final $Res Function(ToolDiff) _then;
+
+  /// Create a copy of ToolDiff
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? path = null,
+    Object? oldText = null,
+    Object? newText = null,
+  }) {
+    return _then(_self.copyWith(
+      path: null == path
+          ? _self.path
+          : path // ignore: cast_nullable_to_non_nullable
+              as String,
+      oldText: null == oldText
+          ? _self.oldText
+          : oldText // ignore: cast_nullable_to_non_nullable
+              as String,
+      newText: null == newText
+          ? _self.newText
+          : newText // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ToolDiff].
+extension ToolDiffPatterns on ToolDiff {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ToolDiff value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ToolDiff() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ToolDiff value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ToolDiff():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ToolDiff value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ToolDiff() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String path, String oldText, String newText)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ToolDiff() when $default != null:
+        return $default(_that.path, _that.oldText, _that.newText);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String path, String oldText, String newText) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ToolDiff():
+        return $default(_that.path, _that.oldText, _that.newText);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String path, String oldText, String newText)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ToolDiff() when $default != null:
+        return $default(_that.path, _that.oldText, _that.newText);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _ToolDiff implements ToolDiff {
+  const _ToolDiff(
+      {required this.path, this.oldText = '', required this.newText});
+
+  @override
+  final String path;
+  @override
+  @JsonKey()
+  final String oldText;
+  @override
+  final String newText;
+
+  /// Create a copy of ToolDiff
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ToolDiffCopyWith<_ToolDiff> get copyWith =>
+      __$ToolDiffCopyWithImpl<_ToolDiff>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ToolDiff &&
+            (identical(other.path, path) || other.path == path) &&
+            (identical(other.oldText, oldText) || other.oldText == oldText) &&
+            (identical(other.newText, newText) || other.newText == newText));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, path, oldText, newText);
+
+  @override
+  String toString() {
+    return 'ToolDiff(path: $path, oldText: $oldText, newText: $newText)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ToolDiffCopyWith<$Res>
+    implements $ToolDiffCopyWith<$Res> {
+  factory _$ToolDiffCopyWith(_ToolDiff value, $Res Function(_ToolDiff) _then) =
+      __$ToolDiffCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String path, String oldText, String newText});
+}
+
+/// @nodoc
+class __$ToolDiffCopyWithImpl<$Res> implements _$ToolDiffCopyWith<$Res> {
+  __$ToolDiffCopyWithImpl(this._self, this._then);
+
+  final _ToolDiff _self;
+  final $Res Function(_ToolDiff) _then;
+
+  /// Create a copy of ToolDiff
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? path = null,
+    Object? oldText = null,
+    Object? newText = null,
+  }) {
+    return _then(_ToolDiff(
+      path: null == path
+          ? _self.path
+          : path // ignore: cast_nullable_to_non_nullable
+              as String,
+      oldText: null == oldText
+          ? _self.oldText
+          : oldText // ignore: cast_nullable_to_non_nullable
+              as String,
+      newText: null == newText
+          ? _self.newText
+          : newText // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$TimelineItem {
   @override
   bool operator ==(Object other) {
@@ -164,7 +478,8 @@ extension TimelineItemPatterns on TimelineItem {
     TResult Function(String id, ChatMessageKind kind, String role, String text)?
         text,
     TResult Function(String id, String role, String text)? textStream,
-    TResult Function(String id, String name, String args, String? result)?
+    TResult Function(String id, String name, String args, String? result,
+            List<ToolDiff> diffs)?
         toolCall,
     TResult Function(String requestId)? permission,
     TResult Function(String requestId)? elicitation,
@@ -177,7 +492,8 @@ extension TimelineItemPatterns on TimelineItem {
       case TextStreamTimelineItem() when textStream != null:
         return textStream(_that.id, _that.role, _that.text);
       case ToolCallTimelineItem() when toolCall != null:
-        return toolCall(_that.id, _that.name, _that.args, _that.result);
+        return toolCall(
+            _that.id, _that.name, _that.args, _that.result, _that.diffs);
       case PermissionTimelineItem() when permission != null:
         return permission(_that.requestId);
       case ElicitationTimelineItem() when elicitation != null:
@@ -206,8 +522,8 @@ extension TimelineItemPatterns on TimelineItem {
             String id, ChatMessageKind kind, String role, String text)
         text,
     required TResult Function(String id, String role, String text) textStream,
-    required TResult Function(
-            String id, String name, String args, String? result)
+    required TResult Function(String id, String name, String args,
+            String? result, List<ToolDiff> diffs)
         toolCall,
     required TResult Function(String requestId) permission,
     required TResult Function(String requestId) elicitation,
@@ -219,7 +535,8 @@ extension TimelineItemPatterns on TimelineItem {
       case TextStreamTimelineItem():
         return textStream(_that.id, _that.role, _that.text);
       case ToolCallTimelineItem():
-        return toolCall(_that.id, _that.name, _that.args, _that.result);
+        return toolCall(
+            _that.id, _that.name, _that.args, _that.result, _that.diffs);
       case PermissionTimelineItem():
         return permission(_that.requestId);
       case ElicitationTimelineItem():
@@ -245,7 +562,8 @@ extension TimelineItemPatterns on TimelineItem {
             String id, ChatMessageKind kind, String role, String text)?
         text,
     TResult? Function(String id, String role, String text)? textStream,
-    TResult? Function(String id, String name, String args, String? result)?
+    TResult? Function(String id, String name, String args, String? result,
+            List<ToolDiff> diffs)?
         toolCall,
     TResult? Function(String requestId)? permission,
     TResult? Function(String requestId)? elicitation,
@@ -257,7 +575,8 @@ extension TimelineItemPatterns on TimelineItem {
       case TextStreamTimelineItem() when textStream != null:
         return textStream(_that.id, _that.role, _that.text);
       case ToolCallTimelineItem() when toolCall != null:
-        return toolCall(_that.id, _that.name, _that.args, _that.result);
+        return toolCall(
+            _that.id, _that.name, _that.args, _that.result, _that.diffs);
       case PermissionTimelineItem() when permission != null:
         return permission(_that.requestId);
       case ElicitationTimelineItem() when elicitation != null:
@@ -441,13 +760,25 @@ class _$TextStreamTimelineItemCopyWithImpl<$Res>
 
 class ToolCallTimelineItem implements TimelineItem {
   const ToolCallTimelineItem(
-      {required this.id, required this.name, this.args = '', this.result});
+      {required this.id,
+      required this.name,
+      this.args = '',
+      this.result,
+      final List<ToolDiff> diffs = const <ToolDiff>[]})
+      : _diffs = diffs;
 
   final String id;
   final String name;
   @JsonKey()
   final String args;
   final String? result;
+  final List<ToolDiff> _diffs;
+  @JsonKey()
+  List<ToolDiff> get diffs {
+    if (_diffs is EqualUnmodifiableListView) return _diffs;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_diffs);
+  }
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
@@ -465,15 +796,17 @@ class ToolCallTimelineItem implements TimelineItem {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.args, args) || other.args == args) &&
-            (identical(other.result, result) || other.result == result));
+            (identical(other.result, result) || other.result == result) &&
+            const DeepCollectionEquality().equals(other._diffs, _diffs));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, args, result);
+  int get hashCode => Object.hash(runtimeType, id, name, args, result,
+      const DeepCollectionEquality().hash(_diffs));
 
   @override
   String toString() {
-    return 'TimelineItem.toolCall(id: $id, name: $name, args: $args, result: $result)';
+    return 'TimelineItem.toolCall(id: $id, name: $name, args: $args, result: $result, diffs: $diffs)';
   }
 }
 
@@ -484,7 +817,12 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
           $Res Function(ToolCallTimelineItem) _then) =
       _$ToolCallTimelineItemCopyWithImpl;
   @useResult
-  $Res call({String id, String name, String args, String? result});
+  $Res call(
+      {String id,
+      String name,
+      String args,
+      String? result,
+      List<ToolDiff> diffs});
 }
 
 /// @nodoc
@@ -503,6 +841,7 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
     Object? name = null,
     Object? args = null,
     Object? result = freezed,
+    Object? diffs = null,
   }) {
     return _then(ToolCallTimelineItem(
       id: null == id
@@ -521,6 +860,10 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self.result
           : result // ignore: cast_nullable_to_non_nullable
               as String?,
+      diffs: null == diffs
+          ? _self._diffs
+          : diffs // ignore: cast_nullable_to_non_nullable
+              as List<ToolDiff>,
     ));
   }
 }

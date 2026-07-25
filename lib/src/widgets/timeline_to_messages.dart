@@ -26,11 +26,19 @@ chat_core.Message _toMessage(TimelineItem item) {
         authorId: role == 'user' ? kUserAuthorId : kAgentAuthorId,
         streamId: id,
       ),
-    ToolCallTimelineItem(:final id, :final name, :final args, :final result) =>
+    ToolCallTimelineItem(:final id, :final name, :final args, :final result, :final diffs) =>
       chat_core.Message.custom(
         id: id,
         authorId: kAgentAuthorId,
-        metadata: {'kind': 'toolCall', 'name': name, 'args': args, 'result': result},
+        metadata: {
+          'kind': 'toolCall',
+          'name': name,
+          'args': args,
+          'result': result,
+          'diffs': diffs
+              .map((d) => {'path': d.path, 'oldText': d.oldText, 'newText': d.newText})
+              .toList(),
+        },
       ),
     PermissionTimelineItem(:final requestId) => chat_core.Message.custom(
         id: requestId,

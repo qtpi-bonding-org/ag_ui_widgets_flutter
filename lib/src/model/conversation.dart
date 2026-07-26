@@ -105,6 +105,7 @@ sealed class TimelineItem with _$TimelineItem {
   /// are nullable for the same reason as on [permissionRequest].
   const factory TimelineItem.toolRequest({
     required String requestId,
+    required String toolName,
     String? toolTitle,
     String? toolKind,
     required String argsJson,

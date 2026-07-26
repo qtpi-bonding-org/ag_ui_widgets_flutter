@@ -46,9 +46,10 @@ void main() {
     expect(e.url, isNull);
   });
 
-  test('ToolRequestTimelineItem requires only requestId and argsJson', () {
-    const item = TimelineItem.toolRequest(requestId: 't1', argsJson: '{}');
+  test('ToolRequestTimelineItem requires requestId, toolName, argsJson; toolTitle/toolKind stay nullable', () {
+    const item = TimelineItem.toolRequest(requestId: 't1', toolName: 'propose_edit', argsJson: '{}');
     final t = item as ToolRequestTimelineItem;
+    expect(t.toolName, 'propose_edit');
     expect(t.toolTitle, isNull);
     expect(t.argsJson, '{}');
   });

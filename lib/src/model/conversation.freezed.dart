@@ -838,8 +838,8 @@ extension TimelineItemPatterns on TimelineItem {
     TResult Function(String requestId, String message, String mode,
             Map<String, dynamic>? schema, String? url)?
         elicitationRequest,
-    TResult Function(String requestId, String? toolTitle, String? toolKind,
-            String argsJson)?
+    TResult Function(String requestId, String toolName, String? toolTitle,
+            String? toolKind, String argsJson)?
         toolRequest,
     required TResult orElse(),
   }) {
@@ -863,8 +863,8 @@ extension TimelineItemPatterns on TimelineItem {
         return elicitationRequest(_that.requestId, _that.message, _that.mode,
             _that.schema, _that.url);
       case ToolRequestTimelineItem() when toolRequest != null:
-        return toolRequest(
-            _that.requestId, _that.toolTitle, _that.toolKind, _that.argsJson);
+        return toolRequest(_that.requestId, _that.toolName, _that.toolTitle,
+            _that.toolKind, _that.argsJson);
       case _:
         return orElse();
     }
@@ -904,8 +904,8 @@ extension TimelineItemPatterns on TimelineItem {
     required TResult Function(String requestId, String message, String mode,
             Map<String, dynamic>? schema, String? url)
         elicitationRequest,
-    required TResult Function(String requestId, String? toolTitle,
-            String? toolKind, String argsJson)
+    required TResult Function(String requestId, String toolName,
+            String? toolTitle, String? toolKind, String argsJson)
         toolRequest,
   }) {
     final _that = this;
@@ -928,8 +928,8 @@ extension TimelineItemPatterns on TimelineItem {
         return elicitationRequest(_that.requestId, _that.message, _that.mode,
             _that.schema, _that.url);
       case ToolRequestTimelineItem():
-        return toolRequest(
-            _that.requestId, _that.toolTitle, _that.toolKind, _that.argsJson);
+        return toolRequest(_that.requestId, _that.toolName, _that.toolTitle,
+            _that.toolKind, _that.argsJson);
     }
   }
 
@@ -962,8 +962,8 @@ extension TimelineItemPatterns on TimelineItem {
     TResult? Function(String requestId, String message, String mode,
             Map<String, dynamic>? schema, String? url)?
         elicitationRequest,
-    TResult? Function(String requestId, String? toolTitle, String? toolKind,
-            String argsJson)?
+    TResult? Function(String requestId, String toolName, String? toolTitle,
+            String? toolKind, String argsJson)?
         toolRequest,
   }) {
     final _that = this;
@@ -986,8 +986,8 @@ extension TimelineItemPatterns on TimelineItem {
         return elicitationRequest(_that.requestId, _that.message, _that.mode,
             _that.schema, _that.url);
       case ToolRequestTimelineItem() when toolRequest != null:
-        return toolRequest(
-            _that.requestId, _that.toolTitle, _that.toolKind, _that.argsJson);
+        return toolRequest(_that.requestId, _that.toolName, _that.toolTitle,
+            _that.toolKind, _that.argsJson);
       case _:
         return null;
     }
@@ -1642,11 +1642,13 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
 class ToolRequestTimelineItem implements TimelineItem {
   const ToolRequestTimelineItem(
       {required this.requestId,
+      required this.toolName,
       this.toolTitle,
       this.toolKind,
       required this.argsJson});
 
   final String requestId;
+  final String toolName;
   final String? toolTitle;
   final String? toolKind;
   final String argsJson;
@@ -1666,6 +1668,8 @@ class ToolRequestTimelineItem implements TimelineItem {
             other is ToolRequestTimelineItem &&
             (identical(other.requestId, requestId) ||
                 other.requestId == requestId) &&
+            (identical(other.toolName, toolName) ||
+                other.toolName == toolName) &&
             (identical(other.toolTitle, toolTitle) ||
                 other.toolTitle == toolTitle) &&
             (identical(other.toolKind, toolKind) ||
@@ -1675,12 +1679,12 @@ class ToolRequestTimelineItem implements TimelineItem {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, requestId, toolTitle, toolKind, argsJson);
+  int get hashCode => Object.hash(
+      runtimeType, requestId, toolName, toolTitle, toolKind, argsJson);
 
   @override
   String toString() {
-    return 'TimelineItem.toolRequest(requestId: $requestId, toolTitle: $toolTitle, toolKind: $toolKind, argsJson: $argsJson)';
+    return 'TimelineItem.toolRequest(requestId: $requestId, toolName: $toolName, toolTitle: $toolTitle, toolKind: $toolKind, argsJson: $argsJson)';
   }
 }
 
@@ -1692,7 +1696,11 @@ abstract mixin class $ToolRequestTimelineItemCopyWith<$Res>
       _$ToolRequestTimelineItemCopyWithImpl;
   @useResult
   $Res call(
-      {String requestId, String? toolTitle, String? toolKind, String argsJson});
+      {String requestId,
+      String toolName,
+      String? toolTitle,
+      String? toolKind,
+      String argsJson});
 }
 
 /// @nodoc
@@ -1708,6 +1716,7 @@ class _$ToolRequestTimelineItemCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? requestId = null,
+    Object? toolName = null,
     Object? toolTitle = freezed,
     Object? toolKind = freezed,
     Object? argsJson = null,
@@ -1716,6 +1725,10 @@ class _$ToolRequestTimelineItemCopyWithImpl<$Res>
       requestId: null == requestId
           ? _self.requestId
           : requestId // ignore: cast_nullable_to_non_nullable
+              as String,
+      toolName: null == toolName
+          ? _self.toolName
+          : toolName // ignore: cast_nullable_to_non_nullable
               as String,
       toolTitle: freezed == toolTitle
           ? _self.toolTitle

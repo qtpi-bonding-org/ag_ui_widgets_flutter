@@ -58,7 +58,19 @@ episutra (`agent-client-protocol` via `acp-core`/`episutra-frb`).
   toolKind (nullable), description (nullable), options (required List<PermissionOption>)}`;
   `ElicitationRequestTimelineItem{requestId (required), message (required), mode (required),
   schema (nullable Map<String,dynamic>), url (nullable String)}`; `ToolRequestTimelineItem{requestId
-  (required), toolTitle (nullable), toolKind (nullable), argsJson (required)}`.
+  (required), toolName (required — the machine dispatch key for a client-executed tool, e.g.
+  "propose_edit"; NOT an ACP-native title/kind, see Task 1 Step 3), toolTitle (nullable,
+  ACP-native), toolKind (nullable, ACP-native), argsJson (required)}`.
+
+> **Design correction (post-review):** `ToolRequestTimelineItem` originally shipped with only
+> `toolTitle`/`toolKind` (copied from `PermissionRequestTimelineItem`'s ACP-native shape). That's
+> wrong for this variant: it models a *client-executed* tool call (episutra's Flutter-declared
+> tools), and there is no ACP-native title/kind for those — the wire's `toolName` is the machine
+> dispatch key `NoteChatCubit`'s dispatch switch is keyed on (`"propose_edit"`,
+> `"render_surface"`, etc.), not a human-readable label. A required `toolName` field was added
+> below to carry it explicitly, alongside (not replacing) the still-nullable ACP-native
+> `toolTitle`/`toolKind`. Adapter A (pocketcoder) has no client-executed-tool convention today, so
+> it never constructs this variant — nothing is forced to invent a placeholder `toolName`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -91,9 +103,10 @@ test('ElicitationRequestTimelineItem carries message/mode/schema/url', () {
   expect(e.url, isNull);
 });
 
-test('ToolRequestTimelineItem requires only requestId and argsJson', () {
-  const item = TimelineItem.toolRequest(requestId: 't1', argsJson: '{}');
+test('ToolRequestTimelineItem requires requestId, toolName, argsJson; toolTitle/toolKind stay nullable', () {
+  const item = TimelineItem.toolRequest(requestId: 't1', toolName: 'propose_edit', argsJson: '{}');
   final t = item as ToolRequestTimelineItem;
+  expect(t.toolName, 'propose_edit');
   expect(t.toolTitle, isNull);
   expect(t.argsJson, '{}');
 });
@@ -145,6 +158,7 @@ Add to the `TimelineItem` sealed class body (after the existing `.elicitation` f
 
   const factory TimelineItem.toolRequest({
     required String requestId,
+    required String toolName,
     String? toolTitle,
     String? toolKind,
     required String argsJson,
@@ -638,7 +652,7 @@ group('permission/elicitation/tool-request (Adapter B: canonical CustomEvent)', 
     }));
     final item = r.current.timeline.single as ToolRequestTimelineItem;
     expect(item.requestId, 't1');
-    expect(item.toolTitle, 'propose_edit');
+    expect(item.toolName, 'propose_edit');
     expect(item.argsJson, '{"changeId":"c1"}');
   });
 
@@ -737,7 +751,7 @@ In `conversation_reducer.dart`'s `apply()` method, add before the existing
               _timeline.length,
               TimelineItem.toolRequest(
                 requestId: callId,
-                toolTitle: value['toolName'] as String?,
+                toolName: (value['toolName'] as String?) ?? '',
                 argsJson: (value['args'] as String?) ?? '{}',
               ),
             );
@@ -884,7 +898,7 @@ testWidgets('permissionBuilder receives the full TimelineItem, not just an id', 
 
 testWidgets('toolRequestBuilder defaults to rendering nothing', (tester) async {
   const conversation = Conversation(timeline: [
-    TimelineItem.toolRequest(requestId: 't1', argsJson: '{}'),
+    TimelineItem.toolRequest(requestId: 't1', toolName: 'noop', argsJson: '{}'),
   ]);
   await tester.pumpWidget(MaterialApp(
     home: AgUiChat(conversation: conversation, currentUserId: 'user', onSendMessage: (_) {}),

@@ -114,8 +114,17 @@ const factory TimelineItem.elicitationRequest({
 
 const factory TimelineItem.toolRequest({
   required String requestId,
-  String? toolTitle,
-  String? toolKind,
+  required String toolName,  // machine dispatch key for a CLIENT-executed tool (e.g.
+                              // "propose_edit", "render_surface") — NOT an ACP-native
+                              // ToolCallUpdate.title/kind; there is no ACP-native title/kind for
+                              // these, since they're Flutter-declared client tools, not built-in
+                              // ACP tool calls. Adapter B (episutra) populates this straight from
+                              // the wire `toolName` field. Adapter A (pocketcoder) has no
+                              // client-executed-tool convention today, so it never constructs
+                              // this variant at all — toolName has no adapter forced to invent a
+                              // placeholder for it.
+  String? toolTitle,         // ACP-native title, if this ever carries a real ACP tool call
+  String? toolKind,          // ACP-native kind, ditto
   required String argsJson,
 }) = ToolRequestTimelineItem;
 

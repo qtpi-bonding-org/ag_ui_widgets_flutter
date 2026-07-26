@@ -169,7 +169,54 @@ void main() {
       });
     });
 
-    test('permission sub-path add inserts a marker after its correlated tool call', () {
+    group('permission (Adapter A: pocketcoder StateDelta)', () {
+      test('StateSnapshot with /pocketcoder/permission produces a full-payload item (toolTitle null today)', () {
+        final r = ConversationReducer();
+        r.apply(const StateSnapshotEvent(snapshot: {
+          'pocketcoder': {
+            'permission': {
+              'requestId': 'p1',
+              'status': 'pending',
+              'options': [
+                {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
+                {'optionId': 'deny', 'name': 'Deny', 'kind': 'reject_once'},
+              ],
+            }
+          }
+        }));
+        expect(r.current.timeline, hasLength(1));
+        final item = r.current.timeline.single as PermissionRequestTimelineItem;
+        expect(item.requestId, 'p1');
+        expect(item.toolTitle, isNull); // pocketcoder doesn't send this yet (Phase 2, Task 9)
+        expect(item.description, isNull); // never an ACP wire field
+        expect(item.options, hasLength(2));
+        expect(item.options[0].optionId, 'allow');
+        expect(item.options[0].label, 'Allow');
+        expect(item.options[0].kind, 'allow_once');
+      });
+
+      test('once pocketcoder forwards title/kind (Phase 2), the adapter reads them', () {
+        final r = ConversationReducer();
+        r.apply(const StateSnapshotEvent(snapshot: {
+          'pocketcoder': {
+            'permission': {
+              'requestId': 'p2',
+              'status': 'pending',
+              'title': 'Run shell command',
+              'kind': 'execute',
+              'options': [
+                {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
+              ],
+            }
+          }
+        }));
+        final item = r.current.timeline.single as PermissionRequestTimelineItem;
+        expect(item.toolTitle, 'Run shell command');
+        expect(item.toolKind, 'execute');
+      });
+    });
+
+    test('permission sub-path add inserts a full-payload item after its correlated tool call', () {
       final r = ConversationReducer()
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'write_file'))
         ..apply(_delta('/pocketcoder/permission',
@@ -177,7 +224,7 @@ void main() {
 
       expect(r.current.timeline, hasLength(2));
       expect(r.current.timeline[0], isA<ToolCallTimelineItem>());
-      final marker = r.current.timeline[1] as PermissionTimelineItem;
+      final marker = r.current.timeline[1] as PermissionRequestTimelineItem;
       expect(marker.requestId, 'p1');
     });
 

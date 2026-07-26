@@ -35,6 +35,11 @@ class ConversationReducer {
   final Map<String, _OpenMessage> _openReasoning = {};
   final Map<String, int> _toolTimelineIndex = {};
   final Map<String, dynamic> _pocketcoder = {};
+  final Set<String> _adapterAIds = {};
+  // Stub — always-empty for now. Task 4 replaces this with real mutable
+  // tracking + `_reset()` exclusion. Exists here so `_syncPermission` /
+  // `_syncElicitation` can already consult it.
+  final Set<String> _resolvedIds = {};
   bool _isRunning = false;
   String? _runError;
 
@@ -199,30 +204,58 @@ class ConversationReducer {
     }
   }
 
+  void _removeAdapterAItemsWhere(bool Function(TimelineItem) test) {
+    _removeTimelineItemsWhere((item) {
+      final id = switch (item) {
+        PermissionRequestTimelineItem(:final requestId) => requestId,
+        ElicitationRequestTimelineItem(:final requestId) => requestId,
+        _ => null,
+      };
+      return test(item) && id != null && _adapterAIds.contains(id);
+    });
+  }
+
   void _syncPermission() {
-    _removeTimelineItemsWhere((item) => item is PermissionTimelineItem);
+    _removeAdapterAItemsWhere((item) => item is PermissionRequestTimelineItem);
     final permission = _pocketcoder['permission'];
     if (permission is! Map) return;
     final requestId = permission['requestId'];
     if (requestId is! String) return;
+    if (_resolvedIds.contains(requestId)) return;
+    final options = (permission['options'] as List? ?? const [])
+        .whereType<Map>()
+        .map((o) => PermissionOption(
+              optionId: (o['optionId'] as String?) ?? '',
+              label: (o['name'] as String?) ?? '',
+              kind: (o['kind'] as String?) ?? '',
+            ))
+        .toList();
     final toolCallId = permission['toolCallId'];
     final toolIdx = toolCallId is String ? _toolTimelineIndex[toolCallId] : null;
+    _adapterAIds.add(requestId);
     _insertTimelineItem(
       toolIdx != null ? toolIdx + 1 : _timeline.length,
-      TimelineItem.permission(requestId: requestId),
+      TimelineItem.permissionRequest(
+        requestId: requestId,
+        toolTitle: permission['title'] as String?,
+        toolKind: permission['kind'] as String?,
+        options: options,
+      ),
     );
   }
 
   void _syncElicitation() {
-    _removeTimelineItemsWhere((item) => item is ElicitationRequestTimelineItem);
+    _removeAdapterAItemsWhere((item) => item is ElicitationRequestTimelineItem);
     final elicitation = _pocketcoder['elicitation'];
     if (elicitation is! Map) return;
     final requestId = elicitation['elicitationId'];
     if (requestId is! String) return;
+    if (_resolvedIds.contains(requestId)) return;
     final message = elicitation['message'] as String? ?? '';
     final mode = elicitation['mode'] as String? ?? 'form';
     final schema = elicitation['requestedSchema'];
     final url = elicitation['url'] as String?;
+    _adapterAIds.add(requestId);
     _insertTimelineItem(
       _timeline.length,
       TimelineItem.elicitationRequest(

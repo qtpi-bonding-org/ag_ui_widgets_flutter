@@ -20,6 +20,8 @@ abstract class IAgUiTransport {
 
   Future<void> respondElicitation(String elicitationId, Map<String, dynamic> response);
 
+  Future<void> submitToolResult(String callId, String resultJson);
+
   Future<void> setMode(String modeId);
 
   Future<void> setConfigOption(String optionId, String value);

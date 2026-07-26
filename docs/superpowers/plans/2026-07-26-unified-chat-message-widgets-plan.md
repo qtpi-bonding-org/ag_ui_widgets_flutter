@@ -1,3 +1,8 @@
+---
+status: done
+completed: 2026-07-26
+---
+
 # Unified Chat Message Widgets Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -57,7 +62,7 @@ so the two builder classes only differ in layout/decoration, never in card logic
 - Consumes: nothing new (only `flutter_markdown_plus`, `package:markdown` — new deps added in this task).
 - Produces: `Widget chatMarkdownBody(BuildContext context, String text, {MarkdownStyleSheet Function(BuildContext)? styleSheetBuilder})` — used by both builder classes in Task 4.
 
-- [ ] **Step 1: Add the new dependencies**
+- [x] **Step 1: Add the new dependencies**
 
 Edit `pubspec.yaml`, adding to the `dependencies:` block (alphabetical order to match the existing list):
 
@@ -68,7 +73,7 @@ Edit `pubspec.yaml`, adding to the `dependencies:` block (alphabetical order to 
 
 Run `flutter pub get` from the repo root to confirm resolution.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Create `test/widgets/markdown_body_test.dart`:
 
@@ -123,12 +128,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2b: Run test to verify it fails**
+- [x] **Step 2b: Run test to verify it fails**
 
 Run: `flutter test test/widgets/markdown_body_test.dart`
 Expected: FAIL — `markdown_body.dart` doesn't exist yet (import error).
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `lib/src/widgets/markdown_body.dart`:
 
@@ -155,12 +160,12 @@ Widget chatMarkdownBody(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `flutter test test/widgets/markdown_body_test.dart`
 Expected: PASS (4 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add pubspec.yaml pubspec.lock lib/src/widgets/markdown_body.dart test/widgets/markdown_body_test.dart
@@ -184,7 +189,7 @@ git commit -m "feat: add chatMarkdownBody shared markdown rendering helper"
   - `BubbleChatStyle({required Color sentBackground, required Color receivedBackground, Color? sentBorder, Color? receivedBorder, required TextStyle textStyle, required double maxWidth, BorderRadius sentRadius = const BorderRadius.all(Radius.circular(12)), BorderRadius receivedRadius = const BorderRadius.all(Radius.circular(12)), EdgeInsets padding = const EdgeInsets.symmetric(vertical: 8, horizontal: 12), MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder})`
   - Both used by Task 5's builder classes.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `test/style/stacked_chat_style_test.dart`:
 
@@ -256,12 +261,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 1b: Run tests to verify they fail**
+- [x] **Step 1b: Run tests to verify they fail**
 
 Run: `flutter test test/style/stacked_chat_style_test.dart test/style/bubble_chat_style_test.dart`
 Expected: FAIL — files under `lib/src/style/` don't exist yet.
 
-- [ ] **Step 2: Write the implementation**
+- [x] **Step 2: Write the implementation**
 
 Create `lib/src/style/stacked_chat_style.dart`:
 
@@ -320,17 +325,17 @@ abstract class BubbleChatStyle with _$BubbleChatStyle {
 }
 ```
 
-- [ ] **Step 3: Run codegen**
+- [x] **Step 3: Run codegen**
 
 Run: `dart run build_runner build --delete-conflicting-outputs`
 Expected: generates `lib/src/style/stacked_chat_style.freezed.dart` and `lib/src/style/bubble_chat_style.freezed.dart` with no errors.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `flutter test test/style/stacked_chat_style_test.dart test/style/bubble_chat_style_test.dart`
 Expected: PASS (4 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/src/style/stacked_chat_style.dart lib/src/style/stacked_chat_style.freezed.dart \
@@ -351,7 +356,7 @@ git commit -m "feat: add StackedChatStyle and BubbleChatStyle config classes"
 - Consumes: `ToolRequestTimelineItem` (already defined in `lib/src/model/conversation.dart`).
 - Produces: `ChatActionCallbacks({required void Function(String requestId, {String? optionId, bool cancelled}) onPermissionOptionSelected, required void Function(String requestId, Map<String, dynamic> response) onElicitationRespond, Map<String, Widget Function(BuildContext, ToolRequestTimelineItem)> toolRequestOverrides = const {}})` — used by Task 4's shared helpers and Task 5's builder classes.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `test/style/chat_action_callbacks_test.dart`:
 
@@ -405,12 +410,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 1b: Run test to verify it fails**
+- [x] **Step 1b: Run test to verify it fails**
 
 Run: `flutter test test/style/chat_action_callbacks_test.dart`
 Expected: FAIL — `chat_action_callbacks.dart` doesn't exist yet.
 
-- [ ] **Step 2: Write the implementation**
+- [x] **Step 2: Write the implementation**
 
 Create `lib/src/style/chat_action_callbacks.dart`:
 
@@ -451,12 +456,12 @@ class ChatActionCallbacks {
 }
 ```
 
-- [ ] **Step 3: Run test to verify it passes**
+- [x] **Step 3: Run test to verify it passes**
 
 Run: `flutter test test/style/chat_action_callbacks_test.dart`
 Expected: PASS (3 tests)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add lib/src/style/chat_action_callbacks.dart test/style/chat_action_callbacks_test.dart
@@ -479,7 +484,7 @@ git commit -m "feat: add ChatActionCallbacks"
   - `Widget buildToolRequestCardContent(BuildContext context, ToolRequestTimelineItem item, {required BoxDecoration decoration, required TextStyle textStyle, required Map<String, Widget Function(BuildContext, ToolRequestTimelineItem)> overrides})`
   - All three used by Task 5's `StackedChatBuilders`/`BubbleChatBuilders`. **Not exported from the barrel** (Task 6 must not add an export line for this file).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `test/widgets/chat_action_cards_test.dart`:
 
@@ -575,12 +580,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 1b: Run tests to verify they fail**
+- [x] **Step 1b: Run tests to verify they fail**
 
 Run: `flutter test test/widgets/chat_action_cards_test.dart`
 Expected: FAIL — `chat_action_cards.dart` doesn't exist yet.
 
-- [ ] **Step 2: Write the implementation**
+- [x] **Step 2: Write the implementation**
 
 Create `lib/src/widgets/chat_action_cards.dart`:
 
@@ -716,12 +721,12 @@ Widget buildToolRequestCardContent(
 }
 ```
 
-- [ ] **Step 3: Run tests to verify they pass**
+- [x] **Step 3: Run tests to verify they pass**
 
 Run: `flutter test test/widgets/chat_action_cards_test.dart`
 Expected: PASS (4 tests)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add lib/src/widgets/chat_action_cards.dart test/widgets/chat_action_cards_test.dart
@@ -752,7 +757,7 @@ git commit -m "feat: add shared permission/elicitation/toolRequest card content 
   - `BubbleChatBuilders(BubbleChatStyle style, ChatActionCallbacks callbacks)` with the same five getters.
   - Both used directly by an app's `AgUiChat(...)` construction (out of scope for this plan — see Global Constraints).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `test/widgets/stacked_chat_builders_test.dart`:
 
@@ -970,12 +975,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 1b: Run tests to verify they fail**
+- [x] **Step 1b: Run tests to verify they fail**
 
 Run: `flutter test test/widgets/stacked_chat_builders_test.dart test/widgets/bubble_chat_builders_test.dart`
 Expected: FAIL — `stacked_chat_builders.dart`/`bubble_chat_builders.dart` don't exist yet.
 
-- [ ] **Step 2: Write the implementation**
+- [x] **Step 2: Write the implementation**
 
 Create `lib/src/widgets/stacked_chat_builders.dart`:
 
@@ -1192,12 +1197,12 @@ class BubbleChatBuilders {
 }
 ```
 
-- [ ] **Step 3: Run tests to verify they pass**
+- [x] **Step 3: Run tests to verify they pass**
 
 Run: `flutter test test/widgets/stacked_chat_builders_test.dart test/widgets/bubble_chat_builders_test.dart`
 Expected: PASS (4 tests + 3 tests)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add lib/src/widgets/stacked_chat_builders.dart lib/src/widgets/bubble_chat_builders.dart \
@@ -1218,7 +1223,7 @@ git commit -m "feat: add StackedChatBuilders and BubbleChatBuilders"
 - Consumes: every public type from Tasks 1–5 (`chatMarkdownBody`, `StackedChatStyle`, `BubbleChatStyle`, `ChatActionCallbacks`, `StackedChatBuilders`, `BubbleChatBuilders`).
 - Produces: nothing new — this is the final wiring task. No later task depends on this one.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 This test asserts the package's public barrel actually exposes everything an app needs, without reaching into `src/` — exactly the gap the spec's review caught.
 
@@ -1264,12 +1269,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 1b: Run test to verify it fails**
+- [x] **Step 1b: Run test to verify it fails**
 
 Run: `flutter test test/widgets/public_api_test.dart`
 Expected: FAIL — none of these symbols are exported from `package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart` yet (compile error: undefined names).
 
-- [ ] **Step 2: Add the barrel exports**
+- [x] **Step 2: Add the barrel exports**
 
 Edit `lib/ag_ui_widgets_flutter.dart`, adding these lines (keep the existing export lines untouched):
 
@@ -1284,7 +1289,7 @@ export 'src/widgets/markdown_body.dart' show chatMarkdownBody;
 
 Do **not** add an export line for `src/widgets/chat_action_cards.dart` — its three helper functions stay internal (Task 4's Interfaces block, Global Constraints).
 
-- [ ] **Step 3: Bump the package version**
+- [x] **Step 3: Bump the package version**
 
 Edit `pubspec.yaml`, change:
 
@@ -1298,17 +1303,17 @@ to:
 version: 0.3.0
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `flutter test test/widgets/public_api_test.dart`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Run the full test suite**
+- [x] **Step 5: Run the full test suite**
 
 Run: `flutter test`
 Expected: PASS — every test added in Tasks 1–6 plus all pre-existing tests (`conversation_test.dart`, `conversation_reducer_test.dart`, `ag_ui_chat_test.dart`, `timeline_to_messages_test.dart`) green.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/ag_ui_widgets_flutter.dart pubspec.yaml test/widgets/public_api_test.dart

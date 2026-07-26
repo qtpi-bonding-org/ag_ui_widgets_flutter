@@ -128,6 +128,47 @@ void main() {
   });
 
   group('permission/elicitation via state delta', () {
+    group('elicitation (Adapter A: pocketcoder StateDelta)', () {
+      test('StateSnapshot with /pocketcoder/elicitation produces a full-payload item', () {
+        final r = ConversationReducer();
+        r.apply(const StateSnapshotEvent(snapshot: {
+          'pocketcoder': {
+            'elicitation': {
+              'elicitationId': 'e1',
+              'message': 'Pick a color',
+              'mode': 'form',
+              'requestedSchema': {'type': 'object', 'properties': {'color': {'type': 'string'}}},
+            }
+          }
+        }));
+        expect(r.current.timeline, hasLength(1));
+        final item = r.current.timeline.single as ElicitationRequestTimelineItem;
+        expect(item.requestId, 'e1');
+        expect(item.message, 'Pick a color');
+        expect(item.mode, 'form');
+        expect(item.schema, {'type': 'object', 'properties': {'color': {'type': 'string'}}});
+        expect(item.url, isNull);
+      });
+
+      test('url-mode elicitation carries url, no schema', () {
+        final r = ConversationReducer();
+        r.apply(const StateSnapshotEvent(snapshot: {
+          'pocketcoder': {
+            'elicitation': {
+              'elicitationId': 'e2',
+              'message': 'Open this link',
+              'mode': 'url',
+              'url': 'https://example.com/auth',
+            }
+          }
+        }));
+        final item = r.current.timeline.single as ElicitationRequestTimelineItem;
+        expect(item.mode, 'url');
+        expect(item.url, 'https://example.com/auth');
+        expect(item.schema, isNull);
+      });
+    });
+
     test('permission sub-path add inserts a marker after its correlated tool call', () {
       final r = ConversationReducer()
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'write_file'))
@@ -145,7 +186,7 @@ void main() {
         ..apply(_delta('/pocketcoder/elicitation', value: {'elicitationId': 'e1'}));
 
       expect(r.current.timeline, hasLength(1));
-      expect((r.current.timeline.single as ElicitationTimelineItem).requestId, 'e1');
+      expect((r.current.timeline.single as ElicitationRequestTimelineItem).requestId, 'e1');
     });
   });
 

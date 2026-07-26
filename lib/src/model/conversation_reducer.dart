@@ -214,12 +214,25 @@ class ConversationReducer {
   }
 
   void _syncElicitation() {
-    _removeTimelineItemsWhere((item) => item is ElicitationTimelineItem);
+    _removeTimelineItemsWhere((item) => item is ElicitationRequestTimelineItem);
     final elicitation = _pocketcoder['elicitation'];
     if (elicitation is! Map) return;
     final requestId = elicitation['elicitationId'];
     if (requestId is! String) return;
-    _insertTimelineItem(_timeline.length, TimelineItem.elicitation(requestId: requestId));
+    final message = elicitation['message'] as String? ?? '';
+    final mode = elicitation['mode'] as String? ?? 'form';
+    final schema = elicitation['requestedSchema'];
+    final url = elicitation['url'] as String?;
+    _insertTimelineItem(
+      _timeline.length,
+      TimelineItem.elicitationRequest(
+        requestId: requestId,
+        message: message,
+        mode: mode,
+        schema: schema is Map ? Map<String, dynamic>.from(schema) : null,
+        url: url,
+      ),
+    );
   }
 
   void _applyPatch(Map<String, dynamic> op) {

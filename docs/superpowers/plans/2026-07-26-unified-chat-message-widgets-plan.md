@@ -625,7 +625,10 @@ Widget buildPermissionCardContent(
 }
 
 /// Card content for a pending elicitation request, shared by every
-/// builder family.
+/// builder family. Renders mode-appropriate input: a text field per
+/// [item.schema] property for `mode == 'form'`, a link button to
+/// [item.url] for `mode == 'url'`, otherwise a plain acknowledgement
+/// button.
 Widget buildElicitationCardContent(
   BuildContext context,
   ElicitationRequestTimelineItem item, {
@@ -633,6 +636,40 @@ Widget buildElicitationCardContent(
   required TextStyle textStyle,
   required void Function(String requestId, Map<String, dynamic> response) onRespond,
 }) {
+  Widget action;
+  switch (item.mode) {
+    case 'form':
+      final controllers = <String, TextEditingController>{
+        for (final key in (item.schema?.keys ?? const <String>[])) key: TextEditingController(),
+      };
+      action = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final entry in controllers.entries)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: TextField(controller: entry.value, decoration: InputDecoration(labelText: entry.key)),
+            ),
+          ElevatedButton(
+            onPressed: () => onRespond(item.requestId, {
+              for (final entry in controllers.entries) entry.key: entry.value.text,
+            }),
+            child: const Text('Submit'),
+          ),
+        ],
+      );
+    case 'url':
+      action = ElevatedButton(
+        onPressed: () => onRespond(item.requestId, {'url': item.url}),
+        child: const Text('Open link'),
+      );
+    default:
+      action = ElevatedButton(
+        onPressed: () => onRespond(item.requestId, {'acknowledged': true}),
+        child: const Text('Continue'),
+      );
+  }
   return Container(
     decoration: decoration,
     padding: const EdgeInsets.all(12),
@@ -642,10 +679,7 @@ Widget buildElicitationCardContent(
       children: [
         Text(item.message, style: textStyle),
         const SizedBox(height: 8),
-        ElevatedButton(
-          onPressed: () => onRespond(item.requestId, {'acknowledged': true}),
-          child: const Text('Continue'),
-        ),
+        action,
       ],
     ),
   );
@@ -727,6 +761,8 @@ Create `test/widgets/stacked_chat_builders_test.dart`:
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
+import 'package:ag_ui_widgets_flutter/src/style/chat_action_callbacks.dart';
+import 'package:ag_ui_widgets_flutter/src/style/stacked_chat_style.dart';
 import 'package:ag_ui_widgets_flutter/src/widgets/stacked_chat_builders.dart';
 
 void main() {
@@ -842,6 +878,8 @@ Create `test/widgets/bubble_chat_builders_test.dart`:
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
+import 'package:ag_ui_widgets_flutter/src/style/bubble_chat_style.dart';
+import 'package:ag_ui_widgets_flutter/src/style/chat_action_callbacks.dart';
 import 'package:ag_ui_widgets_flutter/src/widgets/bubble_chat_builders.dart';
 
 void main() {
@@ -1110,31 +1148,46 @@ class BubbleChatBuilders {
         );
       };
 
+  /// Wraps card content the same way [toolCallBuilder] wraps its own
+  /// output — Align(left) + maxWidth constraint — so permission/
+  /// elicitation/toolRequest cards stay visually consistent with the
+  /// rest of this bubble-family's width-constrained shells. There's no
+  /// `isSentByMe` here (AgUiChat's permission/elicitation/toolRequest
+  /// slots don't receive it), so these always align left, matching
+  /// toolCallBuilder.
+  Widget _leftAlignedBubble(Widget child) => Align(
+        alignment: Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: style.maxWidth),
+          child: Padding(padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), child: child),
+        ),
+      );
+
   Widget Function(BuildContext, TimelineItem) get permissionBuilder => (context, item) {
         final permission = item as PermissionRequestTimelineItem;
-        return buildPermissionCardContent(
+        return _leftAlignedBubble(buildPermissionCardContent(
           context, permission,
           decoration: _cardDecoration, textStyle: style.textStyle,
           onSelect: callbacks.onPermissionOptionSelected,
-        );
+        ));
       };
 
   Widget Function(BuildContext, TimelineItem) get elicitationBuilder => (context, item) {
         final elicitation = item as ElicitationRequestTimelineItem;
-        return buildElicitationCardContent(
+        return _leftAlignedBubble(buildElicitationCardContent(
           context, elicitation,
           decoration: _cardDecoration, textStyle: style.textStyle,
           onRespond: callbacks.onElicitationRespond,
-        );
+        ));
       };
 
   Widget Function(BuildContext, TimelineItem) get toolRequestBuilder => (context, item) {
         final toolRequest = item as ToolRequestTimelineItem;
-        return buildToolRequestCardContent(
+        return _leftAlignedBubble(buildToolRequestCardContent(
           context, toolRequest,
           decoration: _cardDecoration, textStyle: style.textStyle,
           overrides: callbacks.toolRequestOverrides,
-        );
+        ));
       };
 }
 ```

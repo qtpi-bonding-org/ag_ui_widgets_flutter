@@ -29,6 +29,7 @@ class AgUiChat extends StatefulWidget {
     this.toolCallBuilder,
     this.permissionBuilder,
     this.elicitationBuilder,
+    this.toolRequestBuilder,
     this.composerBuilder,
   });
 
@@ -38,12 +39,20 @@ class AgUiChat extends StatefulWidget {
   final chat_core.TextMessageBuilder? textMessageBuilder;
   final CustomCardBuilder? toolCallBuilder;
 
-  /// Receives only the permission `requestId` — no payload. See
-  /// TimelineItem.permission's doc comment.
-  final Widget Function(BuildContext context, String requestId)? permissionBuilder;
+  /// Receives the full `PermissionRequestTimelineItem` — callers downcast to
+  /// access the payload (options, toolTitle, etc.). Lookup is by
+  /// `requestId` via the widget's internal `_itemsById` map.
+  final Widget Function(BuildContext context, TimelineItem item)? permissionBuilder;
 
-  /// Receives only the elicitation `elicitationId` — no payload.
-  final Widget Function(BuildContext context, String elicitationId)? elicitationBuilder;
+  /// Receives the full `ElicitationRequestTimelineItem` — callers downcast
+  /// to access the payload (message, mode, schema, url).
+  final Widget Function(BuildContext context, TimelineItem item)? elicitationBuilder;
+
+  /// Receives the full `ToolRequestTimelineItem` — callers downcast to
+  /// access the payload (toolName, argsJson, toolTitle, toolKind). Default
+  /// renders an empty `SizedBox.shrink()`.
+  final Widget Function(BuildContext context, TimelineItem item)? toolRequestBuilder;
+
   final WidgetBuilder? composerBuilder;
 
   @override
@@ -52,6 +61,14 @@ class AgUiChat extends StatefulWidget {
 
 class _AgUiChatState extends State<AgUiChat> {
   final _controller = chat_core.InMemoryChatController();
+
+  /// requestId → full TimelineItem for the three payload-carrying variants.
+  /// Rebuilt every time `_syncMessages` runs (i.e. on every conversation
+  /// change), then looked up by the `customMessageBuilder` dispatch switch
+  /// when a custom message of kind `permissionRequest`/`elicitationRequest`/
+  /// `toolRequest` is rendered — chosen over embedding the full item in
+  /// `flutter_chat_core`'s untyped `Message.custom` metadata.
+  Map<String, TimelineItem> _itemsById = const {};
 
   @override
   void didUpdateWidget(covariant AgUiChat oldWidget) {
@@ -67,6 +84,14 @@ class _AgUiChatState extends State<AgUiChat> {
 
   void _syncMessages() {
     _controller.setMessages(timelineToMessages(widget.conversation.timeline));
+    _itemsById = {
+      for (final item in widget.conversation.timeline)
+        if (item is PermissionRequestTimelineItem) item.requestId: item,
+      for (final item in widget.conversation.timeline)
+        if (item is ElicitationRequestTimelineItem) item.requestId: item,
+      for (final item in widget.conversation.timeline)
+        if (item is ToolRequestTimelineItem) item.requestId: item,
+    };
   }
 
   @override
@@ -95,11 +120,20 @@ class _AgUiChatState extends State<AgUiChat> {
             case 'toolCall':
               return (widget.toolCallBuilder ?? defaultToolCallBuilder)(
                   context, message, index, isSentByMe: isSentByMe, groupStatus: groupStatus);
-            case 'permission':
-              return widget.permissionBuilder?.call(context, message.id) ??
+            case 'permissionRequest':
+              final item = _itemsById[message.id];
+              if (item == null) return const SizedBox.shrink();
+              return widget.permissionBuilder?.call(context, item) ??
                   const SizedBox.shrink();
-            case 'elicitation':
-              return widget.elicitationBuilder?.call(context, message.id) ??
+            case 'elicitationRequest':
+              final item = _itemsById[message.id];
+              if (item == null) return const SizedBox.shrink();
+              return widget.elicitationBuilder?.call(context, item) ??
+                  const SizedBox.shrink();
+            case 'toolRequest':
+              final item = _itemsById[message.id];
+              if (item == null) return const SizedBox.shrink();
+              return widget.toolRequestBuilder?.call(context, item) ??
                   const SizedBox.shrink();
             default:
               return const SizedBox.shrink();

@@ -40,15 +40,20 @@ chat_core.Message _toMessage(TimelineItem item) {
               .toList(),
         },
       ),
-    PermissionTimelineItem(:final requestId) => chat_core.Message.custom(
+    PermissionRequestTimelineItem(:final requestId) => chat_core.Message.custom(
         id: requestId,
         authorId: kAgentAuthorId,
-        metadata: {'kind': 'permission'},
+        metadata: {'kind': 'permissionRequest'},
       ),
-    ElicitationTimelineItem(:final requestId) => chat_core.Message.custom(
+    ElicitationRequestTimelineItem(:final requestId) => chat_core.Message.custom(
         id: requestId,
         authorId: kAgentAuthorId,
-        metadata: {'kind': 'elicitation'},
+        metadata: {'kind': 'elicitationRequest'},
+      ),
+    ToolRequestTimelineItem(:final requestId) => chat_core.Message.custom(
+        id: requestId,
+        authorId: kAgentAuthorId,
+        metadata: {'kind': 'toolRequest'},
       ),
   };
 }

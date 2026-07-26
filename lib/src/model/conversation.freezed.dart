@@ -687,8 +687,6 @@ extension TimelineItemPatterns on TimelineItem {
     TResult Function(TextTimelineItem value)? text,
     TResult Function(TextStreamTimelineItem value)? textStream,
     TResult Function(ToolCallTimelineItem value)? toolCall,
-    TResult Function(PermissionTimelineItem value)? permission,
-    TResult Function(ElicitationTimelineItem value)? elicitation,
     TResult Function(PermissionRequestTimelineItem value)? permissionRequest,
     TResult Function(ElicitationRequestTimelineItem value)? elicitationRequest,
     TResult Function(ToolRequestTimelineItem value)? toolRequest,
@@ -702,10 +700,6 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(_that);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(_that);
-      case PermissionTimelineItem() when permission != null:
-        return permission(_that);
-      case ElicitationTimelineItem() when elicitation != null:
-        return elicitation(_that);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(_that);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
@@ -735,8 +729,6 @@ extension TimelineItemPatterns on TimelineItem {
     required TResult Function(TextTimelineItem value) text,
     required TResult Function(TextStreamTimelineItem value) textStream,
     required TResult Function(ToolCallTimelineItem value) toolCall,
-    required TResult Function(PermissionTimelineItem value) permission,
-    required TResult Function(ElicitationTimelineItem value) elicitation,
     required TResult Function(PermissionRequestTimelineItem value)
         permissionRequest,
     required TResult Function(ElicitationRequestTimelineItem value)
@@ -751,10 +743,6 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(_that);
       case ToolCallTimelineItem():
         return toolCall(_that);
-      case PermissionTimelineItem():
-        return permission(_that);
-      case ElicitationTimelineItem():
-        return elicitation(_that);
       case PermissionRequestTimelineItem():
         return permissionRequest(_that);
       case ElicitationRequestTimelineItem():
@@ -781,8 +769,6 @@ extension TimelineItemPatterns on TimelineItem {
     TResult? Function(TextTimelineItem value)? text,
     TResult? Function(TextStreamTimelineItem value)? textStream,
     TResult? Function(ToolCallTimelineItem value)? toolCall,
-    TResult? Function(PermissionTimelineItem value)? permission,
-    TResult? Function(ElicitationTimelineItem value)? elicitation,
     TResult? Function(PermissionRequestTimelineItem value)? permissionRequest,
     TResult? Function(ElicitationRequestTimelineItem value)? elicitationRequest,
     TResult? Function(ToolRequestTimelineItem value)? toolRequest,
@@ -795,10 +781,6 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(_that);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(_that);
-      case PermissionTimelineItem() when permission != null:
-        return permission(_that);
-      case ElicitationTimelineItem() when elicitation != null:
-        return elicitation(_that);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(_that);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
@@ -830,8 +812,6 @@ extension TimelineItemPatterns on TimelineItem {
     TResult Function(String id, String name, String args, String? result,
             List<ToolDiff> diffs)?
         toolCall,
-    TResult Function(String requestId)? permission,
-    TResult Function(String requestId)? elicitation,
     TResult Function(String requestId, String? toolTitle, String? toolKind,
             String? description, List<PermissionOption> options)?
         permissionRequest,
@@ -852,10 +832,6 @@ extension TimelineItemPatterns on TimelineItem {
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(
             _that.id, _that.name, _that.args, _that.result, _that.diffs);
-      case PermissionTimelineItem() when permission != null:
-        return permission(_that.requestId);
-      case ElicitationTimelineItem() when elicitation != null:
-        return elicitation(_that.requestId);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(_that.requestId, _that.toolTitle,
             _that.toolKind, _that.description, _that.options);
@@ -892,8 +868,6 @@ extension TimelineItemPatterns on TimelineItem {
     required TResult Function(String id, String name, String args,
             String? result, List<ToolDiff> diffs)
         toolCall,
-    required TResult Function(String requestId) permission,
-    required TResult Function(String requestId) elicitation,
     required TResult Function(
             String requestId,
             String? toolTitle,
@@ -917,10 +891,6 @@ extension TimelineItemPatterns on TimelineItem {
       case ToolCallTimelineItem():
         return toolCall(
             _that.id, _that.name, _that.args, _that.result, _that.diffs);
-      case PermissionTimelineItem():
-        return permission(_that.requestId);
-      case ElicitationTimelineItem():
-        return elicitation(_that.requestId);
       case PermissionRequestTimelineItem():
         return permissionRequest(_that.requestId, _that.toolTitle,
             _that.toolKind, _that.description, _that.options);
@@ -954,8 +924,6 @@ extension TimelineItemPatterns on TimelineItem {
     TResult? Function(String id, String name, String args, String? result,
             List<ToolDiff> diffs)?
         toolCall,
-    TResult? Function(String requestId)? permission,
-    TResult? Function(String requestId)? elicitation,
     TResult? Function(String requestId, String? toolTitle, String? toolKind,
             String? description, List<PermissionOption> options)?
         permissionRequest,
@@ -975,10 +943,6 @@ extension TimelineItemPatterns on TimelineItem {
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(
             _that.id, _that.name, _that.args, _that.result, _that.diffs);
-      case PermissionTimelineItem() when permission != null:
-        return permission(_that.requestId);
-      case ElicitationTimelineItem() when elicitation != null:
-        return elicitation(_that.requestId);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(_that.requestId, _that.toolTitle,
             _that.toolKind, _that.description, _that.options);
@@ -1271,138 +1235,6 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self._diffs
           : diffs // ignore: cast_nullable_to_non_nullable
               as List<ToolDiff>,
-    ));
-  }
-}
-
-/// @nodoc
-
-class PermissionTimelineItem implements TimelineItem {
-  const PermissionTimelineItem({required this.requestId});
-
-  final String requestId;
-
-  /// Create a copy of TimelineItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $PermissionTimelineItemCopyWith<PermissionTimelineItem> get copyWith =>
-      _$PermissionTimelineItemCopyWithImpl<PermissionTimelineItem>(
-          this, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is PermissionTimelineItem &&
-            (identical(other.requestId, requestId) ||
-                other.requestId == requestId));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, requestId);
-
-  @override
-  String toString() {
-    return 'TimelineItem.permission(requestId: $requestId)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $PermissionTimelineItemCopyWith<$Res>
-    implements $TimelineItemCopyWith<$Res> {
-  factory $PermissionTimelineItemCopyWith(PermissionTimelineItem value,
-          $Res Function(PermissionTimelineItem) _then) =
-      _$PermissionTimelineItemCopyWithImpl;
-  @useResult
-  $Res call({String requestId});
-}
-
-/// @nodoc
-class _$PermissionTimelineItemCopyWithImpl<$Res>
-    implements $PermissionTimelineItemCopyWith<$Res> {
-  _$PermissionTimelineItemCopyWithImpl(this._self, this._then);
-
-  final PermissionTimelineItem _self;
-  final $Res Function(PermissionTimelineItem) _then;
-
-  /// Create a copy of TimelineItem
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? requestId = null,
-  }) {
-    return _then(PermissionTimelineItem(
-      requestId: null == requestId
-          ? _self.requestId
-          : requestId // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class ElicitationTimelineItem implements TimelineItem {
-  const ElicitationTimelineItem({required this.requestId});
-
-  final String requestId;
-
-  /// Create a copy of TimelineItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $ElicitationTimelineItemCopyWith<ElicitationTimelineItem> get copyWith =>
-      _$ElicitationTimelineItemCopyWithImpl<ElicitationTimelineItem>(
-          this, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ElicitationTimelineItem &&
-            (identical(other.requestId, requestId) ||
-                other.requestId == requestId));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, requestId);
-
-  @override
-  String toString() {
-    return 'TimelineItem.elicitation(requestId: $requestId)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $ElicitationTimelineItemCopyWith<$Res>
-    implements $TimelineItemCopyWith<$Res> {
-  factory $ElicitationTimelineItemCopyWith(ElicitationTimelineItem value,
-          $Res Function(ElicitationTimelineItem) _then) =
-      _$ElicitationTimelineItemCopyWithImpl;
-  @useResult
-  $Res call({String requestId});
-}
-
-/// @nodoc
-class _$ElicitationTimelineItemCopyWithImpl<$Res>
-    implements $ElicitationTimelineItemCopyWith<$Res> {
-  _$ElicitationTimelineItemCopyWithImpl(this._self, this._then);
-
-  final ElicitationTimelineItem _self;
-  final $Res Function(ElicitationTimelineItem) _then;
-
-  /// Create a copy of TimelineItem
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? requestId = null,
-  }) {
-    return _then(ElicitationTimelineItem(
-      requestId: null == requestId
-          ? _self.requestId
-          : requestId // ignore: cast_nullable_to_non_nullable
-              as String,
     ));
   }
 }

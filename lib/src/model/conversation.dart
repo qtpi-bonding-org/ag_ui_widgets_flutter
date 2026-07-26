@@ -32,7 +32,7 @@ abstract class PermissionOption with _$PermissionOption {
 
 /// One item in the ordered conversation timeline: text/reasoning prose, an
 /// in-progress streaming reply, a tool invocation, or an inline
-/// permission/elicitation position marker. Built by [ConversationReducer]
+/// permission/elicitation/tool-request. Built by [ConversationReducer]
 /// in true chronological order.
 @freezed
 sealed class TimelineItem with _$TimelineItem {
@@ -64,19 +64,6 @@ sealed class TimelineItem with _$TimelineItem {
     String? result,
     @Default(<ToolDiff>[]) List<ToolDiff> diffs,
   }) = ToolCallTimelineItem;
-
-  /// A pending permission — position marker only. The actual request
-  /// payload (options, description, tool name) is NOT carried here; each
-  /// consuming app looks it up by [requestId] from wherever it keeps that
-  /// data (own cubit state, a dedicated cubit, etc).
-  const factory TimelineItem.permission({
-    required String requestId,
-  }) = PermissionTimelineItem;
-
-  /// A pending elicitation — same "marker only" contract as [permission].
-  const factory TimelineItem.elicitation({
-    required String requestId,
-  }) = ElicitationTimelineItem;
 
   /// A pending permission request — full payload, not a marker. `toolTitle`/
   /// `toolKind` are ACP's `ToolCallUpdate.Title`/`Kind`, both optional on the

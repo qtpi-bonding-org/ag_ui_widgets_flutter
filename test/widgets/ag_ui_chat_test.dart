@@ -5,7 +5,9 @@ import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
 
 void main() {
   Widget host(Conversation conversation, {
-    Widget Function(BuildContext, String)? permissionBuilder,
+    Widget Function(BuildContext, TimelineItem)? permissionBuilder,
+    Widget Function(BuildContext, TimelineItem)? elicitationBuilder,
+    Widget Function(BuildContext, TimelineItem)? toolRequestBuilder,
   }) {
     return MaterialApp(
       home: Scaffold(
@@ -14,6 +16,8 @@ void main() {
           currentUserId: 'user',
           onSendMessage: (_) {},
           permissionBuilder: permissionBuilder,
+          elicitationBuilder: elicitationBuilder,
+          toolRequestBuilder: toolRequestBuilder,
         ),
       ),
     );
@@ -29,25 +33,98 @@ void main() {
     expect(find.text('hello'), findsOneWidget);
   });
 
-  testWidgets('invokes the caller-supplied permissionBuilder with only the requestId', (tester) async {
-    String? seenId;
+  testWidgets('invokes the caller-supplied permissionBuilder with the full TimelineItem', (tester) async {
+    PermissionRequestTimelineItem? received;
     await tester.pumpWidget(host(
-      const Conversation(timeline: [TimelineItem.permission(requestId: 'p1')]),
-      permissionBuilder: (context, requestId) {
-        seenId = requestId;
+      const Conversation(timeline: [
+        TimelineItem.permissionRequest(
+          requestId: 'p1',
+          toolTitle: 'bash',
+          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')],
+        ),
+      ]),
+      permissionBuilder: (context, item) {
+        received = item as PermissionRequestTimelineItem;
         return const Text('PERMISSION CARD');
       },
     ));
     await tester.pumpAndSettle();
-    expect(seenId, 'p1');
+    expect(received?.requestId, 'p1');
+    expect(received?.toolTitle, 'bash');
+    expect(received?.options.single.optionId, 'allow');
     expect(find.text('PERMISSION CARD'), findsOneWidget);
   });
 
   testWidgets('renders nothing for a permission item when no builder is supplied', (tester) async {
     await tester.pumpWidget(host(
-      const Conversation(timeline: [TimelineItem.permission(requestId: 'p1')]),
+      const Conversation(timeline: [
+        TimelineItem.permissionRequest(
+          requestId: 'p1',
+          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')],
+        ),
+      ]),
     ));
     await tester.pumpAndSettle();
     expect(find.text('PERMISSION CARD'), findsNothing);
+  });
+
+  testWidgets('elicitationBuilder receives the full TimelineItem', (tester) async {
+    ElicitationRequestTimelineItem? received;
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.elicitationRequest(
+          requestId: 'e1',
+          message: 'Pick a color',
+          mode: 'form',
+        ),
+      ]),
+      elicitationBuilder: (context, item) {
+        received = item as ElicitationRequestTimelineItem;
+        return const Text('ELICITATION CARD');
+      },
+    ));
+    await tester.pumpAndSettle();
+    expect(received?.requestId, 'e1');
+    expect(received?.message, 'Pick a color');
+    expect(received?.mode, 'form');
+    expect(find.text('ELICITATION CARD'), findsOneWidget);
+  });
+
+  testWidgets('toolRequestBuilder receives the full TimelineItem', (tester) async {
+    ToolRequestTimelineItem? received;
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.toolRequest(
+          requestId: 't1',
+          toolName: 'propose_edit',
+          argsJson: '{"changeId":"c1"}',
+        ),
+      ]),
+      toolRequestBuilder: (context, item) {
+        received = item as ToolRequestTimelineItem;
+        return const Text('TOOL REQUEST CARD');
+      },
+    ));
+    await tester.pumpAndSettle();
+    expect(received?.requestId, 't1');
+    expect(received?.toolName, 'propose_edit');
+    expect(received?.argsJson, '{"changeId":"c1"}');
+    expect(find.text('TOOL REQUEST CARD'), findsOneWidget);
+  });
+
+  testWidgets('toolRequestBuilder defaults to rendering nothing', (tester) async {
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.toolRequest(
+          requestId: 't1',
+          toolName: 'noop',
+          argsJson: '{}',
+        ),
+      ]),
+    ));
+    await tester.pumpAndSettle();
+    // Default SizedBox.shrink renders without crashing; tool request card
+    // should not be in the tree.
+    expect(find.text('TOOL REQUEST CARD'), findsNothing);
   });
 }

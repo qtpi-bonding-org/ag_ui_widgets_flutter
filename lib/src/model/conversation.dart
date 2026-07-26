@@ -18,6 +18,18 @@ abstract class ToolDiff with _$ToolDiff {
   }) = _ToolDiff;
 }
 
+/// One option in a pending permission request. ACP's `PermissionOption`
+/// (`option_id`/`name`/`kind` — always present on the wire in both SDKs) maps
+/// 1:1 to this shape; both real backends already forward all three fields.
+@freezed
+abstract class PermissionOption with _$PermissionOption {
+  const factory PermissionOption({
+    required String optionId,
+    required String label,
+    required String kind,
+  }) = _PermissionOption;
+}
+
 /// One item in the ordered conversation timeline: text/reasoning prose, an
 /// in-progress streaming reply, a tool invocation, or an inline
 /// permission/elicitation position marker. Built by [ConversationReducer]
@@ -65,6 +77,38 @@ sealed class TimelineItem with _$TimelineItem {
   const factory TimelineItem.elicitation({
     required String requestId,
   }) = ElicitationTimelineItem;
+
+  /// A pending permission request — full payload, not a marker. `toolTitle`/
+  /// `toolKind` are ACP's `ToolCallUpdate.Title`/`Kind`, both optional on the
+  /// wire; `description` is never protocol-native (only a bridge may
+  /// synthesize one). `options` is the per-request `PermissionOption` list.
+  const factory TimelineItem.permissionRequest({
+    required String requestId,
+    String? toolTitle,
+    String? toolKind,
+    String? description,
+    required List<PermissionOption> options,
+  }) = PermissionRequestTimelineItem;
+
+  /// A pending elicitation request — full payload. `message` and `mode` are
+  /// always present on the wire; `schema` is set for `mode == "form"`, `url`
+  /// for `mode == "url"`.
+  const factory TimelineItem.elicitationRequest({
+    required String requestId,
+    required String message,
+    required String mode,
+    Map<String, dynamic>? schema,
+    String? url,
+  }) = ElicitationRequestTimelineItem;
+
+  /// A client-executed tool request — full payload. `toolTitle`/`toolKind`
+  /// are nullable for the same reason as on [permissionRequest].
+  const factory TimelineItem.toolRequest({
+    required String requestId,
+    String? toolTitle,
+    String? toolKind,
+    required String argsJson,
+  }) = ToolRequestTimelineItem;
 }
 
 /// Ambient session-wide state, sourced from `StateSnapshotEvent`/

@@ -327,6 +327,326 @@ class __$ToolDiffCopyWithImpl<$Res> implements _$ToolDiffCopyWith<$Res> {
 }
 
 /// @nodoc
+mixin _$PermissionOption {
+  String get optionId;
+  String get label;
+  String get kind;
+
+  /// Create a copy of PermissionOption
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $PermissionOptionCopyWith<PermissionOption> get copyWith =>
+      _$PermissionOptionCopyWithImpl<PermissionOption>(
+          this as PermissionOption, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is PermissionOption &&
+            (identical(other.optionId, optionId) ||
+                other.optionId == optionId) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.kind, kind) || other.kind == kind));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, optionId, label, kind);
+
+  @override
+  String toString() {
+    return 'PermissionOption(optionId: $optionId, label: $label, kind: $kind)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $PermissionOptionCopyWith<$Res> {
+  factory $PermissionOptionCopyWith(
+          PermissionOption value, $Res Function(PermissionOption) _then) =
+      _$PermissionOptionCopyWithImpl;
+  @useResult
+  $Res call({String optionId, String label, String kind});
+}
+
+/// @nodoc
+class _$PermissionOptionCopyWithImpl<$Res>
+    implements $PermissionOptionCopyWith<$Res> {
+  _$PermissionOptionCopyWithImpl(this._self, this._then);
+
+  final PermissionOption _self;
+  final $Res Function(PermissionOption) _then;
+
+  /// Create a copy of PermissionOption
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? optionId = null,
+    Object? label = null,
+    Object? kind = null,
+  }) {
+    return _then(_self.copyWith(
+      optionId: null == optionId
+          ? _self.optionId
+          : optionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _self.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      kind: null == kind
+          ? _self.kind
+          : kind // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [PermissionOption].
+extension PermissionOptionPatterns on PermissionOption {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_PermissionOption value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PermissionOption() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_PermissionOption value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PermissionOption():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_PermissionOption value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PermissionOption() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String optionId, String label, String kind)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PermissionOption() when $default != null:
+        return $default(_that.optionId, _that.label, _that.kind);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String optionId, String label, String kind) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PermissionOption():
+        return $default(_that.optionId, _that.label, _that.kind);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String optionId, String label, String kind)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PermissionOption() when $default != null:
+        return $default(_that.optionId, _that.label, _that.kind);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _PermissionOption implements PermissionOption {
+  const _PermissionOption(
+      {required this.optionId, required this.label, required this.kind});
+
+  @override
+  final String optionId;
+  @override
+  final String label;
+  @override
+  final String kind;
+
+  /// Create a copy of PermissionOption
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$PermissionOptionCopyWith<_PermissionOption> get copyWith =>
+      __$PermissionOptionCopyWithImpl<_PermissionOption>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _PermissionOption &&
+            (identical(other.optionId, optionId) ||
+                other.optionId == optionId) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.kind, kind) || other.kind == kind));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, optionId, label, kind);
+
+  @override
+  String toString() {
+    return 'PermissionOption(optionId: $optionId, label: $label, kind: $kind)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$PermissionOptionCopyWith<$Res>
+    implements $PermissionOptionCopyWith<$Res> {
+  factory _$PermissionOptionCopyWith(
+          _PermissionOption value, $Res Function(_PermissionOption) _then) =
+      __$PermissionOptionCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String optionId, String label, String kind});
+}
+
+/// @nodoc
+class __$PermissionOptionCopyWithImpl<$Res>
+    implements _$PermissionOptionCopyWith<$Res> {
+  __$PermissionOptionCopyWithImpl(this._self, this._then);
+
+  final _PermissionOption _self;
+  final $Res Function(_PermissionOption) _then;
+
+  /// Create a copy of PermissionOption
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? optionId = null,
+    Object? label = null,
+    Object? kind = null,
+  }) {
+    return _then(_PermissionOption(
+      optionId: null == optionId
+          ? _self.optionId
+          : optionId // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _self.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      kind: null == kind
+          ? _self.kind
+          : kind // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$TimelineItem {
   @override
   bool operator ==(Object other) {
@@ -369,6 +689,9 @@ extension TimelineItemPatterns on TimelineItem {
     TResult Function(ToolCallTimelineItem value)? toolCall,
     TResult Function(PermissionTimelineItem value)? permission,
     TResult Function(ElicitationTimelineItem value)? elicitation,
+    TResult Function(PermissionRequestTimelineItem value)? permissionRequest,
+    TResult Function(ElicitationRequestTimelineItem value)? elicitationRequest,
+    TResult Function(ToolRequestTimelineItem value)? toolRequest,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -383,6 +706,12 @@ extension TimelineItemPatterns on TimelineItem {
         return permission(_that);
       case ElicitationTimelineItem() when elicitation != null:
         return elicitation(_that);
+      case PermissionRequestTimelineItem() when permissionRequest != null:
+        return permissionRequest(_that);
+      case ElicitationRequestTimelineItem() when elicitationRequest != null:
+        return elicitationRequest(_that);
+      case ToolRequestTimelineItem() when toolRequest != null:
+        return toolRequest(_that);
       case _:
         return orElse();
     }
@@ -408,6 +737,11 @@ extension TimelineItemPatterns on TimelineItem {
     required TResult Function(ToolCallTimelineItem value) toolCall,
     required TResult Function(PermissionTimelineItem value) permission,
     required TResult Function(ElicitationTimelineItem value) elicitation,
+    required TResult Function(PermissionRequestTimelineItem value)
+        permissionRequest,
+    required TResult Function(ElicitationRequestTimelineItem value)
+        elicitationRequest,
+    required TResult Function(ToolRequestTimelineItem value) toolRequest,
   }) {
     final _that = this;
     switch (_that) {
@@ -421,6 +755,12 @@ extension TimelineItemPatterns on TimelineItem {
         return permission(_that);
       case ElicitationTimelineItem():
         return elicitation(_that);
+      case PermissionRequestTimelineItem():
+        return permissionRequest(_that);
+      case ElicitationRequestTimelineItem():
+        return elicitationRequest(_that);
+      case ToolRequestTimelineItem():
+        return toolRequest(_that);
     }
   }
 
@@ -443,6 +783,9 @@ extension TimelineItemPatterns on TimelineItem {
     TResult? Function(ToolCallTimelineItem value)? toolCall,
     TResult? Function(PermissionTimelineItem value)? permission,
     TResult? Function(ElicitationTimelineItem value)? elicitation,
+    TResult? Function(PermissionRequestTimelineItem value)? permissionRequest,
+    TResult? Function(ElicitationRequestTimelineItem value)? elicitationRequest,
+    TResult? Function(ToolRequestTimelineItem value)? toolRequest,
   }) {
     final _that = this;
     switch (_that) {
@@ -456,6 +799,12 @@ extension TimelineItemPatterns on TimelineItem {
         return permission(_that);
       case ElicitationTimelineItem() when elicitation != null:
         return elicitation(_that);
+      case PermissionRequestTimelineItem() when permissionRequest != null:
+        return permissionRequest(_that);
+      case ElicitationRequestTimelineItem() when elicitationRequest != null:
+        return elicitationRequest(_that);
+      case ToolRequestTimelineItem() when toolRequest != null:
+        return toolRequest(_that);
       case _:
         return null;
     }
@@ -483,6 +832,15 @@ extension TimelineItemPatterns on TimelineItem {
         toolCall,
     TResult Function(String requestId)? permission,
     TResult Function(String requestId)? elicitation,
+    TResult Function(String requestId, String? toolTitle, String? toolKind,
+            String? description, List<PermissionOption> options)?
+        permissionRequest,
+    TResult Function(String requestId, String message, String mode,
+            Map<String, dynamic>? schema, String? url)?
+        elicitationRequest,
+    TResult Function(String requestId, String? toolTitle, String? toolKind,
+            String argsJson)?
+        toolRequest,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -498,6 +856,15 @@ extension TimelineItemPatterns on TimelineItem {
         return permission(_that.requestId);
       case ElicitationTimelineItem() when elicitation != null:
         return elicitation(_that.requestId);
+      case PermissionRequestTimelineItem() when permissionRequest != null:
+        return permissionRequest(_that.requestId, _that.toolTitle,
+            _that.toolKind, _that.description, _that.options);
+      case ElicitationRequestTimelineItem() when elicitationRequest != null:
+        return elicitationRequest(_that.requestId, _that.message, _that.mode,
+            _that.schema, _that.url);
+      case ToolRequestTimelineItem() when toolRequest != null:
+        return toolRequest(
+            _that.requestId, _that.toolTitle, _that.toolKind, _that.argsJson);
       case _:
         return orElse();
     }
@@ -527,6 +894,19 @@ extension TimelineItemPatterns on TimelineItem {
         toolCall,
     required TResult Function(String requestId) permission,
     required TResult Function(String requestId) elicitation,
+    required TResult Function(
+            String requestId,
+            String? toolTitle,
+            String? toolKind,
+            String? description,
+            List<PermissionOption> options)
+        permissionRequest,
+    required TResult Function(String requestId, String message, String mode,
+            Map<String, dynamic>? schema, String? url)
+        elicitationRequest,
+    required TResult Function(String requestId, String? toolTitle,
+            String? toolKind, String argsJson)
+        toolRequest,
   }) {
     final _that = this;
     switch (_that) {
@@ -541,6 +921,15 @@ extension TimelineItemPatterns on TimelineItem {
         return permission(_that.requestId);
       case ElicitationTimelineItem():
         return elicitation(_that.requestId);
+      case PermissionRequestTimelineItem():
+        return permissionRequest(_that.requestId, _that.toolTitle,
+            _that.toolKind, _that.description, _that.options);
+      case ElicitationRequestTimelineItem():
+        return elicitationRequest(_that.requestId, _that.message, _that.mode,
+            _that.schema, _that.url);
+      case ToolRequestTimelineItem():
+        return toolRequest(
+            _that.requestId, _that.toolTitle, _that.toolKind, _that.argsJson);
     }
   }
 
@@ -567,6 +956,15 @@ extension TimelineItemPatterns on TimelineItem {
         toolCall,
     TResult? Function(String requestId)? permission,
     TResult? Function(String requestId)? elicitation,
+    TResult? Function(String requestId, String? toolTitle, String? toolKind,
+            String? description, List<PermissionOption> options)?
+        permissionRequest,
+    TResult? Function(String requestId, String message, String mode,
+            Map<String, dynamic>? schema, String? url)?
+        elicitationRequest,
+    TResult? Function(String requestId, String? toolTitle, String? toolKind,
+            String argsJson)?
+        toolRequest,
   }) {
     final _that = this;
     switch (_that) {
@@ -581,6 +979,15 @@ extension TimelineItemPatterns on TimelineItem {
         return permission(_that.requestId);
       case ElicitationTimelineItem() when elicitation != null:
         return elicitation(_that.requestId);
+      case PermissionRequestTimelineItem() when permissionRequest != null:
+        return permissionRequest(_that.requestId, _that.toolTitle,
+            _that.toolKind, _that.description, _that.options);
+      case ElicitationRequestTimelineItem() when elicitationRequest != null:
+        return elicitationRequest(_that.requestId, _that.message, _that.mode,
+            _that.schema, _that.url);
+      case ToolRequestTimelineItem() when toolRequest != null:
+        return toolRequest(
+            _that.requestId, _that.toolTitle, _that.toolKind, _that.argsJson);
       case _:
         return null;
     }
@@ -995,6 +1402,332 @@ class _$ElicitationTimelineItemCopyWithImpl<$Res>
       requestId: null == requestId
           ? _self.requestId
           : requestId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class PermissionRequestTimelineItem implements TimelineItem {
+  const PermissionRequestTimelineItem(
+      {required this.requestId,
+      this.toolTitle,
+      this.toolKind,
+      this.description,
+      required final List<PermissionOption> options})
+      : _options = options;
+
+  final String requestId;
+  final String? toolTitle;
+  final String? toolKind;
+  final String? description;
+  final List<PermissionOption> _options;
+  List<PermissionOption> get options {
+    if (_options is EqualUnmodifiableListView) return _options;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_options);
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $PermissionRequestTimelineItemCopyWith<PermissionRequestTimelineItem>
+      get copyWith => _$PermissionRequestTimelineItemCopyWithImpl<
+          PermissionRequestTimelineItem>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is PermissionRequestTimelineItem &&
+            (identical(other.requestId, requestId) ||
+                other.requestId == requestId) &&
+            (identical(other.toolTitle, toolTitle) ||
+                other.toolTitle == toolTitle) &&
+            (identical(other.toolKind, toolKind) ||
+                other.toolKind == toolKind) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            const DeepCollectionEquality().equals(other._options, _options));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, requestId, toolTitle, toolKind,
+      description, const DeepCollectionEquality().hash(_options));
+
+  @override
+  String toString() {
+    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolKind: $toolKind, description: $description, options: $options)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $PermissionRequestTimelineItemCopyWith<$Res>
+    implements $TimelineItemCopyWith<$Res> {
+  factory $PermissionRequestTimelineItemCopyWith(
+          PermissionRequestTimelineItem value,
+          $Res Function(PermissionRequestTimelineItem) _then) =
+      _$PermissionRequestTimelineItemCopyWithImpl;
+  @useResult
+  $Res call(
+      {String requestId,
+      String? toolTitle,
+      String? toolKind,
+      String? description,
+      List<PermissionOption> options});
+}
+
+/// @nodoc
+class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
+    implements $PermissionRequestTimelineItemCopyWith<$Res> {
+  _$PermissionRequestTimelineItemCopyWithImpl(this._self, this._then);
+
+  final PermissionRequestTimelineItem _self;
+  final $Res Function(PermissionRequestTimelineItem) _then;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? requestId = null,
+    Object? toolTitle = freezed,
+    Object? toolKind = freezed,
+    Object? description = freezed,
+    Object? options = null,
+  }) {
+    return _then(PermissionRequestTimelineItem(
+      requestId: null == requestId
+          ? _self.requestId
+          : requestId // ignore: cast_nullable_to_non_nullable
+              as String,
+      toolTitle: freezed == toolTitle
+          ? _self.toolTitle
+          : toolTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      toolKind: freezed == toolKind
+          ? _self.toolKind
+          : toolKind // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      options: null == options
+          ? _self._options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<PermissionOption>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class ElicitationRequestTimelineItem implements TimelineItem {
+  const ElicitationRequestTimelineItem(
+      {required this.requestId,
+      required this.message,
+      required this.mode,
+      final Map<String, dynamic>? schema,
+      this.url})
+      : _schema = schema;
+
+  final String requestId;
+  final String message;
+  final String mode;
+  final Map<String, dynamic>? _schema;
+  Map<String, dynamic>? get schema {
+    final value = _schema;
+    if (value == null) return null;
+    if (_schema is EqualUnmodifiableMapView) return _schema;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final String? url;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ElicitationRequestTimelineItemCopyWith<ElicitationRequestTimelineItem>
+      get copyWith => _$ElicitationRequestTimelineItemCopyWithImpl<
+          ElicitationRequestTimelineItem>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ElicitationRequestTimelineItem &&
+            (identical(other.requestId, requestId) ||
+                other.requestId == requestId) &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.mode, mode) || other.mode == mode) &&
+            const DeepCollectionEquality().equals(other._schema, _schema) &&
+            (identical(other.url, url) || other.url == url));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, requestId, message, mode,
+      const DeepCollectionEquality().hash(_schema), url);
+
+  @override
+  String toString() {
+    return 'TimelineItem.elicitationRequest(requestId: $requestId, message: $message, mode: $mode, schema: $schema, url: $url)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ElicitationRequestTimelineItemCopyWith<$Res>
+    implements $TimelineItemCopyWith<$Res> {
+  factory $ElicitationRequestTimelineItemCopyWith(
+          ElicitationRequestTimelineItem value,
+          $Res Function(ElicitationRequestTimelineItem) _then) =
+      _$ElicitationRequestTimelineItemCopyWithImpl;
+  @useResult
+  $Res call(
+      {String requestId,
+      String message,
+      String mode,
+      Map<String, dynamic>? schema,
+      String? url});
+}
+
+/// @nodoc
+class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
+    implements $ElicitationRequestTimelineItemCopyWith<$Res> {
+  _$ElicitationRequestTimelineItemCopyWithImpl(this._self, this._then);
+
+  final ElicitationRequestTimelineItem _self;
+  final $Res Function(ElicitationRequestTimelineItem) _then;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? requestId = null,
+    Object? message = null,
+    Object? mode = null,
+    Object? schema = freezed,
+    Object? url = freezed,
+  }) {
+    return _then(ElicitationRequestTimelineItem(
+      requestId: null == requestId
+          ? _self.requestId
+          : requestId // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+      mode: null == mode
+          ? _self.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as String,
+      schema: freezed == schema
+          ? _self._schema
+          : schema // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      url: freezed == url
+          ? _self.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class ToolRequestTimelineItem implements TimelineItem {
+  const ToolRequestTimelineItem(
+      {required this.requestId,
+      this.toolTitle,
+      this.toolKind,
+      required this.argsJson});
+
+  final String requestId;
+  final String? toolTitle;
+  final String? toolKind;
+  final String argsJson;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ToolRequestTimelineItemCopyWith<ToolRequestTimelineItem> get copyWith =>
+      _$ToolRequestTimelineItemCopyWithImpl<ToolRequestTimelineItem>(
+          this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ToolRequestTimelineItem &&
+            (identical(other.requestId, requestId) ||
+                other.requestId == requestId) &&
+            (identical(other.toolTitle, toolTitle) ||
+                other.toolTitle == toolTitle) &&
+            (identical(other.toolKind, toolKind) ||
+                other.toolKind == toolKind) &&
+            (identical(other.argsJson, argsJson) ||
+                other.argsJson == argsJson));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, requestId, toolTitle, toolKind, argsJson);
+
+  @override
+  String toString() {
+    return 'TimelineItem.toolRequest(requestId: $requestId, toolTitle: $toolTitle, toolKind: $toolKind, argsJson: $argsJson)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ToolRequestTimelineItemCopyWith<$Res>
+    implements $TimelineItemCopyWith<$Res> {
+  factory $ToolRequestTimelineItemCopyWith(ToolRequestTimelineItem value,
+          $Res Function(ToolRequestTimelineItem) _then) =
+      _$ToolRequestTimelineItemCopyWithImpl;
+  @useResult
+  $Res call(
+      {String requestId, String? toolTitle, String? toolKind, String argsJson});
+}
+
+/// @nodoc
+class _$ToolRequestTimelineItemCopyWithImpl<$Res>
+    implements $ToolRequestTimelineItemCopyWith<$Res> {
+  _$ToolRequestTimelineItemCopyWithImpl(this._self, this._then);
+
+  final ToolRequestTimelineItem _self;
+  final $Res Function(ToolRequestTimelineItem) _then;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? requestId = null,
+    Object? toolTitle = freezed,
+    Object? toolKind = freezed,
+    Object? argsJson = null,
+  }) {
+    return _then(ToolRequestTimelineItem(
+      requestId: null == requestId
+          ? _self.requestId
+          : requestId // ignore: cast_nullable_to_non_nullable
+              as String,
+      toolTitle: freezed == toolTitle
+          ? _self.toolTitle
+          : toolTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      toolKind: freezed == toolKind
+          ? _self.toolKind
+          : toolKind // ignore: cast_nullable_to_non_nullable
+              as String?,
+      argsJson: null == argsJson
+          ? _self.argsJson
+          : argsJson // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }

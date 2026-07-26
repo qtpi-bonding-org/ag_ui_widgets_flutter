@@ -36,9 +36,6 @@ class ConversationReducer {
   final Map<String, int> _toolTimelineIndex = {};
   final Map<String, dynamic> _pocketcoder = {};
   final Set<String> _adapterAIds = {};
-  // Stub — always-empty for now. Task 4 replaces this with real mutable
-  // tracking + `_reset()` exclusion. Exists here so `_syncPermission` /
-  // `_syncElicitation` can already consult it.
   final Set<String> _resolvedIds = {};
   bool _isRunning = false;
   String? _runError;
@@ -165,6 +162,10 @@ class ConversationReducer {
   }
 
   void _reset() {
+    // _resolvedIds is deliberately NOT cleared here — see resolveRequest's
+    // doc comment. Clearing it would resurrect already-resolved
+    // permission/elicitation/tool-request cards on every pocketcoder
+    // reconnect replay, since the backend never clears its own state.
     _timeline.clear();
     _openText.clear();
     _openTextIndex.clear();
@@ -266,6 +267,23 @@ class ConversationReducer {
         url: url,
       ),
     );
+  }
+
+  /// Resolves a pending permission/elicitation/tool-request: removes it from
+  /// the timeline immediately, and remembers it as resolved so a later
+  /// replay of the same backend state (pocketcoder's backend never clears
+  /// its own /pocketcoder/<ns> namespace server-side — see the design spec's
+  /// "Resolution" section) does not resurrect it. Survives `_reset()`
+  /// deliberately — see that method.
+  void resolveRequest(String requestId) {
+    _resolvedIds.add(requestId);
+    _removeTimelineItemsWhere((item) => switch (item) {
+          PermissionRequestTimelineItem(requestId: final rid) => rid == requestId,
+          ElicitationRequestTimelineItem(requestId: final rid) => rid == requestId,
+          ToolRequestTimelineItem(requestId: final rid) => rid == requestId,
+          _ => false,
+        });
+    _adapterAIds.remove(requestId);
   }
 
   void _applyPatch(Map<String, dynamic> op) {

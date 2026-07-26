@@ -237,6 +237,49 @@ void main() {
     });
   });
 
+  group('resolveRequest', () {
+    test('resolving a permission removes it and a later replay of the same state does not resurrect it', () {
+      final r = ConversationReducer();
+      final snapshot = const StateSnapshotEvent(snapshot: {
+        'pocketcoder': {
+          'permission': {
+            'requestId': 'p1',
+            'status': 'pending',
+            'options': [{'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}],
+          }
+        }
+      });
+      r.apply(snapshot);
+      expect(r.current.timeline, hasLength(1));
+
+      r.resolveRequest('p1');
+      expect(r.current.timeline, isEmpty);
+
+      // Simulate pocketcoder replaying the exact same StateSnapshot (backend
+      // never clears its own namespace) — the resolved item must not come back.
+      r.apply(snapshot);
+      expect(r.current.timeline, isEmpty);
+    });
+
+    test('resolved-id set survives the cold-replay reset marker', () {
+      final r = ConversationReducer();
+      final snapshot = const StateSnapshotEvent(snapshot: {
+        'pocketcoder': {
+          'elicitation': {'elicitationId': 'e1', 'message': 'm', 'mode': 'form'}
+        }
+      });
+      r.apply(snapshot);
+      r.resolveRequest('e1');
+      expect(r.current.timeline, isEmpty);
+
+      // Reconnect replay: cold-replay marker, then the same snapshot again.
+      r.apply(const CustomEvent(name: 'pocketcoder:sync', value: {'mode': 'replace'}));
+      r.apply(snapshot);
+      expect(r.current.timeline, isEmpty,
+          reason: 'resolved-id set must survive _reset(), or reconnect resurrects resolved items');
+    });
+  });
+
   group('cold replay', () {
     test('sync replace marker resets the accumulator; only post-marker events survive', () {
       final r = ConversationReducer()

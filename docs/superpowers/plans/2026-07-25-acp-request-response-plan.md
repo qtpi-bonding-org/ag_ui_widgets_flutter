@@ -1116,7 +1116,11 @@ to:
 Find every existing call site of `PermissionPending(` in `*_test.go` files under
 `services/pocketbase/internal/agent/agui/` and `.../coordinator/` and add the two new trailing
 arguments (`nil, nil` for tests that don't care about title/kind; real values for any test
-asserting on the payload shape). Add one new test asserting the new fields appear:
+asserting on the payload shape). At minimum this means three known call sites in
+`bridge_test.go`: `TestBridgePermissionState` (line 36), `TestBridgePermissionStateCarriesToolCallID`
+(lines 56 and 64 — it calls `PermissionPending` twice), and `TestBridgeSnapshotOmitsResolvedPermission`
+(line 502) — the grep may turn up others; update all of them, not just these three. Add one new
+test asserting the new fields appear:
 
 Existing tests in `bridge_test.go` (`TestBridgePermissionState`,
 `TestBridgePermissionStateCarriesToolCallID`) call `bridge.PermissionPending("rpc-42", nil, "")`,
@@ -1439,10 +1443,9 @@ git commit -m "refactor: rename epi.* CustomEvent names to canonical acp.*"
 - Modify: `app/episutra_flutter/test/features/corner_panels/cubits/chat_cubit_test.dart`
 - Modify: `app/episutra_flutter/test/features/corner_panels/widgets/chat_transcript_pane_test.dart`
 - Modify: `app/episutra_flutter/test/features/corner_panels/widgets/graph_side_panel_test.dart`
-- Modify: `app/episutra_flutter/test/.../chat_panel_text_field_test.dart` (exact path per earlier
-  research: contains a `_FakeTransport`/similar `implements IAgUiTransport`)
-- Modify: `app/episutra_flutter/test/.../new_tab_view_test.dart` (same)
-- Modify: `app/episutra_flutter/test/.../graph_tab_isolation_test.dart` (same)
+- Modify: `app/episutra_flutter/test/features/corner_panels/widgets/chat_panel_text_field_test.dart`
+- Modify: `app/episutra_flutter/test/features/editor/widgets/new_tab_view_test.dart`
+- Modify: `app/episutra_flutter/test/features/editor/widgets/graph_tab_isolation_test.dart`
 
 **Interfaces:**
 - Consumes: `IAgUiTransport.submitToolResult` from Phase 1, Task 6; `IAcpRepository.submitMcpToolResult`
@@ -1489,7 +1492,7 @@ test in these files still passes unchanged.
 - [ ] **Step 4: Commit**
 
 ```bash
-git add packages/episutra_core/lib/data/services/agent/frb_ag_ui_transport.dart app/episutra_flutter/test/features/corner_panels/
+git add packages/episutra_core/lib/data/services/agent/frb_ag_ui_transport.dart app/episutra_flutter/test/features/corner_panels/ app/episutra_flutter/test/features/editor/widgets/new_tab_view_test.dart app/episutra_flutter/test/features/editor/widgets/graph_tab_isolation_test.dart
 git commit -m "feat: implement IAgUiTransport.submitToolResult on FrbAgUiTransport + test fakes"
 ```
 

@@ -1,0 +1,24 @@
+// lib/src/style/bubble_chat_style.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'bubble_chat_style.freezed.dart';
+
+/// Visual configuration for [BubbleChatBuilders] (aligned,
+/// max-width-constrained bubbles). Raw Flutter types only.
+@freezed
+abstract class BubbleChatStyle with _$BubbleChatStyle {
+  const factory BubbleChatStyle({
+    required Color sentBackground,
+    required Color receivedBackground,
+    Color? sentBorder,
+    Color? receivedBorder,
+    required TextStyle textStyle,
+    required double maxWidth,
+    @Default(BorderRadius.all(Radius.circular(12))) BorderRadius sentRadius,
+    @Default(BorderRadius.all(Radius.circular(12))) BorderRadius receivedRadius,
+    @Default(EdgeInsets.symmetric(vertical: 8, horizontal: 12)) EdgeInsets padding,
+    MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
+  }) = _BubbleChatStyle;
+}

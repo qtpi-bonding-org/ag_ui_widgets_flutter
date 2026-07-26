@@ -1,3 +1,11 @@
+## 0.3.0
+
+- **Breaking:** `IAgUiTransport.sendMessage` gains a `context` parameter
+  (`List<AgUiContextItem>`, defaults to `const []`) — every implementer's
+  override must add it, even if unused.
+- New: `AgUiContextItem` freezed type (`uri`, `text`) for passing message
+  context (e.g. the current note's body) in a backend-agnostic shape.
+
 ## 0.2.0
 
 - **Breaking:** `TimelineItem.permission`/`.elicitation` replaced by payload-carrying

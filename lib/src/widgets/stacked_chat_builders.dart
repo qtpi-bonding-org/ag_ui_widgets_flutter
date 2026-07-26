@@ -1,0 +1,93 @@
+// lib/src/widgets/stacked_chat_builders.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
+import '../model/conversation.dart';
+import '../style/chat_action_callbacks.dart';
+import '../style/stacked_chat_style.dart';
+import 'ag_ui_chat.dart' show CustomCardBuilder;
+import 'chat_action_cards.dart';
+import 'markdown_body.dart';
+
+/// Full-width, vertically-alternating builder family for [AgUiChat]'s
+/// five builder slots. Sender is differentiated by background tint and
+/// an optional leading icon — no left/right alignment.
+class StackedChatBuilders {
+  StackedChatBuilders(this.style, this.callbacks);
+
+  final StackedChatStyle style;
+  final ChatActionCallbacks callbacks;
+
+  BoxDecoration get _cardDecoration => BoxDecoration(
+        color: style.receivedBackground,
+        border: style.cardBorderColor != null ? Border.all(color: style.cardBorderColor!) : null,
+        borderRadius: style.cardRadius,
+      );
+
+  chat_core.TextMessageBuilder get textMessageBuilder =>
+      (context, message, index, {required isSentByMe, groupStatus}) {
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: style.padding,
+          color: isSentByMe ? style.sentBackground : style.receivedBackground,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isSentByMe && style.aiLeadingIconBuilder != null) ...[
+                style.aiLeadingIconBuilder!(context),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: chatMarkdownBody(context, message.text, styleSheetBuilder: style.markdownStyleSheetBuilder),
+              ),
+            ],
+          ),
+        );
+      };
+
+  CustomCardBuilder get toolCallBuilder => (context, message, index, {required isSentByMe, groupStatus}) {
+        final name = message.metadata?['name'] as String? ?? '';
+        final result = message.metadata?['result'] as String?;
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: style.padding,
+          decoration: _cardDecoration,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(name, style: style.textStyle),
+              if (result != null) Text(result, style: style.textStyle),
+            ],
+          ),
+        );
+      };
+
+  Widget Function(BuildContext, TimelineItem) get permissionBuilder => (context, item) {
+        final permission = item as PermissionRequestTimelineItem;
+        return buildPermissionCardContent(
+          context, permission,
+          decoration: _cardDecoration, textStyle: style.textStyle,
+          onSelect: callbacks.onPermissionOptionSelected,
+        );
+      };
+
+  Widget Function(BuildContext, TimelineItem) get elicitationBuilder => (context, item) {
+        final elicitation = item as ElicitationRequestTimelineItem;
+        return buildElicitationCardContent(
+          context, elicitation,
+          decoration: _cardDecoration, textStyle: style.textStyle,
+          onRespond: callbacks.onElicitationRespond,
+        );
+      };
+
+  Widget Function(BuildContext, TimelineItem) get toolRequestBuilder => (context, item) {
+        final toolRequest = item as ToolRequestTimelineItem;
+        return buildToolRequestCardContent(
+          context, toolRequest,
+          decoration: _cardDecoration, textStyle: style.textStyle,
+          overrides: callbacks.toolRequestOverrides,
+        );
+      };
+}

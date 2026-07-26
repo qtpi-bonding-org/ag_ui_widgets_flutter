@@ -6,6 +6,8 @@
 // accumulator carries bookkeeping — open-message buffers, id->index maps —
 // that isn't representable in Conversation's public shape, and rebuilding
 // it from Conversation on every call would be O(n) per event).
+import 'dart:convert';
+
 import 'package:ag_ui/ag_ui.dart' as ag_ui;
 import 'conversation.dart';
 
@@ -125,6 +127,63 @@ class ConversationReducer {
       case ag_ui.ToolCallEndEvent():
         break; // terminal state is "has a result"; nothing to flip here.
 
+      case ag_ui.CustomEvent(name: 'acp.permission_request', :final value):
+        if (value is Map) {
+          final callId = value['callId'];
+          if (callId is String) {
+            final optionsJson = value['optionsJson'] as String? ?? '[]';
+            final rawOptions = jsonDecode(optionsJson);
+            final options = (rawOptions is List ? rawOptions : const [])
+                .whereType<Map>()
+                .map((o) => PermissionOption(
+                      optionId: (o['id'] as String?) ?? '',
+                      label: (o['label'] as String?) ?? '',
+                      kind: (o['kind'] as String?) ?? '',
+                    ))
+                .toList();
+            _insertTimelineItem(
+              _timeline.length,
+              TimelineItem.permissionRequest(
+                requestId: callId,
+                toolTitle: value['toolName'] as String?,
+                description: value['description'] as String?,
+                options: options,
+              ),
+            );
+          }
+        }
+      case ag_ui.CustomEvent(name: 'acp.elicitation_request', :final value):
+        if (value is Map) {
+          final requestId = value['requestId'];
+          if (requestId is String) {
+            _insertTimelineItem(
+              _timeline.length,
+              TimelineItem.elicitationRequest(
+                requestId: requestId,
+                message: (value['message'] as String?) ?? '',
+                mode: (value['mode'] as String?) ?? 'form',
+                schema: value['schema'] is Map
+                    ? Map<String, dynamic>.from(value['schema'] as Map)
+                    : null,
+                url: value['url'] as String?,
+              ),
+            );
+          }
+        }
+      case ag_ui.CustomEvent(name: 'acp.tool_request', :final value):
+        if (value is Map) {
+          final callId = value['callId'];
+          if (callId is String) {
+            _insertTimelineItem(
+              _timeline.length,
+              TimelineItem.toolRequest(
+                requestId: callId,
+                toolName: (value['toolName'] as String?) ?? '',
+                argsJson: (value['args'] as String?) ?? '{}',
+              ),
+            );
+          }
+        }
       case ag_ui.CustomEvent(name: 'pocketcoder:diff'):
         final value = event.value;
         if (value is Map) {

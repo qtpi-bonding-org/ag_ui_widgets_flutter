@@ -280,6 +280,68 @@ void main() {
     });
   });
 
+  group('permission/elicitation/tool-request (Adapter B: canonical CustomEvent)', () {
+    test('acp.permission_request decodes optionsJson and remaps id->optionId', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(name: 'acp.permission_request', value: {
+        'callId': 'p1',
+        'toolName': 'bash',
+        'description': 'bash: run ls',
+        'optionsJson': '[{"id":"allow","label":"Allow","kind":"allow_once"}]',
+      }));
+      expect(r.current.timeline, hasLength(1));
+      final item = r.current.timeline.single as PermissionRequestTimelineItem;
+      expect(item.requestId, 'p1');
+      expect(item.toolTitle, 'bash');
+      expect(item.description, 'bash: run ls');
+      expect(item.options.single.optionId, 'allow');
+      expect(item.options.single.label, 'Allow');
+    });
+
+    test('acp.tool_request produces a ToolRequestTimelineItem', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+        'callId': 't1',
+        'toolName': 'propose_edit',
+        'args': '{"changeId":"c1"}',
+      }));
+      final item = r.current.timeline.single as ToolRequestTimelineItem;
+      expect(item.requestId, 't1');
+      expect(item.toolName, 'propose_edit');
+      expect(item.argsJson, '{"changeId":"c1"}');
+    });
+
+    test('Adapter B items are independent of Adapter A — resolving one A item does not touch a B item', () {
+      final r = ConversationReducer();
+      r.apply(const StateSnapshotEvent(snapshot: {
+        'pocketcoder': {
+          'permission': {
+            'requestId': 'a1', 'status': 'pending',
+            'options': [{'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}],
+          }
+        }
+      }));
+      r.apply(const CustomEvent(name: 'acp.permission_request', value: {
+        'callId': 'b1', 'toolName': 'x', 'description': 'x', 'optionsJson': '[]',
+      }));
+      expect(r.current.timeline, hasLength(2));
+
+      // A fresh StateSnapshot rebuild (Adapter A's normal behavior) must not
+      // wipe Adapter B's b1 item.
+      r.apply(const StateSnapshotEvent(snapshot: {
+        'pocketcoder': {
+          'permission': {
+            'requestId': 'a1', 'status': 'pending',
+            'options': [{'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}],
+          }
+        }
+      }));
+      expect(r.current.timeline, hasLength(2));
+      expect(r.current.timeline.any((i) => i is PermissionRequestTimelineItem && i.requestId == 'b1'),
+          isTrue);
+    });
+  });
+
   group('cold replay', () {
     test('sync replace marker resets the accumulator; only post-marker events survive', () {
       final r = ConversationReducer()

@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   ag_ui: 0.3.0
+  diff_match_patch: ^0.4.1
   flutter_chat_core: ^2.9.0
   flutter_chat_ui: ^2.11.1
   flutter_markdown_plus: ^1.0.3

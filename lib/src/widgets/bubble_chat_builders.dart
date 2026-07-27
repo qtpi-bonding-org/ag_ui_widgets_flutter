@@ -99,6 +99,8 @@ class BubbleChatBuilders {
 
   CustomCardBuilder get toolCallBuilder => (context, message, index, {required isSentByMe, groupStatus}) {
         final name = message.metadata?['name'] as String? ?? '';
+        final override = callbacks.toolCallOverrides[name];
+        if (override != null) return override(context, message);
         final result = message.metadata?['result'] as String?;
         final diffs = (message.metadata?['diffs'] as List<dynamic>?) ?? const [];
         return Align(

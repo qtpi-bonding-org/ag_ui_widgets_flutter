@@ -168,4 +168,21 @@ void main() {
     expect(find.text('HEADER:assistant'), findsOneWidget);
     expect(calls.single, (role: 'assistant', isSentByMe: false, isReasoning: true));
   });
+
+  testWidgets('toolCallBuilder dispatches to a registered toolCallOverrides entry', (tester) async {
+    final builders = BubbleChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+        toolCallOverrides: {'edit_file': (context, message) => const Text('CUSTOM TOOL CALL')},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [TimelineItem.toolCall(id: 't1', name: 'edit_file')]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('CUSTOM TOOL CALL'), findsOneWidget);
+  });
 }

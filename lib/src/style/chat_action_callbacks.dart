@@ -1,5 +1,6 @@
 // lib/src/style/chat_action_callbacks.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import '../model/conversation.dart';
 
 /// Action hooks a builder-family caller supplies so shared card content
@@ -11,6 +12,7 @@ class ChatActionCallbacks {
     required this.onPermissionOptionSelected,
     required this.onElicitationRespond,
     this.toolRequestOverrides = const {},
+    this.toolCallOverrides = const {},
   });
 
   /// Signature-compatible with IAgUiTransport.respondPermission(callId,
@@ -31,4 +33,9 @@ class ChatActionCallbacks {
   /// app registers 'render_surface' -> its own surface-hosting widget).
   /// Unregistered tool names get the generic fallback card.
   final Map<String, Widget Function(BuildContext, ToolRequestTimelineItem)> toolRequestOverrides;
+
+  /// Keyed by the tool-call's `name` (`ToolCallTimelineItem.name`). A
+  /// registered entry fully replaces the generic tool-call card for that
+  /// name — mirrors [toolRequestOverrides] exactly.
+  final Map<String, Widget Function(BuildContext, chat_core.CustomMessage)> toolCallOverrides;
 }

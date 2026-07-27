@@ -1,6 +1,8 @@
 // lib/src/widgets/default_builders.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
+import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
+    as chat_stream;
 
 /// Plain bubble used when the caller doesn't supply a `textMessageBuilder`.
 /// Theme.of(context)-only — see design spec's theming section for why the
@@ -53,5 +55,30 @@ Widget defaultToolCallBuilder(
         if (result != null) Text(result, style: Theme.of(context).textTheme.bodySmall),
       ],
     ),
+  );
+}
+
+/// Plain streaming-text renderer used when the caller doesn't supply a
+/// `textStreamMessageBuilder`. Explicitly passes `sentTextStyle`/
+/// `receivedTextStyle` derived from `Theme.of(context)` — left unset,
+/// `FlyerChatTextStreamMessage` falls back to `flutter_chat_ui`'s ambient
+/// `ChatTheme.light()` default instead, causing a visible color pop when
+/// streaming ends and rendering switches to `textMessageBuilder`.
+Widget defaultTextStreamMessageBuilder(
+  BuildContext context,
+  chat_core.TextStreamMessage message,
+  int index, {
+  required bool isSentByMe,
+  chat_core.MessageGroupStatus? groupStatus,
+  required chat_stream.StreamState streamState,
+}) {
+  final colors = Theme.of(context).colorScheme;
+  final bodyStyle = Theme.of(context).textTheme.bodyMedium;
+  return chat_stream.FlyerChatTextStreamMessage(
+    message: message,
+    index: index,
+    streamState: streamState,
+    sentTextStyle: bodyStyle?.copyWith(color: colors.onPrimaryContainer),
+    receivedTextStyle: bodyStyle?.copyWith(color: colors.onSurface),
   );
 }

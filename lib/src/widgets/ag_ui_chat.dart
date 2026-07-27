@@ -16,6 +16,21 @@ typedef CustomCardBuilder = Widget Function(
   chat_core.MessageGroupStatus? groupStatus,
 });
 
+/// Local typedef for `AgUiChat.textStreamMessageBuilder` — mirrors
+/// `CustomCardBuilder`'s pattern. `chat_core.TextStreamMessageBuilder` is
+/// typed against `chat_core.TextStreamMessage`, which carries no text
+/// content (only `id`/`authorId`/`streamId`); the partial text exists only
+/// in this package's private `streamStates` map, so we expose `streamState`
+/// as an explicit param that `AgUiChat` itself supplies at the call site.
+typedef TextStreamCardBuilder = Widget Function(
+  BuildContext context,
+  chat_core.TextStreamMessage message,
+  int index, {
+  required bool isSentByMe,
+  chat_core.MessageGroupStatus? groupStatus,
+  required chat_stream.StreamState streamState,
+});
+
 /// Renders a [Conversation]'s timeline as a chat, wrapping `flutter_chat_ui`.
 /// Every message kind is rendered by a caller-suppliable builder; unset
 /// builders fall back to plain Theme.of(context)-only defaults.
@@ -31,6 +46,7 @@ class AgUiChat extends StatefulWidget {
     this.elicitationBuilder,
     this.toolRequestBuilder,
     this.composerBuilder,
+    this.textStreamMessageBuilder,
   });
 
   final Conversation conversation;
@@ -54,6 +70,12 @@ class AgUiChat extends StatefulWidget {
   final Widget Function(BuildContext context, TimelineItem item)? toolRequestBuilder;
 
   final WidgetBuilder? composerBuilder;
+
+  /// Caller-supplied override for the in-progress streaming message
+  /// builder. Unset falls back to `defaultTextStreamMessageBuilder`. See
+  /// `TextStreamCardBuilder` for why this slot can't reuse
+  /// `chat_core.TextStreamMessageBuilder`'s shape.
+  final TextStreamCardBuilder? textStreamMessageBuilder;
 
   @override
   State<AgUiChat> createState() => _AgUiChatState();
@@ -110,11 +132,12 @@ class _AgUiChatState extends State<AgUiChat> {
       builders: chat_core.Builders(
         textMessageBuilder: widget.textMessageBuilder ?? defaultTextMessageBuilder,
         textStreamMessageBuilder: (context, message, index, {required isSentByMe, groupStatus}) =>
-            chat_stream.FlyerChatTextStreamMessage(
-          message: message,
-          index: index,
-          streamState: streamStates[message.id] ?? const chat_stream.StreamStateLoading(),
-        ),
+            (widget.textStreamMessageBuilder ?? defaultTextStreamMessageBuilder)(
+              context, message, index,
+              isSentByMe: isSentByMe,
+              groupStatus: groupStatus,
+              streamState: streamStates[message.id] ?? const chat_stream.StreamStateLoading(),
+            ),
         customMessageBuilder: (context, message, index, {required isSentByMe, groupStatus}) {
           switch (message.metadata?['kind']) {
             case 'toolCall':

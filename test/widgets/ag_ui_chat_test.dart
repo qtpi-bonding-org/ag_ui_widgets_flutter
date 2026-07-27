@@ -127,4 +127,22 @@ void main() {
     // should not be in the tree.
     expect(find.text('TOOL REQUEST CARD'), findsNothing);
   });
+
+  testWidgets('uses the caller-supplied textStreamMessageBuilder when set', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: AgUiChat(
+          conversation: const Conversation(timeline: [
+            TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial'),
+          ]),
+          currentUserId: 'user',
+          onSendMessage: (_) {},
+          textStreamMessageBuilder: (context, message, index, {required isSentByMe, groupStatus, required streamState}) =>
+              const Text('CUSTOM STREAM'),
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('CUSTOM STREAM'), findsOneWidget);
+  });
 }

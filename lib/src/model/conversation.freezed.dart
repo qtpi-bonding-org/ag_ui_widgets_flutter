@@ -808,7 +808,8 @@ extension TimelineItemPatterns on TimelineItem {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id, ChatMessageKind kind, String role, String text)?
         text,
-    TResult Function(String id, String role, String text)? textStream,
+    TResult Function(String id, ChatMessageKind kind, String role, String text)?
+        textStream,
     TResult Function(String id, String name, String args, String? result,
             List<ToolDiff> diffs)?
         toolCall,
@@ -828,7 +829,7 @@ extension TimelineItemPatterns on TimelineItem {
       case TextTimelineItem() when text != null:
         return text(_that.id, _that.kind, _that.role, _that.text);
       case TextStreamTimelineItem() when textStream != null:
-        return textStream(_that.id, _that.role, _that.text);
+        return textStream(_that.id, _that.kind, _that.role, _that.text);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(
             _that.id, _that.name, _that.args, _that.result, _that.diffs);
@@ -864,7 +865,9 @@ extension TimelineItemPatterns on TimelineItem {
     required TResult Function(
             String id, ChatMessageKind kind, String role, String text)
         text,
-    required TResult Function(String id, String role, String text) textStream,
+    required TResult Function(
+            String id, ChatMessageKind kind, String role, String text)
+        textStream,
     required TResult Function(String id, String name, String args,
             String? result, List<ToolDiff> diffs)
         toolCall,
@@ -887,7 +890,7 @@ extension TimelineItemPatterns on TimelineItem {
       case TextTimelineItem():
         return text(_that.id, _that.kind, _that.role, _that.text);
       case TextStreamTimelineItem():
-        return textStream(_that.id, _that.role, _that.text);
+        return textStream(_that.id, _that.kind, _that.role, _that.text);
       case ToolCallTimelineItem():
         return toolCall(
             _that.id, _that.name, _that.args, _that.result, _that.diffs);
@@ -920,7 +923,9 @@ extension TimelineItemPatterns on TimelineItem {
     TResult? Function(
             String id, ChatMessageKind kind, String role, String text)?
         text,
-    TResult? Function(String id, String role, String text)? textStream,
+    TResult? Function(
+            String id, ChatMessageKind kind, String role, String text)?
+        textStream,
     TResult? Function(String id, String name, String args, String? result,
             List<ToolDiff> diffs)?
         toolCall,
@@ -939,7 +944,7 @@ extension TimelineItemPatterns on TimelineItem {
       case TextTimelineItem() when text != null:
         return text(_that.id, _that.kind, _that.role, _that.text);
       case TextStreamTimelineItem() when textStream != null:
-        return textStream(_that.id, _that.role, _that.text);
+        return textStream(_that.id, _that.kind, _that.role, _that.text);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(
             _that.id, _that.name, _that.args, _that.result, _that.diffs);
@@ -1051,9 +1056,14 @@ class _$TextTimelineItemCopyWithImpl<$Res>
 
 class TextStreamTimelineItem implements TimelineItem {
   const TextStreamTimelineItem(
-      {required this.id, required this.role, required this.text});
+      {required this.id,
+      this.kind = ChatMessageKind.text,
+      required this.role,
+      required this.text});
 
   final String id;
+  @JsonKey()
+  final ChatMessageKind kind;
   final String role;
   final String text;
 
@@ -1071,16 +1081,17 @@ class TextStreamTimelineItem implements TimelineItem {
         (other.runtimeType == runtimeType &&
             other is TextStreamTimelineItem &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.kind, kind) || other.kind == kind) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.text, text) || other.text == text));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, role, text);
+  int get hashCode => Object.hash(runtimeType, id, kind, role, text);
 
   @override
   String toString() {
-    return 'TimelineItem.textStream(id: $id, role: $role, text: $text)';
+    return 'TimelineItem.textStream(id: $id, kind: $kind, role: $role, text: $text)';
   }
 }
 
@@ -1091,7 +1102,7 @@ abstract mixin class $TextStreamTimelineItemCopyWith<$Res>
           $Res Function(TextStreamTimelineItem) _then) =
       _$TextStreamTimelineItemCopyWithImpl;
   @useResult
-  $Res call({String id, String role, String text});
+  $Res call({String id, ChatMessageKind kind, String role, String text});
 }
 
 /// @nodoc
@@ -1107,6 +1118,7 @@ class _$TextStreamTimelineItemCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
+    Object? kind = null,
     Object? role = null,
     Object? text = null,
   }) {
@@ -1115,6 +1127,10 @@ class _$TextStreamTimelineItemCopyWithImpl<$Res>
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      kind: null == kind
+          ? _self.kind
+          : kind // ignore: cast_nullable_to_non_nullable
+              as ChatMessageKind,
       role: null == role
           ? _self.role
           : role // ignore: cast_nullable_to_non_nullable

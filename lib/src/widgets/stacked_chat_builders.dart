@@ -70,18 +70,22 @@ class StackedChatBuilders {
 
   TextStreamCardBuilder get textStreamMessageBuilder =>
       (context, message, index, {required isSentByMe, groupStatus, required streamState}) {
+        final isReasoning = message.metadata?['kind'] == 'reasoning';
         final role = message.metadata?['role'] as String? ?? (isSentByMe ? 'user' : 'assistant');
+        final effectiveStyle = isReasoning
+            ? (style.reasoningTextStyle ?? style.textStyle.copyWith(fontStyle: FontStyle.italic))
+            : style.textStyle;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (style.roleHeaderBuilder != null)
-              style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: false),
+              style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: isReasoning),
             chat_stream.FlyerChatTextStreamMessage(
               message: message,
               index: index,
               streamState: streamState,
-              sentTextStyle: style.textStyle,
-              receivedTextStyle: style.textStyle,
+              sentTextStyle: effectiveStyle,
+              receivedTextStyle: effectiveStyle,
             ),
           ],
         );

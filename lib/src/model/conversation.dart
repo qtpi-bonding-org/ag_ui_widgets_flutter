@@ -47,9 +47,12 @@ sealed class TimelineItem with _$TimelineItem {
 
   /// A still-open text message: `text` is the partial content accumulated
   /// so far. Replaced in place by a `TimelineItem.text` (same `id`) once the
-  /// message's `*_END` event arrives.
+  /// message's `*_END` event arrives. `kind` mirrors `TimelineItem.text`'s
+  /// so a still-streaming reasoning block can be told apart from a
+  /// still-streaming response while it's in progress, not just once done.
   const factory TimelineItem.textStream({
     required String id,
+    @Default(ChatMessageKind.text) ChatMessageKind kind,
     required String role,
     required String text,
   }) = TextStreamTimelineItem;

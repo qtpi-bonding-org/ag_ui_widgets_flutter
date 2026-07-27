@@ -34,16 +34,37 @@ void main() {
   });
 
   group('reasoning messages', () {
-    test('START/CONTENT/END -> one reasoning text item (no streaming placeholder)', () {
-      final r = ConversationReducer()
-        ..apply(const ReasoningMessageStartEvent(messageId: 'r1'))
-        ..apply(const ReasoningMessageContentEvent(messageId: 'r1', delta: 'thinking...'))
-        ..apply(const ReasoningMessageEndEvent(messageId: 'r1'));
+    test('START -> reasoning textStream item; CONTENT grows in place; END -> replaced by reasoning text item', () {
+      final r = ConversationReducer();
+      r.apply(const ReasoningMessageStartEvent(messageId: 'r1'));
+      expect(r.current.timeline, hasLength(1));
+      final streaming = r.current.timeline.single as TextStreamTimelineItem;
+      expect(streaming.kind, ChatMessageKind.reasoning);
+      expect(streaming.text, '');
 
+      r.apply(const ReasoningMessageContentEvent(messageId: 'r1', delta: 'thinking...'));
+      expect(r.current.timeline, hasLength(1));
+      expect((r.current.timeline.single as TextStreamTimelineItem).text, 'thinking...');
+
+      r.apply(const ReasoningMessageEndEvent(messageId: 'r1'));
       expect(r.current.timeline, hasLength(1));
       final item = r.current.timeline.single as TextTimelineItem;
       expect(item.kind, ChatMessageKind.reasoning);
       expect(item.text, 'thinking...');
+    });
+
+    test('reasoning streams in place even when a tool call starts afterward', () {
+      final r = ConversationReducer()
+        ..apply(const ReasoningMessageStartEvent(messageId: 'r1'))
+        ..apply(const ReasoningMessageContentEvent(messageId: 'r1', delta: 'first '))
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
+        ..apply(const ReasoningMessageContentEvent(messageId: 'r1', delta: 'second'));
+
+      expect(r.current.timeline, hasLength(2));
+      final reasoning = r.current.timeline[0] as TextStreamTimelineItem;
+      expect(reasoning.kind, ChatMessageKind.reasoning);
+      expect(reasoning.text, 'first second');
+      expect(r.current.timeline[1], isA<ToolCallTimelineItem>());
     });
   });
 

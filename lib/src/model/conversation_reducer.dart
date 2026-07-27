@@ -35,6 +35,7 @@ class ConversationReducer {
   final Map<String, _OpenMessage> _openText = {};
   final Map<String, int> _openTextIndex = {};
   final Map<String, _OpenMessage> _openReasoning = {};
+  final Map<String, int> _openReasoningIndex = {};
   final Map<String, int> _toolTimelineIndex = {};
   final Map<String, dynamic> _pocketcoder = {};
   final Set<String> _adapterAIds = {};
@@ -96,23 +97,35 @@ class ConversationReducer {
         }
 
       case ag_ui.ReasoningMessageStartEvent():
-        _openReasoning[event.messageId] = _OpenMessage(event.role.value);
+        final open = _OpenMessage(event.role.value);
+        _openReasoning[event.messageId] = open;
+        _insertTimelineItem(
+          _timeline.length,
+          TimelineItem.textStream(
+              id: event.messageId, kind: ChatMessageKind.reasoning, role: open.role, text: ''),
+        );
+        _openReasoningIndex[event.messageId] = _timeline.length - 1;
       case ag_ui.ReasoningMessageContentEvent():
-        _openReasoning
-            .putIfAbsent(event.messageId, () => _OpenMessage('assistant'))
-            .text
-            .write(event.delta);
-      case ag_ui.ReasoningMessageEndEvent():
-        final open = _openReasoning.remove(event.messageId);
-        if (open != null) {
-          _insertTimelineItem(
-            _timeline.length,
-            TimelineItem.text(
+        final open = _openReasoning.putIfAbsent(
+            event.messageId, () => _OpenMessage('assistant'));
+        open.text.write(event.delta);
+        final idx = _openReasoningIndex[event.messageId];
+        if (idx != null) {
+          _timeline[idx] = TimelineItem.textStream(
               id: event.messageId,
               kind: ChatMessageKind.reasoning,
               role: open.role,
-              text: open.text.toString(),
-            ),
+              text: open.text.toString());
+        }
+      case ag_ui.ReasoningMessageEndEvent():
+        final open = _openReasoning.remove(event.messageId);
+        final idx = _openReasoningIndex.remove(event.messageId);
+        if (open != null && idx != null) {
+          _timeline[idx] = TimelineItem.text(
+            id: event.messageId,
+            kind: ChatMessageKind.reasoning,
+            role: open.role,
+            text: open.text.toString(),
           );
         }
 
@@ -229,6 +242,7 @@ class ConversationReducer {
     _openText.clear();
     _openTextIndex.clear();
     _openReasoning.clear();
+    _openReasoningIndex.clear();
     _toolTimelineIndex.clear();
     _pocketcoder.clear();
     _isRunning = false;
@@ -252,6 +266,7 @@ class ConversationReducer {
     _timeline.insert(index, item);
     _toolTimelineIndex.updateAll((_, i) => i >= index ? i + 1 : i);
     _openTextIndex.updateAll((_, i) => i >= index ? i + 1 : i);
+    _openReasoningIndex.updateAll((_, i) => i >= index ? i + 1 : i);
   }
 
   void _removeTimelineItemsWhere(bool Function(TimelineItem) test) {
@@ -260,6 +275,7 @@ class ConversationReducer {
         _timeline.removeAt(i);
         _toolTimelineIndex.updateAll((_, v) => v > i ? v - 1 : v);
         _openTextIndex.updateAll((_, v) => v > i ? v - 1 : v);
+        _openReasoningIndex.updateAll((_, v) => v > i ? v - 1 : v);
       }
     }
   }

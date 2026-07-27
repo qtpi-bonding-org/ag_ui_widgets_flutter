@@ -27,6 +27,7 @@ void main() {
           permissionBuilder: builders.permissionBuilder,
           elicitationBuilder: builders.elicitationBuilder,
           toolRequestBuilder: builders.toolRequestBuilder,
+          textStreamMessageBuilder: builders.textStreamMessageBuilder,
         ),
       ),
     );
@@ -140,5 +141,31 @@ void main() {
     final markdownBody = tester.widget<MarkdownBody>(find.byType(MarkdownBody));
     expect(markdownBody.styleSheet?.p?.fontStyle, FontStyle.italic);
     expect(markdownBody.styleSheet?.p?.color, Colors.orange);
+  });
+
+  testWidgets('roleHeaderBuilder receives role/isSentByMe/isReasoning', (tester) async {
+    final calls = <({String role, bool isSentByMe, bool isReasoning})>[];
+    final styleWithHeader = style.copyWith(
+      roleHeaderBuilder: (context, {required role, required isSentByMe, required isReasoning}) {
+        calls.add((role: role, isSentByMe: isSentByMe, isReasoning: isReasoning));
+        return Text('HEADER:$role');
+      },
+    );
+    final builders = BubbleChatBuilders(
+      styleWithHeader,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking'),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('HEADER:assistant'), findsOneWidget);
+    expect(calls.single, (role: 'assistant', isSentByMe: false, isReasoning: true));
   });
 }

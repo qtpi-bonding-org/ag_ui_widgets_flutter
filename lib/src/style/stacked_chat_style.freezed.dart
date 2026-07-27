@@ -25,6 +25,10 @@ mixin _$StackedChatStyle {
   Color get diffRemovedColor;
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
   TextStyle? get reasoningTextStyle;
+  Widget Function(BuildContext context,
+      {required String role,
+      required bool isSentByMe,
+      required bool isReasoning})? get roleHeaderBuilder;
 
   /// Create a copy of StackedChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -60,7 +64,9 @@ mixin _$StackedChatStyle {
                     markdownStyleSheetBuilder) ||
                 other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
-                other.reasoningTextStyle == reasoningTextStyle));
+                other.reasoningTextStyle == reasoningTextStyle) &&
+            (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
+                other.roleHeaderBuilder == roleHeaderBuilder));
   }
 
   @override
@@ -76,11 +82,12 @@ mixin _$StackedChatStyle {
       diffAddedColor,
       diffRemovedColor,
       markdownStyleSheetBuilder,
-      reasoningTextStyle);
+      reasoningTextStyle,
+      roleHeaderBuilder);
 
   @override
   String toString() {
-    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
+    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
   }
 }
 
@@ -101,7 +108,12 @@ abstract mixin class $StackedChatStyleCopyWith<$Res> {
       Color diffAddedColor,
       Color diffRemovedColor,
       MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
-      TextStyle? reasoningTextStyle});
+      TextStyle? reasoningTextStyle,
+      Widget Function(BuildContext context,
+              {required String role,
+              required bool isSentByMe,
+              required bool isReasoning})?
+          roleHeaderBuilder});
 }
 
 /// @nodoc
@@ -128,6 +140,7 @@ class _$StackedChatStyleCopyWithImpl<$Res>
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
+    Object? roleHeaderBuilder = freezed,
   }) {
     return _then(_self.copyWith(
       sentBackground: null == sentBackground
@@ -174,6 +187,13 @@ class _$StackedChatStyleCopyWithImpl<$Res>
           ? _self.reasoningTextStyle
           : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
               as TextStyle?,
+      roleHeaderBuilder: freezed == roleHeaderBuilder
+          ? _self.roleHeaderBuilder
+          : roleHeaderBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext context,
+                  {required String role,
+                  required bool isSentByMe,
+                  required bool isReasoning})?,
     ));
   }
 }
@@ -283,7 +303,12 @@ extension StackedChatStylePatterns on StackedChatStyle {
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder,
-            TextStyle? reasoningTextStyle)?
+            TextStyle? reasoningTextStyle,
+            Widget Function(BuildContext context,
+                    {required String role,
+                    required bool isSentByMe,
+                    required bool isReasoning})?
+                roleHeaderBuilder)?
         $default, {
     required TResult orElse(),
   }) {
@@ -301,7 +326,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.diffAddedColor,
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
-            _that.reasoningTextStyle);
+            _that.reasoningTextStyle,
+            _that.roleHeaderBuilder);
       case _:
         return orElse();
     }
@@ -334,7 +360,12 @@ extension StackedChatStylePatterns on StackedChatStyle {
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder,
-            TextStyle? reasoningTextStyle)
+            TextStyle? reasoningTextStyle,
+            Widget Function(BuildContext context,
+                    {required String role,
+                    required bool isSentByMe,
+                    required bool isReasoning})?
+                roleHeaderBuilder)
         $default,
   ) {
     final _that = this;
@@ -351,7 +382,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.diffAddedColor,
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
-            _that.reasoningTextStyle);
+            _that.reasoningTextStyle,
+            _that.roleHeaderBuilder);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -383,7 +415,12 @@ extension StackedChatStylePatterns on StackedChatStyle {
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder,
-            TextStyle? reasoningTextStyle)?
+            TextStyle? reasoningTextStyle,
+            Widget Function(BuildContext context,
+                    {required String role,
+                    required bool isSentByMe,
+                    required bool isReasoning})?
+                roleHeaderBuilder)?
         $default,
   ) {
     final _that = this;
@@ -400,7 +437,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.diffAddedColor,
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
-            _that.reasoningTextStyle);
+            _that.reasoningTextStyle,
+            _that.roleHeaderBuilder);
       case _:
         return null;
     }
@@ -421,7 +459,8 @@ class _StackedChatStyle implements StackedChatStyle {
       this.diffAddedColor = const Color(0xFF2E7D32),
       this.diffRemovedColor = const Color(0xFFC62828),
       this.markdownStyleSheetBuilder,
-      this.reasoningTextStyle});
+      this.reasoningTextStyle,
+      this.roleHeaderBuilder});
 
   @override
   final Color sentBackground;
@@ -449,6 +488,11 @@ class _StackedChatStyle implements StackedChatStyle {
   final MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder;
   @override
   final TextStyle? reasoningTextStyle;
+  @override
+  final Widget Function(BuildContext context,
+      {required String role,
+      required bool isSentByMe,
+      required bool isReasoning})? roleHeaderBuilder;
 
   /// Create a copy of StackedChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -484,7 +528,9 @@ class _StackedChatStyle implements StackedChatStyle {
                     markdownStyleSheetBuilder) ||
                 other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
-                other.reasoningTextStyle == reasoningTextStyle));
+                other.reasoningTextStyle == reasoningTextStyle) &&
+            (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
+                other.roleHeaderBuilder == roleHeaderBuilder));
   }
 
   @override
@@ -500,11 +546,12 @@ class _StackedChatStyle implements StackedChatStyle {
       diffAddedColor,
       diffRemovedColor,
       markdownStyleSheetBuilder,
-      reasoningTextStyle);
+      reasoningTextStyle,
+      roleHeaderBuilder);
 
   @override
   String toString() {
-    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
+    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
   }
 }
 
@@ -527,7 +574,12 @@ abstract mixin class _$StackedChatStyleCopyWith<$Res>
       Color diffAddedColor,
       Color diffRemovedColor,
       MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
-      TextStyle? reasoningTextStyle});
+      TextStyle? reasoningTextStyle,
+      Widget Function(BuildContext context,
+              {required String role,
+              required bool isSentByMe,
+              required bool isReasoning})?
+          roleHeaderBuilder});
 }
 
 /// @nodoc
@@ -554,6 +606,7 @@ class __$StackedChatStyleCopyWithImpl<$Res>
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
+    Object? roleHeaderBuilder = freezed,
   }) {
     return _then(_StackedChatStyle(
       sentBackground: null == sentBackground
@@ -600,6 +653,13 @@ class __$StackedChatStyleCopyWithImpl<$Res>
           ? _self.reasoningTextStyle
           : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
               as TextStyle?,
+      roleHeaderBuilder: freezed == roleHeaderBuilder
+          ? _self.roleHeaderBuilder
+          : roleHeaderBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext context,
+                  {required String role,
+                  required bool isSentByMe,
+                  required bool isReasoning})?,
     ));
   }
 }

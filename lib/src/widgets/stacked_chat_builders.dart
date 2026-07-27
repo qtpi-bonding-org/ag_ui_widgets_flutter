@@ -2,10 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
+    as chat_stream;
 import '../model/conversation.dart';
 import '../style/chat_action_callbacks.dart';
 import '../style/stacked_chat_style.dart';
-import 'ag_ui_chat.dart' show CustomCardBuilder;
+import 'ag_ui_chat.dart' show CustomCardBuilder, TextStreamCardBuilder;
 import 'chat_action_cards.dart';
 import 'markdown_body.dart';
 
@@ -27,6 +29,7 @@ class StackedChatBuilders {
   chat_core.TextMessageBuilder get textMessageBuilder =>
       (context, message, index, {required isSentByMe, groupStatus}) {
         final isReasoning = message.metadata?['kind'] == 'reasoning';
+        final role = message.metadata?['role'] as String? ?? (isSentByMe ? 'user' : 'assistant');
         final effectiveStyle = isReasoning
             ? (style.reasoningTextStyle ?? style.textStyle.copyWith(fontStyle: FontStyle.italic))
             : style.textStyle;
@@ -39,22 +42,48 @@ class StackedChatBuilders {
           margin: const EdgeInsets.symmetric(vertical: 4),
           padding: style.padding,
           color: isSentByMe ? style.sentBackground : style.receivedBackground,
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!isSentByMe && style.aiLeadingIconBuilder != null) ...[
-                style.aiLeadingIconBuilder!(context),
-                const SizedBox(width: 8),
-              ],
-              Expanded(
-                child: chatMarkdownBody(
-                  context,
-                  message.text,
-                  styleSheetBuilder: styleSheetBuilder,
-                ),
+              if (style.roleHeaderBuilder != null)
+                style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: isReasoning),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isSentByMe && style.aiLeadingIconBuilder != null) ...[
+                    style.aiLeadingIconBuilder!(context),
+                    const SizedBox(width: 8),
+                  ],
+                  Expanded(
+                    child: chatMarkdownBody(
+                      context,
+                      message.text,
+                      styleSheetBuilder: styleSheetBuilder,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
+        );
+      };
+
+  TextStreamCardBuilder get textStreamMessageBuilder =>
+      (context, message, index, {required isSentByMe, groupStatus, required streamState}) {
+        final role = message.metadata?['role'] as String? ?? (isSentByMe ? 'user' : 'assistant');
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (style.roleHeaderBuilder != null)
+              style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: false),
+            chat_stream.FlyerChatTextStreamMessage(
+              message: message,
+              index: index,
+              streamState: streamState,
+              sentTextStyle: style.textStyle,
+              receivedTextStyle: style.textStyle,
+            ),
+          ],
         );
       };
 

@@ -19,12 +19,16 @@ chat_core.Message _toMessage(TimelineItem item) {
         id: id,
         authorId: role == 'user' ? kUserAuthorId : kAgentAuthorId,
         text: text,
-        metadata: {'kind': kind == ChatMessageKind.reasoning ? 'reasoning' : 'text'},
+        metadata: {
+          'kind': kind == ChatMessageKind.reasoning ? 'reasoning' : 'text',
+          'role': role,
+        },
       ),
     TextStreamTimelineItem(:final id, :final role) => chat_core.Message.textStream(
         id: id,
         authorId: role == 'user' ? kUserAuthorId : kAgentAuthorId,
         streamId: id,
+        metadata: {'role': role},
       ),
     ToolCallTimelineItem(:final id, :final name, :final args, :final result, :final diffs) =>
       chat_core.Message.custom(

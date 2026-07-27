@@ -27,6 +27,10 @@ mixin _$BubbleChatStyle {
   Color get diffRemovedColor;
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
   TextStyle? get reasoningTextStyle;
+  Widget Function(BuildContext context,
+      {required String role,
+      required bool isSentByMe,
+      required bool isReasoning})? get roleHeaderBuilder;
 
   /// Create a copy of BubbleChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -66,7 +70,9 @@ mixin _$BubbleChatStyle {
                     markdownStyleSheetBuilder) ||
                 other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
-                other.reasoningTextStyle == reasoningTextStyle));
+                other.reasoningTextStyle == reasoningTextStyle) &&
+            (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
+                other.roleHeaderBuilder == roleHeaderBuilder));
   }
 
   @override
@@ -84,11 +90,12 @@ mixin _$BubbleChatStyle {
       diffAddedColor,
       diffRemovedColor,
       markdownStyleSheetBuilder,
-      reasoningTextStyle);
+      reasoningTextStyle,
+      roleHeaderBuilder);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
   }
 }
 
@@ -111,7 +118,12 @@ abstract mixin class $BubbleChatStyleCopyWith<$Res> {
       Color diffAddedColor,
       Color diffRemovedColor,
       MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
-      TextStyle? reasoningTextStyle});
+      TextStyle? reasoningTextStyle,
+      Widget Function(BuildContext context,
+              {required String role,
+              required bool isSentByMe,
+              required bool isReasoning})?
+          roleHeaderBuilder});
 }
 
 /// @nodoc
@@ -140,6 +152,7 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
+    Object? roleHeaderBuilder = freezed,
   }) {
     return _then(_self.copyWith(
       sentBackground: null == sentBackground
@@ -194,6 +207,13 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
           ? _self.reasoningTextStyle
           : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
               as TextStyle?,
+      roleHeaderBuilder: freezed == roleHeaderBuilder
+          ? _self.roleHeaderBuilder
+          : roleHeaderBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext context,
+                  {required String role,
+                  required bool isSentByMe,
+                  required bool isReasoning})?,
     ));
   }
 }
@@ -305,7 +325,12 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder,
-            TextStyle? reasoningTextStyle)?
+            TextStyle? reasoningTextStyle,
+            Widget Function(BuildContext context,
+                    {required String role,
+                    required bool isSentByMe,
+                    required bool isReasoning})?
+                roleHeaderBuilder)?
         $default, {
     required TResult orElse(),
   }) {
@@ -325,7 +350,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.diffAddedColor,
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
-            _that.reasoningTextStyle);
+            _that.reasoningTextStyle,
+            _that.roleHeaderBuilder);
       case _:
         return orElse();
     }
@@ -360,7 +386,12 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder,
-            TextStyle? reasoningTextStyle)
+            TextStyle? reasoningTextStyle,
+            Widget Function(BuildContext context,
+                    {required String role,
+                    required bool isSentByMe,
+                    required bool isReasoning})?
+                roleHeaderBuilder)
         $default,
   ) {
     final _that = this;
@@ -379,7 +410,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.diffAddedColor,
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
-            _that.reasoningTextStyle);
+            _that.reasoningTextStyle,
+            _that.roleHeaderBuilder);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -413,7 +445,12 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder,
-            TextStyle? reasoningTextStyle)?
+            TextStyle? reasoningTextStyle,
+            Widget Function(BuildContext context,
+                    {required String role,
+                    required bool isSentByMe,
+                    required bool isReasoning})?
+                roleHeaderBuilder)?
         $default,
   ) {
     final _that = this;
@@ -432,7 +469,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.diffAddedColor,
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
-            _that.reasoningTextStyle);
+            _that.reasoningTextStyle,
+            _that.roleHeaderBuilder);
       case _:
         return null;
     }
@@ -455,7 +493,8 @@ class _BubbleChatStyle implements BubbleChatStyle {
       this.diffAddedColor = const Color(0xFF2E7D32),
       this.diffRemovedColor = const Color(0xFFC62828),
       this.markdownStyleSheetBuilder,
-      this.reasoningTextStyle});
+      this.reasoningTextStyle,
+      this.roleHeaderBuilder});
 
   @override
   final Color sentBackground;
@@ -488,6 +527,11 @@ class _BubbleChatStyle implements BubbleChatStyle {
   final MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder;
   @override
   final TextStyle? reasoningTextStyle;
+  @override
+  final Widget Function(BuildContext context,
+      {required String role,
+      required bool isSentByMe,
+      required bool isReasoning})? roleHeaderBuilder;
 
   /// Create a copy of BubbleChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -527,7 +571,9 @@ class _BubbleChatStyle implements BubbleChatStyle {
                     markdownStyleSheetBuilder) ||
                 other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
-                other.reasoningTextStyle == reasoningTextStyle));
+                other.reasoningTextStyle == reasoningTextStyle) &&
+            (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
+                other.roleHeaderBuilder == roleHeaderBuilder));
   }
 
   @override
@@ -545,11 +591,12 @@ class _BubbleChatStyle implements BubbleChatStyle {
       diffAddedColor,
       diffRemovedColor,
       markdownStyleSheetBuilder,
-      reasoningTextStyle);
+      reasoningTextStyle,
+      roleHeaderBuilder);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
   }
 }
 
@@ -574,7 +621,12 @@ abstract mixin class _$BubbleChatStyleCopyWith<$Res>
       Color diffAddedColor,
       Color diffRemovedColor,
       MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
-      TextStyle? reasoningTextStyle});
+      TextStyle? reasoningTextStyle,
+      Widget Function(BuildContext context,
+              {required String role,
+              required bool isSentByMe,
+              required bool isReasoning})?
+          roleHeaderBuilder});
 }
 
 /// @nodoc
@@ -603,6 +655,7 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
+    Object? roleHeaderBuilder = freezed,
   }) {
     return _then(_BubbleChatStyle(
       sentBackground: null == sentBackground
@@ -657,6 +710,13 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
           ? _self.reasoningTextStyle
           : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
               as TextStyle?,
+      roleHeaderBuilder: freezed == roleHeaderBuilder
+          ? _self.roleHeaderBuilder
+          : roleHeaderBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext context,
+                  {required String role,
+                  required bool isSentByMe,
+                  required bool isReasoning})?,
     ));
   }
 }

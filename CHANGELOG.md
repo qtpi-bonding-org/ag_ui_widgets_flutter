@@ -1,3 +1,19 @@
+## 0.4.0
+
+- New: `AgUiChat.textStreamMessageBuilder` — streaming (in-progress) messages are now
+  caller-overridable like every other message kind (previously hardcoded internally).
+- New: `StackedChatStyle`/`BubbleChatStyle` gain `diffAddedColor`/`diffRemovedColor`,
+  `reasoningTextStyle`, and `roleHeaderBuilder({role, isSentByMe, isReasoning})`.
+- New: `ChatActionCallbacks` gains `toolCallOverrides` (mirrors `toolRequestOverrides`),
+  `permissionCardBuilder`, `elicitationCardBuilder` (full-override escape hatches, `null` falls
+  back to generic shared content).
+- New: both builder families now render tool-call diffs (`diffs` metadata) via a new shared
+  `DiffLinesView` widget, and render JSON-Schema-typed elicitation form fields (checkbox for
+  `boolean`, numeric keyboard for `integer`/`number`, dropdown for `enum`) instead of a plain
+  `TextField` per top-level schema key.
+- Fix: elicitation `mode == 'form'` cards previously read `schema.keys` directly instead of
+  `schema['properties']` — every form rendered zero usable fields for any real ACP-shaped schema.
+
 ## 0.3.0
 
 - **Breaking:** `IAgUiTransport.sendMessage` gains a `context` parameter

@@ -127,4 +127,78 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('lib/a.dart'), findsOneWidget);
   });
+
+  testWidgets('elicitation form renders a checkbox for boolean properties', (tester) async {
+    Map<String, dynamic>? gotResponse;
+    final builders = StackedChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, response) => gotResponse = response,
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.elicitationRequest(
+          requestId: 'e1',
+          message: 'Configure',
+          mode: 'form',
+          schema: {
+            'type': 'object',
+            'properties': {
+              'enabled': {'type': 'boolean', 'title': 'Enabled'},
+            },
+          },
+        ),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.byType(CheckboxListTile), findsOneWidget);
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Submit'));
+    expect(gotResponse, {'enabled': true});
+  });
+
+  testWidgets('elicitation form renders a numeric field for integer properties', (tester) async {
+    final builders = StackedChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.elicitationRequest(
+          requestId: 'e2',
+          message: 'Configure',
+          mode: 'form',
+          schema: {
+            'type': 'object',
+            'properties': {
+              'count': {'type': 'integer', 'title': 'Count'},
+            },
+          },
+        ),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    // `flutter_chat_core` mounts its own composer `TextField` underneath
+    // the elicitation card, so `find.byType(TextField)` matches two
+    // widgets — the elicitation one (our `_ElicitationForm` field) and
+    // the composer one. Both have a default `TextInputType.text`, so we
+    // assert specifically on the *numeric* one (i.e. the elicitation
+    // field) to disambiguate.
+    final numericFields = tester
+        .widgetList<TextField>(
+          find.byWidgetPredicate(
+            (w) => w is TextField && w.keyboardType == TextInputType.number,
+          ),
+        )
+        .toList();
+    expect(numericFields, hasLength(1));
+  });
 }

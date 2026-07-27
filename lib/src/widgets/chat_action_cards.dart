@@ -39,9 +39,9 @@ Widget buildPermissionCardContent(
 }
 
 /// Card content for a pending elicitation request, shared by every
-/// builder family. Renders mode-appropriate input: a text field per
-/// [item.schema] property for `mode == 'form'`, a link button to
-/// [item.url] for `mode == 'url'`, otherwise a plain acknowledgement
+/// builder family. Renders mode-appropriate input: a typed field per
+/// JSON-Schema [item.schema] property for `mode == 'form'`, a link button
+/// to [item.url] for `mode == 'url'`, otherwise a plain acknowledgement
 /// button.
 Widget buildElicitationCardContent(
   BuildContext context,
@@ -53,25 +53,20 @@ Widget buildElicitationCardContent(
   Widget action;
   switch (item.mode) {
     case 'form':
-      final controllers = <String, TextEditingController>{
-        for (final key in (item.schema?.keys ?? const <String>[])) key: TextEditingController(),
-      };
-      action = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final entry in controllers.entries)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: TextField(controller: entry.value, decoration: InputDecoration(labelText: entry.key)),
-            ),
-          ElevatedButton(
-            onPressed: () => onRespond(item.requestId, {
-              for (final entry in controllers.entries) entry.key: entry.value.text,
-            }),
-            child: const Text('Submit'),
-          ),
-        ],
+      final properties = (item.schema?['properties'] as Map<String, dynamic>?) ?? const {};
+      // The elicitation card is typically embedded in a decorated chat
+      // bubble; without an explicit `Material` ancestor, `CheckboxListTile`'s
+      // ink splash and `DropdownButtonFormField`'s input border paint onto a
+      // backgrounded `DecoratedBox` whose `Container` would otherwise hide
+      // them (`flutter` throws `ListTile background color ... may be invisible`
+      // here). This `Material` is local — it only wraps the form so it does
+      // not paint over the caller's outer card decoration.
+      action = Material(
+        type: MaterialType.transparency,
+        child: _ElicitationForm(
+          properties: properties,
+          onSubmit: (values) => onRespond(item.requestId, values),
+        ),
       );
     case 'url':
       action = ElevatedButton(
@@ -171,4 +166,97 @@ Widget buildToolCallCardContent(
       ],
     ),
   );
- }
+}
+
+/// One elicitation form: a typed field per JSON-Schema property (checkbox
+/// for `boolean`, numeric keyboard for `integer`/`number`, dropdown for an
+/// `enum` list, plain text otherwise), plus a Submit button collecting every
+/// field into the `Map<String, dynamic>` [onSubmit] expects.
+class _ElicitationForm extends StatefulWidget {
+  const _ElicitationForm({required this.properties, required this.onSubmit});
+
+  final Map<String, dynamic> properties;
+  final void Function(Map<String, dynamic> values) onSubmit;
+
+  @override
+  State<_ElicitationForm> createState() => _ElicitationFormState();
+}
+
+class _ElicitationFormState extends State<_ElicitationForm> {
+  final _controllers = <String, TextEditingController>{};
+  final _boolValues = <String, bool>{};
+
+  @override
+  void initState() {
+    super.initState();
+    for (final entry in widget.properties.entries) {
+      final spec = (entry.value as Map<String, dynamic>?) ?? const {};
+      if (spec['type'] == 'boolean') {
+        _boolValues[entry.key] = (spec['currentValue'] as bool?) ?? false;
+      } else {
+        _controllers[entry.key] = TextEditingController(text: spec['currentValue']?.toString() ?? '');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final entry in widget.properties.entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _field(entry.key, (entry.value as Map<String, dynamic>?) ?? const {}),
+          ),
+        ElevatedButton(
+          onPressed: () => widget.onSubmit({
+            for (final entry in _controllers.entries) entry.key: entry.value.text,
+            for (final entry in _boolValues.entries) entry.key: entry.value,
+          }),
+          child: const Text('Submit'),
+        ),
+      ],
+    );
+  }
+
+  Widget _field(String key, Map<String, dynamic> spec) {
+    final label = spec['title'] as String? ?? key;
+    final type = spec['type'] as String?;
+    final enumValues = spec['enum'] as List<dynamic>?;
+
+    if (type == 'boolean') {
+      return CheckboxListTile(
+        title: Text(label),
+        value: _boolValues[key] ?? false,
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: EdgeInsets.zero,
+        onChanged: (value) => setState(() => _boolValues[key] = value ?? false),
+      );
+    }
+    if (enumValues != null && enumValues.isNotEmpty) {
+      final current = _controllers[key]!.text;
+      return DropdownButtonFormField<String>(
+        decoration: InputDecoration(labelText: label),
+        initialValue: current.isNotEmpty ? current : null,
+        items: [for (final v in enumValues) DropdownMenuItem(value: v.toString(), child: Text(v.toString()))],
+        onChanged: (value) => setState(() => _controllers[key]!.text = value ?? ''),
+      );
+    }
+    final isNumeric = type == 'integer' || type == 'number';
+    return TextField(
+      controller: _controllers[key],
+      keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+      decoration: InputDecoration(labelText: label),
+    );
+  }
+}

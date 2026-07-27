@@ -91,4 +91,22 @@ void main() {
     await tester.tap(find.byType(ElevatedButton));
     expect(gotRequestId, 'e1');
   });
+
+  testWidgets('toolCallBuilder renders a diff summary when diffs are present', (tester) async {
+    final builders = BubbleChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.toolCall(id: 't1', name: 'edit_file', diffs: [ToolDiff(path: 'lib/a.dart', oldText: 'a', newText: 'b')]),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('lib/a.dart'), findsOneWidget);
+  });
 }

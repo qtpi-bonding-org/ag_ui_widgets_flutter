@@ -23,6 +23,8 @@ mixin _$BubbleChatStyle {
   BorderRadius get sentRadius;
   BorderRadius get receivedRadius;
   EdgeInsets get padding;
+  Color get diffAddedColor;
+  Color get diffRemovedColor;
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
 
   /// Create a copy of BubbleChatStyle
@@ -55,6 +57,10 @@ mixin _$BubbleChatStyle {
             (identical(other.receivedRadius, receivedRadius) ||
                 other.receivedRadius == receivedRadius) &&
             (identical(other.padding, padding) || other.padding == padding) &&
+            (identical(other.diffAddedColor, diffAddedColor) ||
+                other.diffAddedColor == diffAddedColor) &&
+            (identical(other.diffRemovedColor, diffRemovedColor) ||
+                other.diffRemovedColor == diffRemovedColor) &&
             (identical(other.markdownStyleSheetBuilder,
                     markdownStyleSheetBuilder) ||
                 other.markdownStyleSheetBuilder == markdownStyleSheetBuilder));
@@ -72,11 +78,13 @@ mixin _$BubbleChatStyle {
       sentRadius,
       receivedRadius,
       padding,
+      diffAddedColor,
+      diffRemovedColor,
       markdownStyleSheetBuilder);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
   }
 }
 
@@ -96,6 +104,8 @@ abstract mixin class $BubbleChatStyleCopyWith<$Res> {
       BorderRadius sentRadius,
       BorderRadius receivedRadius,
       EdgeInsets padding,
+      Color diffAddedColor,
+      Color diffRemovedColor,
       MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder});
 }
 
@@ -121,6 +131,8 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
     Object? sentRadius = null,
     Object? receivedRadius = null,
     Object? padding = null,
+    Object? diffAddedColor = null,
+    Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
   }) {
     return _then(_self.copyWith(
@@ -160,6 +172,14 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
           ? _self.padding
           : padding // ignore: cast_nullable_to_non_nullable
               as EdgeInsets,
+      diffAddedColor: null == diffAddedColor
+          ? _self.diffAddedColor
+          : diffAddedColor // ignore: cast_nullable_to_non_nullable
+              as Color,
+      diffRemovedColor: null == diffRemovedColor
+          ? _self.diffRemovedColor
+          : diffRemovedColor // ignore: cast_nullable_to_non_nullable
+              as Color,
       markdownStyleSheetBuilder: freezed == markdownStyleSheetBuilder
           ? _self.markdownStyleSheetBuilder
           : markdownStyleSheetBuilder // ignore: cast_nullable_to_non_nullable
@@ -271,6 +291,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             BorderRadius sentRadius,
             BorderRadius receivedRadius,
             EdgeInsets padding,
+            Color diffAddedColor,
+            Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder)?
         $default, {
@@ -289,6 +311,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.sentRadius,
             _that.receivedRadius,
             _that.padding,
+            _that.diffAddedColor,
+            _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder);
       case _:
         return orElse();
@@ -320,6 +344,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             BorderRadius sentRadius,
             BorderRadius receivedRadius,
             EdgeInsets padding,
+            Color diffAddedColor,
+            Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder)
         $default,
@@ -337,6 +363,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.sentRadius,
             _that.receivedRadius,
             _that.padding,
+            _that.diffAddedColor,
+            _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder);
       case _:
         throw StateError('Unexpected subclass');
@@ -367,6 +395,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             BorderRadius sentRadius,
             BorderRadius receivedRadius,
             EdgeInsets padding,
+            Color diffAddedColor,
+            Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
                 markdownStyleSheetBuilder)?
         $default,
@@ -384,6 +414,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.sentRadius,
             _that.receivedRadius,
             _that.padding,
+            _that.diffAddedColor,
+            _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder);
       case _:
         return null;
@@ -404,6 +436,8 @@ class _BubbleChatStyle implements BubbleChatStyle {
       this.sentRadius = const BorderRadius.all(Radius.circular(12)),
       this.receivedRadius = const BorderRadius.all(Radius.circular(12)),
       this.padding = const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      this.diffAddedColor = const Color(0xFF2E7D32),
+      this.diffRemovedColor = const Color(0xFFC62828),
       this.markdownStyleSheetBuilder});
 
   @override
@@ -427,6 +461,12 @@ class _BubbleChatStyle implements BubbleChatStyle {
   @override
   @JsonKey()
   final EdgeInsets padding;
+  @override
+  @JsonKey()
+  final Color diffAddedColor;
+  @override
+  @JsonKey()
+  final Color diffRemovedColor;
   @override
   final MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder;
 
@@ -460,6 +500,10 @@ class _BubbleChatStyle implements BubbleChatStyle {
             (identical(other.receivedRadius, receivedRadius) ||
                 other.receivedRadius == receivedRadius) &&
             (identical(other.padding, padding) || other.padding == padding) &&
+            (identical(other.diffAddedColor, diffAddedColor) ||
+                other.diffAddedColor == diffAddedColor) &&
+            (identical(other.diffRemovedColor, diffRemovedColor) ||
+                other.diffRemovedColor == diffRemovedColor) &&
             (identical(other.markdownStyleSheetBuilder,
                     markdownStyleSheetBuilder) ||
                 other.markdownStyleSheetBuilder == markdownStyleSheetBuilder));
@@ -477,11 +521,13 @@ class _BubbleChatStyle implements BubbleChatStyle {
       sentRadius,
       receivedRadius,
       padding,
+      diffAddedColor,
+      diffRemovedColor,
       markdownStyleSheetBuilder);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
   }
 }
 
@@ -503,6 +549,8 @@ abstract mixin class _$BubbleChatStyleCopyWith<$Res>
       BorderRadius sentRadius,
       BorderRadius receivedRadius,
       EdgeInsets padding,
+      Color diffAddedColor,
+      Color diffRemovedColor,
       MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder});
 }
 
@@ -528,6 +576,8 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
     Object? sentRadius = null,
     Object? receivedRadius = null,
     Object? padding = null,
+    Object? diffAddedColor = null,
+    Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
   }) {
     return _then(_BubbleChatStyle(
@@ -567,6 +617,14 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
           ? _self.padding
           : padding // ignore: cast_nullable_to_non_nullable
               as EdgeInsets,
+      diffAddedColor: null == diffAddedColor
+          ? _self.diffAddedColor
+          : diffAddedColor // ignore: cast_nullable_to_non_nullable
+              as Color,
+      diffRemovedColor: null == diffRemovedColor
+          ? _self.diffRemovedColor
+          : diffRemovedColor // ignore: cast_nullable_to_non_nullable
+              as Color,
       markdownStyleSheetBuilder: freezed == markdownStyleSheetBuilder
           ? _self.markdownStyleSheetBuilder
           : markdownStyleSheetBuilder // ignore: cast_nullable_to_non_nullable

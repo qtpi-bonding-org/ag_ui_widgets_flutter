@@ -109,4 +109,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('Other Tool'), findsOneWidget);
   });
+
+  testWidgets('toolCallBuilder renders a diff summary when diffs are present', (tester) async {
+    final builders = StackedChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.toolCall(id: 't1', name: 'edit_file', diffs: [ToolDiff(path: 'lib/a.dart', oldText: 'a', newText: 'b')]),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('lib/a.dart'), findsOneWidget);
+  });
 }

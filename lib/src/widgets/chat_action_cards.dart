@@ -1,6 +1,7 @@
 // lib/src/widgets/chat_action_cards.dart
 import 'package:flutter/material.dart';
 import '../model/conversation.dart';
+import 'diff_lines_view.dart';
 
 /// Card content for a pending permission request, shared by every
 /// builder family. Callers resolve their own [decoration]/[textStyle]
@@ -127,3 +128,47 @@ Widget buildToolRequestCardContent(
     ),
   );
 }
+
+
+/// Card content for a tool-call message — name, result, and (if present)
+/// every diff hunk in `diffs` (shape: `[{'path', 'oldText', 'newText'}, ...]`,
+/// the same JSON shape [ToolDiff] serializes to in
+/// `timeline_to_messages.dart`). Shared by every builder family.
+Widget buildToolCallCardContent(
+  BuildContext context, {
+  required String name,
+  required String? result,
+  required List<dynamic> diffs,
+  required BoxDecoration decoration,
+  required TextStyle textStyle,
+  required Color diffAddedColor,
+  required Color diffRemovedColor,
+}) {
+  return Container(
+    decoration: decoration,
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(name, style: textStyle),
+        if (result != null) ...[
+          const SizedBox(height: 4),
+          Text(result, style: textStyle),
+        ],
+        if (diffs.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          for (final d in diffs)
+            DiffLinesView(
+              path: (d as Map)['path'] as String? ?? '',
+              oldText: d['oldText'] as String? ?? '',
+              newText: d['newText'] as String? ?? '',
+              textStyle: textStyle,
+              addedColor: diffAddedColor,
+              removedColor: diffRemovedColor,
+            ),
+        ],
+      ],
+    ),
+  );
+ }

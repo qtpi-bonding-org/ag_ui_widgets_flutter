@@ -19,6 +19,8 @@ abstract class BubbleChatStyle with _$BubbleChatStyle {
     @Default(BorderRadius.all(Radius.circular(12))) BorderRadius sentRadius,
     @Default(BorderRadius.all(Radius.circular(12))) BorderRadius receivedRadius,
     @Default(EdgeInsets.symmetric(vertical: 8, horizontal: 12)) EdgeInsets padding,
+    @Default(Color(0xFF2E7D32)) Color diffAddedColor,
+    @Default(Color(0xFFC62828)) Color diffRemovedColor,
     MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
   }) = _BubbleChatStyle;
 }

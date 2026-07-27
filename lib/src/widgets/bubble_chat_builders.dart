@@ -47,21 +47,22 @@ class BubbleChatBuilders {
   CustomCardBuilder get toolCallBuilder => (context, message, index, {required isSentByMe, groupStatus}) {
         final name = message.metadata?['name'] as String? ?? '';
         final result = message.metadata?['result'] as String?;
+        final diffs = (message.metadata?['diffs'] as List<dynamic>?) ?? const [];
         return Align(
           alignment: Alignment.centerLeft,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: style.maxWidth),
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              padding: style.padding,
-              decoration: _cardDecoration,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(name, style: style.textStyle),
-                  if (result != null) Text(result, style: style.textStyle),
-                ],
+              child: buildToolCallCardContent(
+                context,
+                name: name,
+                result: result,
+                diffs: diffs,
+                decoration: _cardDecoration,
+                textStyle: style.textStyle,
+                diffAddedColor: style.diffAddedColor,
+                diffRemovedColor: style.diffRemovedColor,
               ),
             ),
           ),

@@ -18,6 +18,8 @@ abstract class StackedChatStyle with _$StackedChatStyle {
     @Default(EdgeInsets.symmetric(vertical: 8, horizontal: 12)) EdgeInsets padding,
     Color? cardBorderColor,
     @Default(BorderRadius.all(Radius.circular(8))) BorderRadius cardRadius,
+    @Default(Color(0xFF2E7D32)) Color diffAddedColor,
+    @Default(Color(0xFFC62828)) Color diffRemovedColor,
     MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
   }) = _StackedChatStyle;
 }

@@ -314,4 +314,58 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('CUSTOM ELICITATION e1'), findsOneWidget);
   });
+
+  testWidgets('textStreamMessageBuilder renders the in-progress text and its role header', (tester) async {
+    final builders = StackedChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply'),
+      ]),
+      builders,
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    // FlyerChatTextStreamMessage renders in-progress text via RichText (with
+    // per-chunk fade animations), not a plain Text widget — find.text/
+    // find.textContaining only match Text, so match on the rendered
+    // RichText's plain-text content instead.
+    final richText = find.byWidgetPredicate(
+      (widget) => widget is RichText && widget.text.toPlainText().contains('partial reply'),
+    );
+    expect(richText, findsOneWidget);
+  });
+
+  testWidgets('textStreamMessageBuilder uses style.textStyle, not the ambient ChatTheme default',
+      (tester) async {
+    const styledStyle = StackedChatStyle(
+      sentBackground: Colors.blue,
+      receivedBackground: Colors.grey,
+      textStyle: TextStyle(color: Colors.orange, fontSize: 14),
+    );
+    final builders = StackedChatBuilders(
+      styledStyle,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply'),
+      ]),
+      builders,
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    final richText = tester.widget<RichText>(find.byWidgetPredicate(
+      (widget) => widget is RichText && widget.text.toPlainText().contains('partial reply'),
+    ));
+    expect(richText.text.style?.color, Colors.orange);
+  });
 }

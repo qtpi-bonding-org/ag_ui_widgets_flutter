@@ -21,5 +21,6 @@ abstract class StackedChatStyle with _$StackedChatStyle {
     @Default(Color(0xFF2E7D32)) Color diffAddedColor,
     @Default(Color(0xFFC62828)) Color diffRemovedColor,
     MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
+    TextStyle? reasoningTextStyle,
   }) = _StackedChatStyle;
 }

@@ -1,6 +1,7 @@
 // lib/src/widgets/bubble_chat_builders.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import '../model/conversation.dart';
 import '../style/bubble_chat_style.dart';
 import '../style/chat_action_callbacks.dart';
@@ -24,6 +25,14 @@ class BubbleChatBuilders {
 
   chat_core.TextMessageBuilder get textMessageBuilder =>
       (context, message, index, {required isSentByMe, groupStatus}) {
+        final isReasoning = message.metadata?['kind'] == 'reasoning';
+        final effectiveStyle = isReasoning
+            ? (style.reasoningTextStyle ?? style.textStyle.copyWith(fontStyle: FontStyle.italic))
+            : style.textStyle;
+        final styleSheetBuilder = style.markdownStyleSheetBuilder ??
+            (isReasoning
+                ? (ctx) => MarkdownStyleSheet.fromTheme(Theme.of(ctx)).copyWith(p: effectiveStyle)
+                : null);
         return Align(
           alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
           child: ConstrainedBox(
@@ -38,7 +47,11 @@ class BubbleChatBuilders {
                     : null,
                 borderRadius: isSentByMe ? style.sentRadius : style.receivedRadius,
               ),
-              child: chatMarkdownBody(context, message.text, styleSheetBuilder: style.markdownStyleSheetBuilder),
+              child: chatMarkdownBody(
+                context,
+                message.text,
+                styleSheetBuilder: styleSheetBuilder,
+              ),
             ),
           ),
         );

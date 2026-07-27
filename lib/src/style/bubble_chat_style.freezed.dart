@@ -26,6 +26,7 @@ mixin _$BubbleChatStyle {
   Color get diffAddedColor;
   Color get diffRemovedColor;
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
+  TextStyle? get reasoningTextStyle;
 
   /// Create a copy of BubbleChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -63,7 +64,9 @@ mixin _$BubbleChatStyle {
                 other.diffRemovedColor == diffRemovedColor) &&
             (identical(other.markdownStyleSheetBuilder,
                     markdownStyleSheetBuilder) ||
-                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder));
+                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
+            (identical(other.reasoningTextStyle, reasoningTextStyle) ||
+                other.reasoningTextStyle == reasoningTextStyle));
   }
 
   @override
@@ -80,11 +83,12 @@ mixin _$BubbleChatStyle {
       padding,
       diffAddedColor,
       diffRemovedColor,
-      markdownStyleSheetBuilder);
+      markdownStyleSheetBuilder,
+      reasoningTextStyle);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
   }
 }
 
@@ -106,7 +110,8 @@ abstract mixin class $BubbleChatStyleCopyWith<$Res> {
       EdgeInsets padding,
       Color diffAddedColor,
       Color diffRemovedColor,
-      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder});
+      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
+      TextStyle? reasoningTextStyle});
 }
 
 /// @nodoc
@@ -134,6 +139,7 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
     Object? diffAddedColor = null,
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
+    Object? reasoningTextStyle = freezed,
   }) {
     return _then(_self.copyWith(
       sentBackground: null == sentBackground
@@ -184,6 +190,10 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
           ? _self.markdownStyleSheetBuilder
           : markdownStyleSheetBuilder // ignore: cast_nullable_to_non_nullable
               as MarkdownStyleSheet Function(BuildContext)?,
+      reasoningTextStyle: freezed == reasoningTextStyle
+          ? _self.reasoningTextStyle
+          : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
+              as TextStyle?,
     ));
   }
 }
@@ -294,7 +304,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             Color diffAddedColor,
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
-                markdownStyleSheetBuilder)?
+                markdownStyleSheetBuilder,
+            TextStyle? reasoningTextStyle)?
         $default, {
     required TResult orElse(),
   }) {
@@ -313,7 +324,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.padding,
             _that.diffAddedColor,
             _that.diffRemovedColor,
-            _that.markdownStyleSheetBuilder);
+            _that.markdownStyleSheetBuilder,
+            _that.reasoningTextStyle);
       case _:
         return orElse();
     }
@@ -347,7 +359,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             Color diffAddedColor,
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
-                markdownStyleSheetBuilder)
+                markdownStyleSheetBuilder,
+            TextStyle? reasoningTextStyle)
         $default,
   ) {
     final _that = this;
@@ -365,7 +378,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.padding,
             _that.diffAddedColor,
             _that.diffRemovedColor,
-            _that.markdownStyleSheetBuilder);
+            _that.markdownStyleSheetBuilder,
+            _that.reasoningTextStyle);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -398,7 +412,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             Color diffAddedColor,
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
-                markdownStyleSheetBuilder)?
+                markdownStyleSheetBuilder,
+            TextStyle? reasoningTextStyle)?
         $default,
   ) {
     final _that = this;
@@ -416,7 +431,8 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.padding,
             _that.diffAddedColor,
             _that.diffRemovedColor,
-            _that.markdownStyleSheetBuilder);
+            _that.markdownStyleSheetBuilder,
+            _that.reasoningTextStyle);
       case _:
         return null;
     }
@@ -438,7 +454,8 @@ class _BubbleChatStyle implements BubbleChatStyle {
       this.padding = const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       this.diffAddedColor = const Color(0xFF2E7D32),
       this.diffRemovedColor = const Color(0xFFC62828),
-      this.markdownStyleSheetBuilder});
+      this.markdownStyleSheetBuilder,
+      this.reasoningTextStyle});
 
   @override
   final Color sentBackground;
@@ -469,6 +486,8 @@ class _BubbleChatStyle implements BubbleChatStyle {
   final Color diffRemovedColor;
   @override
   final MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder;
+  @override
+  final TextStyle? reasoningTextStyle;
 
   /// Create a copy of BubbleChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -506,7 +525,9 @@ class _BubbleChatStyle implements BubbleChatStyle {
                 other.diffRemovedColor == diffRemovedColor) &&
             (identical(other.markdownStyleSheetBuilder,
                     markdownStyleSheetBuilder) ||
-                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder));
+                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
+            (identical(other.reasoningTextStyle, reasoningTextStyle) ||
+                other.reasoningTextStyle == reasoningTextStyle));
   }
 
   @override
@@ -523,11 +544,12 @@ class _BubbleChatStyle implements BubbleChatStyle {
       padding,
       diffAddedColor,
       diffRemovedColor,
-      markdownStyleSheetBuilder);
+      markdownStyleSheetBuilder,
+      reasoningTextStyle);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
   }
 }
 
@@ -551,7 +573,8 @@ abstract mixin class _$BubbleChatStyleCopyWith<$Res>
       EdgeInsets padding,
       Color diffAddedColor,
       Color diffRemovedColor,
-      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder});
+      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
+      TextStyle? reasoningTextStyle});
 }
 
 /// @nodoc
@@ -579,6 +602,7 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
     Object? diffAddedColor = null,
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
+    Object? reasoningTextStyle = freezed,
   }) {
     return _then(_BubbleChatStyle(
       sentBackground: null == sentBackground
@@ -629,6 +653,10 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
           ? _self.markdownStyleSheetBuilder
           : markdownStyleSheetBuilder // ignore: cast_nullable_to_non_nullable
               as MarkdownStyleSheet Function(BuildContext)?,
+      reasoningTextStyle: freezed == reasoningTextStyle
+          ? _self.reasoningTextStyle
+          : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
+              as TextStyle?,
     ));
   }
 }

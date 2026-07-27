@@ -24,6 +24,7 @@ mixin _$StackedChatStyle {
   Color get diffAddedColor;
   Color get diffRemovedColor;
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
+  TextStyle? get reasoningTextStyle;
 
   /// Create a copy of StackedChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -57,7 +58,9 @@ mixin _$StackedChatStyle {
                 other.diffRemovedColor == diffRemovedColor) &&
             (identical(other.markdownStyleSheetBuilder,
                     markdownStyleSheetBuilder) ||
-                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder));
+                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
+            (identical(other.reasoningTextStyle, reasoningTextStyle) ||
+                other.reasoningTextStyle == reasoningTextStyle));
   }
 
   @override
@@ -72,11 +75,12 @@ mixin _$StackedChatStyle {
       cardRadius,
       diffAddedColor,
       diffRemovedColor,
-      markdownStyleSheetBuilder);
+      markdownStyleSheetBuilder,
+      reasoningTextStyle);
 
   @override
   String toString() {
-    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
+    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
   }
 }
 
@@ -96,7 +100,8 @@ abstract mixin class $StackedChatStyleCopyWith<$Res> {
       BorderRadius cardRadius,
       Color diffAddedColor,
       Color diffRemovedColor,
-      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder});
+      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
+      TextStyle? reasoningTextStyle});
 }
 
 /// @nodoc
@@ -122,6 +127,7 @@ class _$StackedChatStyleCopyWithImpl<$Res>
     Object? diffAddedColor = null,
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
+    Object? reasoningTextStyle = freezed,
   }) {
     return _then(_self.copyWith(
       sentBackground: null == sentBackground
@@ -164,6 +170,10 @@ class _$StackedChatStyleCopyWithImpl<$Res>
           ? _self.markdownStyleSheetBuilder
           : markdownStyleSheetBuilder // ignore: cast_nullable_to_non_nullable
               as MarkdownStyleSheet Function(BuildContext)?,
+      reasoningTextStyle: freezed == reasoningTextStyle
+          ? _self.reasoningTextStyle
+          : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
+              as TextStyle?,
     ));
   }
 }
@@ -272,7 +282,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             Color diffAddedColor,
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
-                markdownStyleSheetBuilder)?
+                markdownStyleSheetBuilder,
+            TextStyle? reasoningTextStyle)?
         $default, {
     required TResult orElse(),
   }) {
@@ -289,7 +300,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.cardRadius,
             _that.diffAddedColor,
             _that.diffRemovedColor,
-            _that.markdownStyleSheetBuilder);
+            _that.markdownStyleSheetBuilder,
+            _that.reasoningTextStyle);
       case _:
         return orElse();
     }
@@ -321,7 +333,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             Color diffAddedColor,
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
-                markdownStyleSheetBuilder)
+                markdownStyleSheetBuilder,
+            TextStyle? reasoningTextStyle)
         $default,
   ) {
     final _that = this;
@@ -337,7 +350,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.cardRadius,
             _that.diffAddedColor,
             _that.diffRemovedColor,
-            _that.markdownStyleSheetBuilder);
+            _that.markdownStyleSheetBuilder,
+            _that.reasoningTextStyle);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -368,7 +382,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             Color diffAddedColor,
             Color diffRemovedColor,
             MarkdownStyleSheet Function(BuildContext)?
-                markdownStyleSheetBuilder)?
+                markdownStyleSheetBuilder,
+            TextStyle? reasoningTextStyle)?
         $default,
   ) {
     final _that = this;
@@ -384,7 +399,8 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.cardRadius,
             _that.diffAddedColor,
             _that.diffRemovedColor,
-            _that.markdownStyleSheetBuilder);
+            _that.markdownStyleSheetBuilder,
+            _that.reasoningTextStyle);
       case _:
         return null;
     }
@@ -404,7 +420,8 @@ class _StackedChatStyle implements StackedChatStyle {
       this.cardRadius = const BorderRadius.all(Radius.circular(8)),
       this.diffAddedColor = const Color(0xFF2E7D32),
       this.diffRemovedColor = const Color(0xFFC62828),
-      this.markdownStyleSheetBuilder});
+      this.markdownStyleSheetBuilder,
+      this.reasoningTextStyle});
 
   @override
   final Color sentBackground;
@@ -430,6 +447,8 @@ class _StackedChatStyle implements StackedChatStyle {
   final Color diffRemovedColor;
   @override
   final MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder;
+  @override
+  final TextStyle? reasoningTextStyle;
 
   /// Create a copy of StackedChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -463,7 +482,9 @@ class _StackedChatStyle implements StackedChatStyle {
                 other.diffRemovedColor == diffRemovedColor) &&
             (identical(other.markdownStyleSheetBuilder,
                     markdownStyleSheetBuilder) ||
-                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder));
+                other.markdownStyleSheetBuilder == markdownStyleSheetBuilder) &&
+            (identical(other.reasoningTextStyle, reasoningTextStyle) ||
+                other.reasoningTextStyle == reasoningTextStyle));
   }
 
   @override
@@ -478,11 +499,12 @@ class _StackedChatStyle implements StackedChatStyle {
       cardRadius,
       diffAddedColor,
       diffRemovedColor,
-      markdownStyleSheetBuilder);
+      markdownStyleSheetBuilder,
+      reasoningTextStyle);
 
   @override
   String toString() {
-    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder)';
+    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle)';
   }
 }
 
@@ -504,7 +526,8 @@ abstract mixin class _$StackedChatStyleCopyWith<$Res>
       BorderRadius cardRadius,
       Color diffAddedColor,
       Color diffRemovedColor,
-      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder});
+      MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
+      TextStyle? reasoningTextStyle});
 }
 
 /// @nodoc
@@ -530,6 +553,7 @@ class __$StackedChatStyleCopyWithImpl<$Res>
     Object? diffAddedColor = null,
     Object? diffRemovedColor = null,
     Object? markdownStyleSheetBuilder = freezed,
+    Object? reasoningTextStyle = freezed,
   }) {
     return _then(_StackedChatStyle(
       sentBackground: null == sentBackground
@@ -572,6 +596,10 @@ class __$StackedChatStyleCopyWithImpl<$Res>
           ? _self.markdownStyleSheetBuilder
           : markdownStyleSheetBuilder // ignore: cast_nullable_to_non_nullable
               as MarkdownStyleSheet Function(BuildContext)?,
+      reasoningTextStyle: freezed == reasoningTextStyle
+          ? _self.reasoningTextStyle
+          : reasoningTextStyle // ignore: cast_nullable_to_non_nullable
+              as TextStyle?,
     ));
   }
 }

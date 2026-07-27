@@ -1,5 +1,6 @@
 // test/widgets/stacked_chat_builders_test.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
 import 'package:ag_ui_widgets_flutter/src/style/chat_action_callbacks.dart';
@@ -200,5 +201,35 @@ void main() {
         )
         .toList();
     expect(numericFields, hasLength(1));
+  });
+
+  testWidgets('reasoning messages render with reasoningTextStyle', (tester) async {
+    // `chatMarkdownBody` renders into a `MarkdownBody` widget whose
+    // `styleSheet.p` carries the paragraph style — inspect that directly
+    // rather than the plain text, since reasoning styling flows through
+    // the markdown style sheet, not a `Text` widget.
+    const reasoningStyle = StackedChatStyle(
+      sentBackground: Colors.blue,
+      receivedBackground: Colors.grey,
+      textStyle: TextStyle(fontSize: 14),
+      reasoningTextStyle: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.orange),
+    );
+    final builders = StackedChatBuilders(
+      reasoningStyle,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking...'),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    final markdownBody = tester.widget<MarkdownBody>(find.byType(MarkdownBody));
+    expect(markdownBody.styleSheet?.p?.fontStyle, FontStyle.italic);
+    expect(markdownBody.styleSheet?.p?.color, Colors.orange);
   });
 }

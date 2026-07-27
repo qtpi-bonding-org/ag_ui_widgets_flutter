@@ -47,6 +47,7 @@ class AgUiChat extends StatefulWidget {
     this.toolRequestBuilder,
     this.composerBuilder,
     this.textStreamMessageBuilder,
+    this.theme,
   });
 
   final Conversation conversation;
@@ -76,6 +77,13 @@ class AgUiChat extends StatefulWidget {
   /// `TextStreamCardBuilder` for why this slot can't reuse
   /// `chat_core.TextStreamMessageBuilder`'s shape.
   final TextStreamCardBuilder? textStreamMessageBuilder;
+
+  /// Caller-supplied theme for the underlying `flutter_chat_ui` `Chat`
+  /// widget. Left unset, `Chat` silently falls back to `ChatTheme.light()`
+  /// regardless of the app's ambient `Theme.of(context)` brightness — so a
+  /// dark-themed host app must pass one explicitly or the message list
+  /// renders on a white background.
+  final chat_core.ChatTheme? theme;
 
   @override
   State<AgUiChat> createState() => _AgUiChatState();
@@ -129,6 +137,7 @@ class _AgUiChatState extends State<AgUiChat> {
       currentUserId: widget.currentUserId,
       resolveUser: (id) async => chat_core.User(id: id),
       chatController: _controller,
+      theme: widget.theme,
       builders: chat_core.Builders(
         textMessageBuilder: widget.textMessageBuilder ?? defaultTextMessageBuilder,
         textStreamMessageBuilder: (context, message, index, {required isSentByMe, groupStatus}) =>

@@ -141,20 +141,28 @@ class BubbleChatBuilders {
 
   Widget Function(BuildContext, TimelineItem) get permissionBuilder => (context, item) {
         final permission = item as PermissionRequestTimelineItem;
-        return _leftAlignedBubble(buildPermissionCardContent(
-          context, permission,
-          decoration: _cardDecoration, textStyle: style.textStyle,
-          onSelect: callbacks.onPermissionOptionSelected,
-        ));
+        final override = callbacks.permissionCardBuilder;
+        final card = override != null
+            ? override(context, permission)
+            : buildPermissionCardContent(
+                context, permission,
+                decoration: _cardDecoration, textStyle: style.textStyle,
+                onSelect: callbacks.onPermissionOptionSelected,
+              );
+        return _leftAlignedBubble(card);
       };
 
   Widget Function(BuildContext, TimelineItem) get elicitationBuilder => (context, item) {
         final elicitation = item as ElicitationRequestTimelineItem;
-        return _leftAlignedBubble(buildElicitationCardContent(
-          context, elicitation,
-          decoration: _cardDecoration, textStyle: style.textStyle,
-          onRespond: callbacks.onElicitationRespond,
-        ));
+        final override = callbacks.elicitationCardBuilder;
+        final card = override != null
+            ? override(context, elicitation)
+            : buildElicitationCardContent(
+                context, elicitation,
+                decoration: _cardDecoration, textStyle: style.textStyle,
+                onRespond: callbacks.onElicitationRespond,
+              );
+        return _leftAlignedBubble(card);
       };
 
   Widget Function(BuildContext, TimelineItem) get toolRequestBuilder => (context, item) {

@@ -276,4 +276,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('CUSTOM TOOL CALL'), findsOneWidget);
   });
+
+  testWidgets('permissionBuilder uses permissionCardBuilder when set', (tester) async {
+    final builders = StackedChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+        permissionCardBuilder: (context, item) => Text('CUSTOM PERMISSION ${item.requestId}'),
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.permissionRequest(requestId: 'p1', toolTitle: 'bash', options: []),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('CUSTOM PERMISSION p1'), findsOneWidget);
+  });
+
+  testWidgets('elicitationBuilder uses elicitationCardBuilder when set', (tester) async {
+    final builders = StackedChatBuilders(
+      style,
+      ChatActionCallbacks(
+        onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+        onElicitationRespond: (_, __) {},
+        elicitationCardBuilder: (context, item) => Text('CUSTOM ELICITATION ${item.requestId}'),
+      ),
+    );
+    await tester.pumpWidget(host(
+      const Conversation(timeline: [
+        TimelineItem.elicitationRequest(requestId: 'e1', message: 'hi', mode: 'form'),
+      ]),
+      builders,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('CUSTOM ELICITATION e1'), findsOneWidget);
+  });
 }

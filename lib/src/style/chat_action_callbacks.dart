@@ -13,6 +13,8 @@ class ChatActionCallbacks {
     required this.onElicitationRespond,
     this.toolRequestOverrides = const {},
     this.toolCallOverrides = const {},
+    this.permissionCardBuilder,
+    this.elicitationCardBuilder,
   });
 
   /// Signature-compatible with IAgUiTransport.respondPermission(callId,
@@ -38,4 +40,14 @@ class ChatActionCallbacks {
   /// registered entry fully replaces the generic tool-call card for that
   /// name — mirrors [toolRequestOverrides] exactly.
   final Map<String, Widget Function(BuildContext, chat_core.CustomMessage)> toolCallOverrides;
+
+  /// Full override for a pending permission request's card. `null` (the
+  /// default) uses the shared generic content — set this only when the
+  /// generic card genuinely can't express what an app needs (e.g. a
+  /// distinct deny action, a requestId tag, app-specific icon/typography).
+  final Widget Function(BuildContext, PermissionRequestTimelineItem)? permissionCardBuilder;
+
+  /// Full override for a pending elicitation request's card. Same
+  /// null-means-generic semantics as [permissionCardBuilder].
+  final Widget Function(BuildContext, ElicitationRequestTimelineItem)? elicitationCardBuilder;
 }

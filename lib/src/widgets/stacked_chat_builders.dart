@@ -111,6 +111,8 @@ class StackedChatBuilders {
 
   Widget Function(BuildContext, TimelineItem) get permissionBuilder => (context, item) {
         final permission = item as PermissionRequestTimelineItem;
+        final override = callbacks.permissionCardBuilder;
+        if (override != null) return override(context, permission);
         return buildPermissionCardContent(
           context, permission,
           decoration: _cardDecoration, textStyle: style.textStyle,
@@ -120,6 +122,8 @@ class StackedChatBuilders {
 
   Widget Function(BuildContext, TimelineItem) get elicitationBuilder => (context, item) {
         final elicitation = item as ElicitationRequestTimelineItem;
+        final override = callbacks.elicitationCardBuilder;
+        if (override != null) return override(context, elicitation);
         return buildElicitationCardContent(
           context, elicitation,
           decoration: _cardDecoration, textStyle: style.textStyle,

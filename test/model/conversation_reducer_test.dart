@@ -460,6 +460,72 @@ void main() {
     });
   });
 
+  group('deterministic identity', () {
+    test('a repeated ToolCallStartEvent for the same id updates in place, not duplicates', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'search'))
+        ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'search'));
+      expect(r.current.timeline.whereType<ToolCallTimelineItem>(), hasLength(1));
+    });
+
+    test('resolving a tool-request card does not remove its correlated ToolCallTimelineItem', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'add_comment'))
+        ..apply(const CustomEvent(
+          name: 'acp.tool_request',
+          value: {'callId': 'tc1', 'toolName': 'add_comment', 'args': '{}'},
+        ));
+      r.resolveRequest('tc1');
+      expect(r.current.timeline.whereType<ToolCallTimelineItem>(), hasLength(1));
+      expect(r.current.timeline.whereType<ToolRequestTimelineItem>(), isEmpty);
+    });
+
+    test('a re-synced permission whose requestId changed removes the stale card, not just adds the new one', () {
+      final r = ConversationReducer();
+      r.apply(const StateSnapshotEvent(snapshot: {
+        'pocketcoder': {
+          'permission': {'requestId': 'p1', 'status': 'pending', 'options': []}
+        }
+      }));
+      expect(
+        r.current.timeline.whereType<PermissionRequestTimelineItem>().map((i) => i.requestId),
+        ['p1'],
+      );
+      r.apply(const StateSnapshotEvent(snapshot: {
+        'pocketcoder': {
+          'permission': {'requestId': 'p2', 'status': 'pending', 'options': []}
+        }
+      }));
+      expect(
+        r.current.timeline.whereType<PermissionRequestTimelineItem>().map((i) => i.requestId),
+        ['p2'],
+      );
+    });
+
+    test('a reasoning stream and a text stream with the same messageId do not collide', () {
+      final r = ConversationReducer()
+        ..apply(const ReasoningMessageStartEvent(messageId: 'm1'))
+        ..apply(const TextMessageStartEvent(messageId: 'm1', role: TextMessageRole.assistant))
+        ..apply(const ReasoningMessageContentEvent(messageId: 'm1', delta: 'thinking...'))
+        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'hello'));
+      expect(r.current.timeline.whereType<TextStreamTimelineItem>(), hasLength(2));
+    });
+
+    test('a tool call and its correlated tool-request survive together in the same timeline', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'add_comment'))
+        ..apply(const CustomEvent(
+          name: 'acp.tool_request',
+          value: {'callId': 'tc1', 'toolName': 'add_comment', 'args': '{}'},
+        ));
+      expect(r.current.timeline.whereType<ToolCallTimelineItem>(), hasLength(1));
+      expect(r.current.timeline.whereType<ToolRequestTimelineItem>(), hasLength(1));
+      // The request anchors right after its tool call, not wherever _seq happens to land.
+      expect(r.current.timeline[0], isA<ToolCallTimelineItem>());
+      expect(r.current.timeline[1], isA<ToolRequestTimelineItem>());
+    });
+  });
+
   group('reduce() convenience wrapper', () {
     test('folds a full event list identically to sequential apply() calls', () {
       final events = [

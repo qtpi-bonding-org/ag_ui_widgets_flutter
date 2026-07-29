@@ -32,7 +32,7 @@ void main() {
   });
 
   test('toolRequestOverrides dispatches by toolName', () {
-    const item = ToolRequestTimelineItem(requestId: 'r1', toolName: 'render_surface', argsJson: '{}');
+    const item = ToolRequestTimelineItem(requestId: 'r1', toolName: 'render_surface', argsJson: '{}', order: OrderKey(0));
     final callbacks = ChatActionCallbacks(
       onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
       onElicitationRespond: (_, __) {},

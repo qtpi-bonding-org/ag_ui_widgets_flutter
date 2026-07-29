@@ -26,7 +26,7 @@ void main() {
   testWidgets('renders a completed text message via the default bubble', (tester) async {
     await tester.pumpWidget(host(const Conversation(
       timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'assistant', text: 'hello'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'assistant', text: 'hello', order: OrderKey(0)),
       ],
     )));
     await tester.pumpAndSettle();
@@ -40,8 +40,7 @@ void main() {
         TimelineItem.permissionRequest(
           requestId: 'p1',
           toolTitle: 'bash',
-          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')],
-        ),
+          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')], order: OrderKey(0),),
       ]),
       permissionBuilder: (context, item) {
         received = item as PermissionRequestTimelineItem;
@@ -60,8 +59,7 @@ void main() {
       const Conversation(timeline: [
         TimelineItem.permissionRequest(
           requestId: 'p1',
-          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')],
-        ),
+          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')], order: OrderKey(0),),
       ]),
     ));
     await tester.pumpAndSettle();
@@ -75,8 +73,7 @@ void main() {
         TimelineItem.elicitationRequest(
           requestId: 'e1',
           message: 'Pick a color',
-          mode: 'form',
-        ),
+          mode: 'form', order: OrderKey(0),),
       ]),
       elicitationBuilder: (context, item) {
         received = item as ElicitationRequestTimelineItem;
@@ -97,8 +94,7 @@ void main() {
         TimelineItem.toolRequest(
           requestId: 't1',
           toolName: 'propose_edit',
-          argsJson: '{"changeId":"c1"}',
-        ),
+          argsJson: '{"changeId":"c1"}', order: OrderKey(0),),
       ]),
       toolRequestBuilder: (context, item) {
         received = item as ToolRequestTimelineItem;
@@ -118,8 +114,7 @@ void main() {
         TimelineItem.toolRequest(
           requestId: 't1',
           toolName: 'noop',
-          argsJson: '{}',
-        ),
+          argsJson: '{}', order: OrderKey(0),),
       ]),
     ));
     await tester.pumpAndSettle();
@@ -133,7 +128,7 @@ void main() {
       home: Scaffold(
         body: AgUiChat(
           conversation: const Conversation(timeline: [
-            TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial'),
+            TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial', order: OrderKey(0)),
           ]),
           currentUserId: 'user',
           onSendMessage: (_) {},

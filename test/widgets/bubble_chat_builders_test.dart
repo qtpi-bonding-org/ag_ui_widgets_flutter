@@ -43,8 +43,8 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'user', text: 'hi'),
-        TimelineItem.text(id: 'm2', kind: ChatMessageKind.text, role: 'assistant', text: 'hello'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'user', text: 'hi', order: OrderKey(0)),
+        TimelineItem.text(id: 'm2', kind: ChatMessageKind.text, role: 'assistant', text: 'hello', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -65,7 +65,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'assistant', text: 'hello **world**'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'assistant', text: 'hello **world**', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -85,7 +85,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.elicitationRequest(requestId: 'e1', message: 'Pick one', mode: 'url', url: 'https://example.com'),
+        TimelineItem.elicitationRequest(requestId: 'e1', message: 'Pick one', mode: 'url', url: 'https://example.com', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -104,7 +104,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.toolCall(id: 't1', name: 'edit_file', diffs: [ToolDiff(path: 'lib/a.dart', oldText: 'a', newText: 'b')]),
+        TimelineItem.toolCall(id: 't1', name: 'edit_file', diffs: [ToolDiff(path: 'lib/a.dart', oldText: 'a', newText: 'b')], order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -133,7 +133,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking...'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking...', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -160,7 +160,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -179,7 +179,7 @@ void main() {
       ),
     );
     await tester.pumpWidget(host(
-      const Conversation(timeline: [TimelineItem.toolCall(id: 't1', name: 'edit_file')]),
+      const Conversation(timeline: [TimelineItem.toolCall(id: 't1', name: 'edit_file', order: OrderKey(0))]),
       builders,
     ));
     await tester.pumpAndSettle();
@@ -197,7 +197,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.permissionRequest(requestId: 'p1', toolTitle: 'bash', options: []),
+        TimelineItem.permissionRequest(requestId: 'p1', toolTitle: 'bash', options: [], order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -216,7 +216,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.elicitationRequest(requestId: 'e1', message: 'hi', mode: 'form'),
+        TimelineItem.elicitationRequest(requestId: 'e1', message: 'hi', mode: 'form', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -234,7 +234,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply'),
+        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -267,7 +267,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply'),
+        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply', order: OrderKey(0)),
       ]),
       builders,
     ));

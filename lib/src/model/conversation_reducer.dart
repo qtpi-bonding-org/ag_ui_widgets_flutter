@@ -83,7 +83,7 @@ class ConversationReducer {
         final open = _OpenMessage(event.role.value);
         _openText[event.messageId] = open;
         _insertTimelineItem(_timeline.length,
-            TimelineItem.textStream(id: event.messageId, role: open.role, text: ''));
+            TimelineItem.textStream(id: event.messageId, role: open.role, text: '', order: const OrderKey(0)));
         _openTextIndex[event.messageId] = _timeline.length - 1;
       case ag_ui.TextMessageContentEvent():
         var open = _openText[event.messageId];
@@ -91,14 +91,14 @@ class ConversationReducer {
           open = _OpenMessage('assistant');
           _openText[event.messageId] = open;
           _insertTimelineItem(_timeline.length,
-              TimelineItem.textStream(id: event.messageId, role: open.role, text: ''));
+              TimelineItem.textStream(id: event.messageId, role: open.role, text: '', order: const OrderKey(0)));
           _openTextIndex[event.messageId] = _timeline.length - 1;
         }
         open.text.write(event.delta);
         final idx = _openTextIndex[event.messageId];
         if (idx != null) {
           _timeline[idx] = TimelineItem.textStream(
-              id: event.messageId, role: open.role, text: open.text.toString());
+              id: event.messageId, role: open.role, text: open.text.toString(), order: const OrderKey(0));
         }
       case ag_ui.TextMessageEndEvent():
         final open = _openText.remove(event.messageId);
@@ -108,8 +108,7 @@ class ConversationReducer {
             id: event.messageId,
             kind: ChatMessageKind.text,
             role: open.role,
-            text: open.text.toString(),
-          );
+            text: open.text.toString(), order: const OrderKey(0),);
         }
 
       case ag_ui.ReasoningMessageStartEvent():
@@ -118,7 +117,7 @@ class ConversationReducer {
         _insertTimelineItem(
           _timeline.length,
           TimelineItem.textStream(
-              id: event.messageId, kind: ChatMessageKind.reasoning, role: open.role, text: ''),
+              id: event.messageId, kind: ChatMessageKind.reasoning, role: open.role, text: '', order: const OrderKey(0)),
         );
         _openReasoningIndex[event.messageId] = _timeline.length - 1;
       case ag_ui.ReasoningMessageContentEvent():
@@ -131,7 +130,7 @@ class ConversationReducer {
               id: event.messageId,
               kind: ChatMessageKind.reasoning,
               role: open.role,
-              text: open.text.toString());
+              text: open.text.toString(), order: const OrderKey(0));
         }
       case ag_ui.ReasoningMessageEndEvent():
         final open = _openReasoning.remove(event.messageId);
@@ -141,13 +140,12 @@ class ConversationReducer {
             id: event.messageId,
             kind: ChatMessageKind.reasoning,
             role: open.role,
-            text: open.text.toString(),
-          );
+            text: open.text.toString(), order: const OrderKey(0),);
         }
 
       case ag_ui.ToolCallStartEvent():
         _insertTimelineItem(_timeline.length,
-            TimelineItem.toolCall(id: event.toolCallId, name: event.toolCallName));
+            TimelineItem.toolCall(id: event.toolCallId, name: event.toolCallName, order: const OrderKey(0)));
         _toolTimelineIndex[event.toolCallId] = _timeline.length - 1;
       case ag_ui.ToolCallArgsEvent():
         _updateTool(event.toolCallId, (t) => t.copyWith(args: t.args + event.delta));
@@ -176,8 +174,7 @@ class ConversationReducer {
                 requestId: callId,
                 toolTitle: value['toolName'] as String?,
                 description: value['description'] as String?,
-                options: options,
-              ),
+                options: options, order: const OrderKey(0),),
             );
           }
         }
@@ -194,8 +191,7 @@ class ConversationReducer {
                 schema: value['schema'] is Map
                     ? Map<String, dynamic>.from(value['schema'] as Map)
                     : null,
-                url: value['url'] as String?,
-              ),
+                url: value['url'] as String?, order: const OrderKey(0),),
             );
           }
         }
@@ -212,8 +208,7 @@ class ConversationReducer {
                 TimelineItem.toolRequest(
                   requestId: callId,
                   toolName: toolName,
-                  argsJson: (value['args'] as String?) ?? '{}',
-                ),
+                  argsJson: (value['args'] as String?) ?? '{}', order: const OrderKey(0),),
               );
             }
           }
@@ -273,7 +268,7 @@ class ConversationReducer {
   void _updateTool(String id, ToolCallTimelineItem Function(ToolCallTimelineItem) update) {
     var idx = _toolTimelineIndex[id];
     if (idx == null) {
-      _insertTimelineItem(_timeline.length, TimelineItem.toolCall(id: id, name: ''));
+      _insertTimelineItem(_timeline.length, TimelineItem.toolCall(id: id, name: '', order: const OrderKey(0)));
       idx = _timeline.length - 1;
       _toolTimelineIndex[id] = idx;
     }
@@ -336,8 +331,7 @@ class ConversationReducer {
         requestId: requestId,
         toolTitle: permission['title'] as String?,
         toolKind: permission['kind'] as String?,
-        options: options,
-      ),
+        options: options, order: const OrderKey(0),),
     );
   }
 
@@ -360,8 +354,7 @@ class ConversationReducer {
         message: message,
         mode: mode,
         schema: schema is Map ? Map<String, dynamic>.from(schema) : null,
-        url: url,
-      ),
+        url: url, order: const OrderKey(0),),
     );
   }
 

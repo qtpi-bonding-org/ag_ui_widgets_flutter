@@ -30,12 +30,35 @@ abstract class PermissionOption with _$PermissionOption {
   }) = _PermissionOption;
 }
 
+/// Total order over timeline items. `seq` is the reducer's monotonic
+/// event-arrival counter, bumped once per `apply()` call. `sub` orders
+/// items correlated to the same anchor (e.g. a permission card pinned
+/// just after its tool call) without needing a fractional key.
+class OrderKey implements Comparable<OrderKey> {
+  const OrderKey(this.seq, [this.sub = 0]);
+  final int seq;
+  final int sub;
+
+  @override
+  int compareTo(OrderKey other) =>
+      seq != other.seq ? seq.compareTo(other.seq) : sub.compareTo(other.sub);
+
+  @override
+  bool operator ==(Object other) =>
+      other is OrderKey && other.seq == seq && other.sub == sub;
+
+  @override
+  int get hashCode => Object.hash(seq, sub);
+}
+
 /// One item in the ordered conversation timeline: text/reasoning prose, an
 /// in-progress streaming reply, a tool invocation, or an inline
 /// permission/elicitation/tool-request. Built by [ConversationReducer]
 /// in true chronological order.
 @freezed
 sealed class TimelineItem with _$TimelineItem {
+  const TimelineItem._();
+
   /// A completed message: concatenation of every `*_CONTENT` delta between
   /// a message's `*_START` and `*_END`.
   const factory TimelineItem.text({
@@ -43,6 +66,7 @@ sealed class TimelineItem with _$TimelineItem {
     required ChatMessageKind kind,
     required String role,
     required String text,
+    required OrderKey order,
   }) = TextTimelineItem;
 
   /// A still-open text message: `text` is the partial content accumulated
@@ -55,6 +79,7 @@ sealed class TimelineItem with _$TimelineItem {
     @Default(ChatMessageKind.text) ChatMessageKind kind,
     required String role,
     required String text,
+    required OrderKey order,
   }) = TextStreamTimelineItem;
 
   /// One tool invocation. Enters the timeline on `TOOL_CALL_START`.
@@ -63,6 +88,7 @@ sealed class TimelineItem with _$TimelineItem {
   const factory TimelineItem.toolCall({
     required String id,
     required String name,
+    required OrderKey order,
     @Default('') String args,
     String? result,
     @Default(<ToolDiff>[]) List<ToolDiff> diffs,
@@ -75,9 +101,11 @@ sealed class TimelineItem with _$TimelineItem {
   const factory TimelineItem.permissionRequest({
     required String requestId,
     String? toolTitle,
+    String? toolCallId,
     String? toolKind,
     String? description,
     required List<PermissionOption> options,
+    required OrderKey order,
   }) = PermissionRequestTimelineItem;
 
   /// A pending elicitation request — full payload. `message` and `mode` are
@@ -85,8 +113,10 @@ sealed class TimelineItem with _$TimelineItem {
   /// for `mode == "url"`.
   const factory TimelineItem.elicitationRequest({
     required String requestId,
+    String? toolCallId,
     required String message,
     required String mode,
+    required OrderKey order,
     Map<String, dynamic>? schema,
     String? url,
   }) = ElicitationRequestTimelineItem;
@@ -96,10 +126,30 @@ sealed class TimelineItem with _$TimelineItem {
   const factory TimelineItem.toolRequest({
     required String requestId,
     required String toolName,
+    required OrderKey order,
     String? toolTitle,
     String? toolKind,
     required String argsJson,
   }) = ToolRequestTimelineItem;
+
+  /// Display/correlation identity. A ToolCallTimelineItem and its correlated
+  /// ToolRequestTimelineItem share the same itemId ON PURPOSE (same subject).
+  String get itemId => switch (this) {
+        TextTimelineItem(:final id) => id,
+        TextStreamTimelineItem(:final id) => id,
+        ToolCallTimelineItem(:final id) => id,
+        PermissionRequestTimelineItem(:final requestId) => requestId,
+        ElicitationRequestTimelineItem(:final requestId) => requestId,
+        ToolRequestTimelineItem(:final requestId) => requestId,
+      };
+
+  /// Storage/merge identity — unique per distinct entity. Namespaces
+  /// ToolRequestTimelineItem away from its correlated ToolCallTimelineItem
+  /// (same itemId, NOT the same entity).
+  String get storageKey => switch (this) {
+        ToolRequestTimelineItem(:final requestId) => 'req:$requestId',
+        _ => itemId,
+      };
 }
 
 /// Ambient session-wide state, sourced from `StateSnapshotEvent`/

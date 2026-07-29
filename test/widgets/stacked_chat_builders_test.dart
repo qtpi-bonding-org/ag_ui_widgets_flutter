@@ -42,7 +42,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'assistant', text: 'hello **world**'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.text, role: 'assistant', text: 'hello **world**', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -65,8 +65,7 @@ void main() {
         TimelineItem.permissionRequest(
           requestId: 'p1',
           toolTitle: 'bash',
-          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')],
-        ),
+          options: [PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once')], order: OrderKey(0),),
       ]),
       builders,
     ));
@@ -86,7 +85,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.toolRequest(requestId: 'r1', toolName: 'render_surface', argsJson: '{}'),
+        TimelineItem.toolRequest(requestId: 'r1', toolName: 'render_surface', argsJson: '{}', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -104,7 +103,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.toolRequest(requestId: 'r1', toolName: 'other_tool', toolTitle: 'Other Tool', argsJson: '{}'),
+        TimelineItem.toolRequest(requestId: 'r1', toolName: 'other_tool', toolTitle: 'Other Tool', argsJson: '{}', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -122,7 +121,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.toolCall(id: 't1', name: 'edit_file', diffs: [ToolDiff(path: 'lib/a.dart', oldText: 'a', newText: 'b')]),
+        TimelineItem.toolCall(id: 't1', name: 'edit_file', diffs: [ToolDiff(path: 'lib/a.dart', oldText: 'a', newText: 'b')], order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -150,8 +149,7 @@ void main() {
             'properties': {
               'enabled': {'type': 'boolean', 'title': 'Enabled'},
             },
-          },
-        ),
+          }, order: OrderKey(0),),
       ]),
       builders,
     ));
@@ -182,8 +180,7 @@ void main() {
             'properties': {
               'count': {'type': 'integer', 'title': 'Count'},
             },
-          },
-        ),
+          }, order: OrderKey(0),),
       ]),
       builders,
     ));
@@ -224,7 +221,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking...'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking...', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -251,7 +248,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking'),
+        TimelineItem.text(id: 'm1', kind: ChatMessageKind.reasoning, role: 'assistant', text: 'thinking', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -270,7 +267,7 @@ void main() {
       ),
     );
     await tester.pumpWidget(host(
-      const Conversation(timeline: [TimelineItem.toolCall(id: 't1', name: 'edit_file')]),
+      const Conversation(timeline: [TimelineItem.toolCall(id: 't1', name: 'edit_file', order: OrderKey(0))]),
       builders,
     ));
     await tester.pumpAndSettle();
@@ -288,7 +285,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.permissionRequest(requestId: 'p1', toolTitle: 'bash', options: []),
+        TimelineItem.permissionRequest(requestId: 'p1', toolTitle: 'bash', options: [], order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -307,7 +304,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.elicitationRequest(requestId: 'e1', message: 'hi', mode: 'form'),
+        TimelineItem.elicitationRequest(requestId: 'e1', message: 'hi', mode: 'form', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -325,7 +322,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply'),
+        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply', order: OrderKey(0)),
       ]),
       builders,
     ));
@@ -357,7 +354,7 @@ void main() {
     );
     await tester.pumpWidget(host(
       const Conversation(timeline: [
-        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply'),
+        TimelineItem.textStream(id: 's1', role: 'assistant', text: 'partial reply', order: OrderKey(0)),
       ]),
       builders,
     ));

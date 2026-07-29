@@ -11,8 +11,7 @@ void main() {
         name: 'edit_file',
         args: '{}',
         result: 'ok',
-        diffs: [ToolDiff(path: 'lib/foo.dart', oldText: 'a', newText: 'b')],
-      );
+        diffs: [ToolDiff(path: 'lib/foo.dart', oldText: 'a', newText: 'b')], order: OrderKey(0),);
 
       final messages = timelineToMessages([item]);
       final message = messages.single as chat_core.CustomMessage;
@@ -22,7 +21,7 @@ void main() {
     });
 
     test('toolCall item with no diffs produces an empty diffs list', () {
-      const item = TimelineItem.toolCall(id: 't1', name: 'search');
+      const item = TimelineItem.toolCall(id: 't1', name: 'search', order: OrderKey(0));
       final messages = timelineToMessages([item]);
       final message = messages.single as chat_core.CustomMessage;
       expect(message.metadata?['diffs'], isEmpty);

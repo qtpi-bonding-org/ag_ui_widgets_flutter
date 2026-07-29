@@ -18,8 +18,7 @@ void main() {
       options: [
         PermissionOption(optionId: 'allow', label: 'Allow', kind: 'allow_once'),
         PermissionOption(optionId: 'deny', label: 'Deny', kind: 'reject_once'),
-      ],
-    );
+      ], order: OrderKey(0),);
     await tester.pumpWidget(host(Builder(
       builder: (context) => buildPermissionCardContent(
         context, item,
@@ -41,7 +40,7 @@ void main() {
   testWidgets('elicitation card renders the message and calls onRespond on submit', (tester) async {
     String? gotRequestId;
     Map<String, dynamic>? gotResponse;
-    const item = ElicitationRequestTimelineItem(requestId: 'e1', message: 'Pick a color', mode: 'url', url: 'https://example.com');
+    const item = ElicitationRequestTimelineItem(requestId: 'e1', message: 'Pick a color', mode: 'url', url: 'https://example.com', order: OrderKey(0));
     await tester.pumpWidget(host(Builder(
       builder: (context) => buildElicitationCardContent(
         context, item,
@@ -62,7 +61,7 @@ void main() {
   });
 
   testWidgets('toolRequest card dispatches to a registered override', (tester) async {
-    const item = ToolRequestTimelineItem(requestId: 'r1', toolName: 'render_surface', argsJson: '{}');
+    const item = ToolRequestTimelineItem(requestId: 'r1', toolName: 'render_surface', argsJson: '{}', order: OrderKey(0));
     await tester.pumpWidget(host(Builder(
       builder: (context) => buildToolRequestCardContent(
         context, item,
@@ -75,7 +74,7 @@ void main() {
   });
 
   testWidgets('toolRequest card falls back to a generic card for an unregistered tool name', (tester) async {
-    const item = ToolRequestTimelineItem(requestId: 'r1', toolName: 'unknown_tool', toolTitle: 'Unknown Tool', argsJson: '{}');
+    const item = ToolRequestTimelineItem(requestId: 'r1', toolName: 'unknown_tool', toolTitle: 'Unknown Tool', argsJson: '{}', order: OrderKey(0));
     await tester.pumpWidget(host(Builder(
       builder: (context) => buildToolRequestCardContent(
         context, item,

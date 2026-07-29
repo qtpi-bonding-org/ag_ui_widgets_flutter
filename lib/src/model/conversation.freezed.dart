@@ -648,24 +648,63 @@ class __$PermissionOptionCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$TimelineItem {
+  OrderKey get order;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $TimelineItemCopyWith<TimelineItem> get copyWith =>
+      _$TimelineItemCopyWithImpl<TimelineItem>(
+          this as TimelineItem, _$identity);
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is TimelineItem);
+        (other.runtimeType == runtimeType &&
+            other is TimelineItem &&
+            (identical(other.order, order) || other.order == order));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, order);
 
   @override
   String toString() {
-    return 'TimelineItem()';
+    return 'TimelineItem(order: $order)';
   }
 }
 
 /// @nodoc
-class $TimelineItemCopyWith<$Res> {
-  $TimelineItemCopyWith(TimelineItem _, $Res Function(TimelineItem) __);
+abstract mixin class $TimelineItemCopyWith<$Res> {
+  factory $TimelineItemCopyWith(
+          TimelineItem value, $Res Function(TimelineItem) _then) =
+      _$TimelineItemCopyWithImpl;
+  @useResult
+  $Res call({OrderKey order});
+}
+
+/// @nodoc
+class _$TimelineItemCopyWithImpl<$Res> implements $TimelineItemCopyWith<$Res> {
+  _$TimelineItemCopyWithImpl(this._self, this._then);
+
+  final TimelineItem _self;
+  final $Res Function(TimelineItem) _then;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? order = null,
+  }) {
+    return _then(_self.copyWith(
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
+    ));
+  }
 }
 
 /// Adds pattern-matching-related methods to [TimelineItem].
@@ -806,42 +845,63 @@ extension TimelineItemPatterns on TimelineItem {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, ChatMessageKind kind, String role, String text)?
+    TResult Function(String id, ChatMessageKind kind, String role, String text,
+            OrderKey order)?
         text,
-    TResult Function(String id, ChatMessageKind kind, String role, String text)?
+    TResult Function(String id, ChatMessageKind kind, String role, String text,
+            OrderKey order)?
         textStream,
-    TResult Function(String id, String name, String args, String? result,
-            List<ToolDiff> diffs)?
+    TResult Function(String id, String name, OrderKey order, String args,
+            String? result, List<ToolDiff> diffs)?
         toolCall,
-    TResult Function(String requestId, String? toolTitle, String? toolKind,
-            String? description, List<PermissionOption> options)?
+    TResult Function(
+            String requestId,
+            String? toolTitle,
+            String? toolCallId,
+            String? toolKind,
+            String? description,
+            List<PermissionOption> options,
+            OrderKey order)?
         permissionRequest,
-    TResult Function(String requestId, String message, String mode,
-            Map<String, dynamic>? schema, String? url)?
+    TResult Function(
+            String requestId,
+            String? toolCallId,
+            String message,
+            String mode,
+            OrderKey order,
+            Map<String, dynamic>? schema,
+            String? url)?
         elicitationRequest,
-    TResult Function(String requestId, String toolName, String? toolTitle,
-            String? toolKind, String argsJson)?
+    TResult Function(String requestId, String toolName, OrderKey order,
+            String? toolTitle, String? toolKind, String argsJson)?
         toolRequest,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case TextTimelineItem() when text != null:
-        return text(_that.id, _that.kind, _that.role, _that.text);
+        return text(_that.id, _that.kind, _that.role, _that.text, _that.order);
       case TextStreamTimelineItem() when textStream != null:
-        return textStream(_that.id, _that.kind, _that.role, _that.text);
+        return textStream(
+            _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem() when toolCall != null:
-        return toolCall(
-            _that.id, _that.name, _that.args, _that.result, _that.diffs);
+        return toolCall(_that.id, _that.name, _that.order, _that.args,
+            _that.result, _that.diffs);
       case PermissionRequestTimelineItem() when permissionRequest != null:
-        return permissionRequest(_that.requestId, _that.toolTitle,
-            _that.toolKind, _that.description, _that.options);
+        return permissionRequest(
+            _that.requestId,
+            _that.toolTitle,
+            _that.toolCallId,
+            _that.toolKind,
+            _that.description,
+            _that.options,
+            _that.order);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
-        return elicitationRequest(_that.requestId, _that.message, _that.mode,
-            _that.schema, _that.url);
+        return elicitationRequest(_that.requestId, _that.toolCallId,
+            _that.message, _that.mode, _that.order, _that.schema, _that.url);
       case ToolRequestTimelineItem() when toolRequest != null:
-        return toolRequest(_that.requestId, _that.toolName, _that.toolTitle,
-            _that.toolKind, _that.argsJson);
+        return toolRequest(_that.requestId, _that.toolName, _that.order,
+            _that.toolTitle, _that.toolKind, _that.argsJson);
       case _:
         return orElse();
     }
@@ -862,47 +922,62 @@ extension TimelineItemPatterns on TimelineItem {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(
-            String id, ChatMessageKind kind, String role, String text)
+    required TResult Function(String id, ChatMessageKind kind, String role,
+            String text, OrderKey order)
         text,
-    required TResult Function(
-            String id, ChatMessageKind kind, String role, String text)
+    required TResult Function(String id, ChatMessageKind kind, String role,
+            String text, OrderKey order)
         textStream,
-    required TResult Function(String id, String name, String args,
-            String? result, List<ToolDiff> diffs)
+    required TResult Function(String id, String name, OrderKey order,
+            String args, String? result, List<ToolDiff> diffs)
         toolCall,
     required TResult Function(
             String requestId,
             String? toolTitle,
+            String? toolCallId,
             String? toolKind,
             String? description,
-            List<PermissionOption> options)
+            List<PermissionOption> options,
+            OrderKey order)
         permissionRequest,
-    required TResult Function(String requestId, String message, String mode,
-            Map<String, dynamic>? schema, String? url)
+    required TResult Function(
+            String requestId,
+            String? toolCallId,
+            String message,
+            String mode,
+            OrderKey order,
+            Map<String, dynamic>? schema,
+            String? url)
         elicitationRequest,
-    required TResult Function(String requestId, String toolName,
+    required TResult Function(String requestId, String toolName, OrderKey order,
             String? toolTitle, String? toolKind, String argsJson)
         toolRequest,
   }) {
     final _that = this;
     switch (_that) {
       case TextTimelineItem():
-        return text(_that.id, _that.kind, _that.role, _that.text);
+        return text(_that.id, _that.kind, _that.role, _that.text, _that.order);
       case TextStreamTimelineItem():
-        return textStream(_that.id, _that.kind, _that.role, _that.text);
+        return textStream(
+            _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem():
-        return toolCall(
-            _that.id, _that.name, _that.args, _that.result, _that.diffs);
+        return toolCall(_that.id, _that.name, _that.order, _that.args,
+            _that.result, _that.diffs);
       case PermissionRequestTimelineItem():
-        return permissionRequest(_that.requestId, _that.toolTitle,
-            _that.toolKind, _that.description, _that.options);
+        return permissionRequest(
+            _that.requestId,
+            _that.toolTitle,
+            _that.toolCallId,
+            _that.toolKind,
+            _that.description,
+            _that.options,
+            _that.order);
       case ElicitationRequestTimelineItem():
-        return elicitationRequest(_that.requestId, _that.message, _that.mode,
-            _that.schema, _that.url);
+        return elicitationRequest(_that.requestId, _that.toolCallId,
+            _that.message, _that.mode, _that.order, _that.schema, _that.url);
       case ToolRequestTimelineItem():
-        return toolRequest(_that.requestId, _that.toolName, _that.toolTitle,
-            _that.toolKind, _that.argsJson);
+        return toolRequest(_that.requestId, _that.toolName, _that.order,
+            _that.toolTitle, _that.toolKind, _that.argsJson);
     }
   }
 
@@ -920,43 +995,62 @@ extension TimelineItemPatterns on TimelineItem {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(
-            String id, ChatMessageKind kind, String role, String text)?
+    TResult? Function(String id, ChatMessageKind kind, String role, String text,
+            OrderKey order)?
         text,
-    TResult? Function(
-            String id, ChatMessageKind kind, String role, String text)?
+    TResult? Function(String id, ChatMessageKind kind, String role, String text,
+            OrderKey order)?
         textStream,
-    TResult? Function(String id, String name, String args, String? result,
-            List<ToolDiff> diffs)?
+    TResult? Function(String id, String name, OrderKey order, String args,
+            String? result, List<ToolDiff> diffs)?
         toolCall,
-    TResult? Function(String requestId, String? toolTitle, String? toolKind,
-            String? description, List<PermissionOption> options)?
+    TResult? Function(
+            String requestId,
+            String? toolTitle,
+            String? toolCallId,
+            String? toolKind,
+            String? description,
+            List<PermissionOption> options,
+            OrderKey order)?
         permissionRequest,
-    TResult? Function(String requestId, String message, String mode,
-            Map<String, dynamic>? schema, String? url)?
+    TResult? Function(
+            String requestId,
+            String? toolCallId,
+            String message,
+            String mode,
+            OrderKey order,
+            Map<String, dynamic>? schema,
+            String? url)?
         elicitationRequest,
-    TResult? Function(String requestId, String toolName, String? toolTitle,
-            String? toolKind, String argsJson)?
+    TResult? Function(String requestId, String toolName, OrderKey order,
+            String? toolTitle, String? toolKind, String argsJson)?
         toolRequest,
   }) {
     final _that = this;
     switch (_that) {
       case TextTimelineItem() when text != null:
-        return text(_that.id, _that.kind, _that.role, _that.text);
+        return text(_that.id, _that.kind, _that.role, _that.text, _that.order);
       case TextStreamTimelineItem() when textStream != null:
-        return textStream(_that.id, _that.kind, _that.role, _that.text);
+        return textStream(
+            _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem() when toolCall != null:
-        return toolCall(
-            _that.id, _that.name, _that.args, _that.result, _that.diffs);
+        return toolCall(_that.id, _that.name, _that.order, _that.args,
+            _that.result, _that.diffs);
       case PermissionRequestTimelineItem() when permissionRequest != null:
-        return permissionRequest(_that.requestId, _that.toolTitle,
-            _that.toolKind, _that.description, _that.options);
+        return permissionRequest(
+            _that.requestId,
+            _that.toolTitle,
+            _that.toolCallId,
+            _that.toolKind,
+            _that.description,
+            _that.options,
+            _that.order);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
-        return elicitationRequest(_that.requestId, _that.message, _that.mode,
-            _that.schema, _that.url);
+        return elicitationRequest(_that.requestId, _that.toolCallId,
+            _that.message, _that.mode, _that.order, _that.schema, _that.url);
       case ToolRequestTimelineItem() when toolRequest != null:
-        return toolRequest(_that.requestId, _that.toolName, _that.toolTitle,
-            _that.toolKind, _that.argsJson);
+        return toolRequest(_that.requestId, _that.toolName, _that.order,
+            _that.toolTitle, _that.toolKind, _that.argsJson);
       case _:
         return null;
     }
@@ -965,20 +1059,25 @@ extension TimelineItemPatterns on TimelineItem {
 
 /// @nodoc
 
-class TextTimelineItem implements TimelineItem {
+class TextTimelineItem extends TimelineItem {
   const TextTimelineItem(
       {required this.id,
       required this.kind,
       required this.role,
-      required this.text});
+      required this.text,
+      required this.order})
+      : super._();
 
   final String id;
   final ChatMessageKind kind;
   final String role;
   final String text;
+  @override
+  final OrderKey order;
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $TextTimelineItemCopyWith<TextTimelineItem> get copyWith =>
@@ -992,15 +1091,16 @@ class TextTimelineItem implements TimelineItem {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.kind, kind) || other.kind == kind) &&
             (identical(other.role, role) || other.role == role) &&
-            (identical(other.text, text) || other.text == text));
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.order, order) || other.order == order));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, kind, role, text);
+  int get hashCode => Object.hash(runtimeType, id, kind, role, text, order);
 
   @override
   String toString() {
-    return 'TimelineItem.text(id: $id, kind: $kind, role: $role, text: $text)';
+    return 'TimelineItem.text(id: $id, kind: $kind, role: $role, text: $text, order: $order)';
   }
 }
 
@@ -1010,8 +1110,14 @@ abstract mixin class $TextTimelineItemCopyWith<$Res>
   factory $TextTimelineItemCopyWith(
           TextTimelineItem value, $Res Function(TextTimelineItem) _then) =
       _$TextTimelineItemCopyWithImpl;
+  @override
   @useResult
-  $Res call({String id, ChatMessageKind kind, String role, String text});
+  $Res call(
+      {String id,
+      ChatMessageKind kind,
+      String role,
+      String text,
+      OrderKey order});
 }
 
 /// @nodoc
@@ -1024,12 +1130,14 @@ class _$TextTimelineItemCopyWithImpl<$Res>
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? kind = null,
     Object? role = null,
     Object? text = null,
+    Object? order = null,
   }) {
     return _then(TextTimelineItem(
       id: null == id
@@ -1048,27 +1156,36 @@ class _$TextTimelineItemCopyWithImpl<$Res>
           ? _self.text
           : text // ignore: cast_nullable_to_non_nullable
               as String,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
     ));
   }
 }
 
 /// @nodoc
 
-class TextStreamTimelineItem implements TimelineItem {
+class TextStreamTimelineItem extends TimelineItem {
   const TextStreamTimelineItem(
       {required this.id,
       this.kind = ChatMessageKind.text,
       required this.role,
-      required this.text});
+      required this.text,
+      required this.order})
+      : super._();
 
   final String id;
   @JsonKey()
   final ChatMessageKind kind;
   final String role;
   final String text;
+  @override
+  final OrderKey order;
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $TextStreamTimelineItemCopyWith<TextStreamTimelineItem> get copyWith =>
@@ -1083,15 +1200,16 @@ class TextStreamTimelineItem implements TimelineItem {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.kind, kind) || other.kind == kind) &&
             (identical(other.role, role) || other.role == role) &&
-            (identical(other.text, text) || other.text == text));
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.order, order) || other.order == order));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, kind, role, text);
+  int get hashCode => Object.hash(runtimeType, id, kind, role, text, order);
 
   @override
   String toString() {
-    return 'TimelineItem.textStream(id: $id, kind: $kind, role: $role, text: $text)';
+    return 'TimelineItem.textStream(id: $id, kind: $kind, role: $role, text: $text, order: $order)';
   }
 }
 
@@ -1101,8 +1219,14 @@ abstract mixin class $TextStreamTimelineItemCopyWith<$Res>
   factory $TextStreamTimelineItemCopyWith(TextStreamTimelineItem value,
           $Res Function(TextStreamTimelineItem) _then) =
       _$TextStreamTimelineItemCopyWithImpl;
+  @override
   @useResult
-  $Res call({String id, ChatMessageKind kind, String role, String text});
+  $Res call(
+      {String id,
+      ChatMessageKind kind,
+      String role,
+      String text,
+      OrderKey order});
 }
 
 /// @nodoc
@@ -1115,12 +1239,14 @@ class _$TextStreamTimelineItemCopyWithImpl<$Res>
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? kind = null,
     Object? role = null,
     Object? text = null,
+    Object? order = null,
   }) {
     return _then(TextStreamTimelineItem(
       id: null == id
@@ -1139,23 +1265,31 @@ class _$TextStreamTimelineItemCopyWithImpl<$Res>
           ? _self.text
           : text // ignore: cast_nullable_to_non_nullable
               as String,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
     ));
   }
 }
 
 /// @nodoc
 
-class ToolCallTimelineItem implements TimelineItem {
+class ToolCallTimelineItem extends TimelineItem {
   const ToolCallTimelineItem(
       {required this.id,
       required this.name,
+      required this.order,
       this.args = '',
       this.result,
       final List<ToolDiff> diffs = const <ToolDiff>[]})
-      : _diffs = diffs;
+      : _diffs = diffs,
+        super._();
 
   final String id;
   final String name;
+  @override
+  final OrderKey order;
   @JsonKey()
   final String args;
   final String? result;
@@ -1169,6 +1303,7 @@ class ToolCallTimelineItem implements TimelineItem {
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $ToolCallTimelineItemCopyWith<ToolCallTimelineItem> get copyWith =>
@@ -1182,18 +1317,19 @@ class ToolCallTimelineItem implements TimelineItem {
             other is ToolCallTimelineItem &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.order, order) || other.order == order) &&
             (identical(other.args, args) || other.args == args) &&
             (identical(other.result, result) || other.result == result) &&
             const DeepCollectionEquality().equals(other._diffs, _diffs));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, args, result,
+  int get hashCode => Object.hash(runtimeType, id, name, order, args, result,
       const DeepCollectionEquality().hash(_diffs));
 
   @override
   String toString() {
-    return 'TimelineItem.toolCall(id: $id, name: $name, args: $args, result: $result, diffs: $diffs)';
+    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs)';
   }
 }
 
@@ -1203,10 +1339,12 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
   factory $ToolCallTimelineItemCopyWith(ToolCallTimelineItem value,
           $Res Function(ToolCallTimelineItem) _then) =
       _$ToolCallTimelineItemCopyWithImpl;
+  @override
   @useResult
   $Res call(
       {String id,
       String name,
+      OrderKey order,
       String args,
       String? result,
       List<ToolDiff> diffs});
@@ -1222,10 +1360,12 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? order = null,
     Object? args = null,
     Object? result = freezed,
     Object? diffs = null,
@@ -1239,6 +1379,10 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
       args: null == args
           ? _self.args
           : args // ignore: cast_nullable_to_non_nullable
@@ -1257,17 +1401,21 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
 
 /// @nodoc
 
-class PermissionRequestTimelineItem implements TimelineItem {
+class PermissionRequestTimelineItem extends TimelineItem {
   const PermissionRequestTimelineItem(
       {required this.requestId,
       this.toolTitle,
+      this.toolCallId,
       this.toolKind,
       this.description,
-      required final List<PermissionOption> options})
-      : _options = options;
+      required final List<PermissionOption> options,
+      required this.order})
+      : _options = options,
+        super._();
 
   final String requestId;
   final String? toolTitle;
+  final String? toolCallId;
   final String? toolKind;
   final String? description;
   final List<PermissionOption> _options;
@@ -1277,8 +1425,12 @@ class PermissionRequestTimelineItem implements TimelineItem {
     return EqualUnmodifiableListView(_options);
   }
 
+  @override
+  final OrderKey order;
+
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $PermissionRequestTimelineItemCopyWith<PermissionRequestTimelineItem>
@@ -1294,20 +1446,30 @@ class PermissionRequestTimelineItem implements TimelineItem {
                 other.requestId == requestId) &&
             (identical(other.toolTitle, toolTitle) ||
                 other.toolTitle == toolTitle) &&
+            (identical(other.toolCallId, toolCallId) ||
+                other.toolCallId == toolCallId) &&
             (identical(other.toolKind, toolKind) ||
                 other.toolKind == toolKind) &&
             (identical(other.description, description) ||
                 other.description == description) &&
-            const DeepCollectionEquality().equals(other._options, _options));
+            const DeepCollectionEquality().equals(other._options, _options) &&
+            (identical(other.order, order) || other.order == order));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, requestId, toolTitle, toolKind,
-      description, const DeepCollectionEquality().hash(_options));
+  int get hashCode => Object.hash(
+      runtimeType,
+      requestId,
+      toolTitle,
+      toolCallId,
+      toolKind,
+      description,
+      const DeepCollectionEquality().hash(_options),
+      order);
 
   @override
   String toString() {
-    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolKind: $toolKind, description: $description, options: $options)';
+    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolCallId: $toolCallId, toolKind: $toolKind, description: $description, options: $options, order: $order)';
   }
 }
 
@@ -1318,13 +1480,16 @@ abstract mixin class $PermissionRequestTimelineItemCopyWith<$Res>
           PermissionRequestTimelineItem value,
           $Res Function(PermissionRequestTimelineItem) _then) =
       _$PermissionRequestTimelineItemCopyWithImpl;
+  @override
   @useResult
   $Res call(
       {String requestId,
       String? toolTitle,
+      String? toolCallId,
       String? toolKind,
       String? description,
-      List<PermissionOption> options});
+      List<PermissionOption> options,
+      OrderKey order});
 }
 
 /// @nodoc
@@ -1337,13 +1502,16 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? requestId = null,
     Object? toolTitle = freezed,
+    Object? toolCallId = freezed,
     Object? toolKind = freezed,
     Object? description = freezed,
     Object? options = null,
+    Object? order = null,
   }) {
     return _then(PermissionRequestTimelineItem(
       requestId: null == requestId
@@ -1353,6 +1521,10 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
       toolTitle: freezed == toolTitle
           ? _self.toolTitle
           : toolTitle // ignore: cast_nullable_to_non_nullable
+              as String?,
+      toolCallId: freezed == toolCallId
+          ? _self.toolCallId
+          : toolCallId // ignore: cast_nullable_to_non_nullable
               as String?,
       toolKind: freezed == toolKind
           ? _self.toolKind
@@ -1366,24 +1538,34 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
           ? _self._options
           : options // ignore: cast_nullable_to_non_nullable
               as List<PermissionOption>,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
     ));
   }
 }
 
 /// @nodoc
 
-class ElicitationRequestTimelineItem implements TimelineItem {
+class ElicitationRequestTimelineItem extends TimelineItem {
   const ElicitationRequestTimelineItem(
       {required this.requestId,
+      this.toolCallId,
       required this.message,
       required this.mode,
+      required this.order,
       final Map<String, dynamic>? schema,
       this.url})
-      : _schema = schema;
+      : _schema = schema,
+        super._();
 
   final String requestId;
+  final String? toolCallId;
   final String message;
   final String mode;
+  @override
+  final OrderKey order;
   final Map<String, dynamic>? _schema;
   Map<String, dynamic>? get schema {
     final value = _schema;
@@ -1397,6 +1579,7 @@ class ElicitationRequestTimelineItem implements TimelineItem {
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $ElicitationRequestTimelineItemCopyWith<ElicitationRequestTimelineItem>
@@ -1410,19 +1593,22 @@ class ElicitationRequestTimelineItem implements TimelineItem {
             other is ElicitationRequestTimelineItem &&
             (identical(other.requestId, requestId) ||
                 other.requestId == requestId) &&
+            (identical(other.toolCallId, toolCallId) ||
+                other.toolCallId == toolCallId) &&
             (identical(other.message, message) || other.message == message) &&
             (identical(other.mode, mode) || other.mode == mode) &&
+            (identical(other.order, order) || other.order == order) &&
             const DeepCollectionEquality().equals(other._schema, _schema) &&
             (identical(other.url, url) || other.url == url));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, requestId, message, mode,
-      const DeepCollectionEquality().hash(_schema), url);
+  int get hashCode => Object.hash(runtimeType, requestId, toolCallId, message,
+      mode, order, const DeepCollectionEquality().hash(_schema), url);
 
   @override
   String toString() {
-    return 'TimelineItem.elicitationRequest(requestId: $requestId, message: $message, mode: $mode, schema: $schema, url: $url)';
+    return 'TimelineItem.elicitationRequest(requestId: $requestId, toolCallId: $toolCallId, message: $message, mode: $mode, order: $order, schema: $schema, url: $url)';
   }
 }
 
@@ -1433,11 +1619,14 @@ abstract mixin class $ElicitationRequestTimelineItemCopyWith<$Res>
           ElicitationRequestTimelineItem value,
           $Res Function(ElicitationRequestTimelineItem) _then) =
       _$ElicitationRequestTimelineItemCopyWithImpl;
+  @override
   @useResult
   $Res call(
       {String requestId,
+      String? toolCallId,
       String message,
       String mode,
+      OrderKey order,
       Map<String, dynamic>? schema,
       String? url});
 }
@@ -1452,11 +1641,14 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? requestId = null,
+    Object? toolCallId = freezed,
     Object? message = null,
     Object? mode = null,
+    Object? order = null,
     Object? schema = freezed,
     Object? url = freezed,
   }) {
@@ -1465,6 +1657,10 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
           ? _self.requestId
           : requestId // ignore: cast_nullable_to_non_nullable
               as String,
+      toolCallId: freezed == toolCallId
+          ? _self.toolCallId
+          : toolCallId // ignore: cast_nullable_to_non_nullable
+              as String?,
       message: null == message
           ? _self.message
           : message // ignore: cast_nullable_to_non_nullable
@@ -1473,6 +1669,10 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
           ? _self.mode
           : mode // ignore: cast_nullable_to_non_nullable
               as String,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
       schema: freezed == schema
           ? _self._schema
           : schema // ignore: cast_nullable_to_non_nullable
@@ -1487,22 +1687,27 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
 
 /// @nodoc
 
-class ToolRequestTimelineItem implements TimelineItem {
+class ToolRequestTimelineItem extends TimelineItem {
   const ToolRequestTimelineItem(
       {required this.requestId,
       required this.toolName,
+      required this.order,
       this.toolTitle,
       this.toolKind,
-      required this.argsJson});
+      required this.argsJson})
+      : super._();
 
   final String requestId;
   final String toolName;
+  @override
+  final OrderKey order;
   final String? toolTitle;
   final String? toolKind;
   final String argsJson;
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $ToolRequestTimelineItemCopyWith<ToolRequestTimelineItem> get copyWith =>
@@ -1518,6 +1723,7 @@ class ToolRequestTimelineItem implements TimelineItem {
                 other.requestId == requestId) &&
             (identical(other.toolName, toolName) ||
                 other.toolName == toolName) &&
+            (identical(other.order, order) || other.order == order) &&
             (identical(other.toolTitle, toolTitle) ||
                 other.toolTitle == toolTitle) &&
             (identical(other.toolKind, toolKind) ||
@@ -1528,11 +1734,11 @@ class ToolRequestTimelineItem implements TimelineItem {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, requestId, toolName, toolTitle, toolKind, argsJson);
+      runtimeType, requestId, toolName, order, toolTitle, toolKind, argsJson);
 
   @override
   String toString() {
-    return 'TimelineItem.toolRequest(requestId: $requestId, toolName: $toolName, toolTitle: $toolTitle, toolKind: $toolKind, argsJson: $argsJson)';
+    return 'TimelineItem.toolRequest(requestId: $requestId, toolName: $toolName, order: $order, toolTitle: $toolTitle, toolKind: $toolKind, argsJson: $argsJson)';
   }
 }
 
@@ -1542,10 +1748,12 @@ abstract mixin class $ToolRequestTimelineItemCopyWith<$Res>
   factory $ToolRequestTimelineItemCopyWith(ToolRequestTimelineItem value,
           $Res Function(ToolRequestTimelineItem) _then) =
       _$ToolRequestTimelineItemCopyWithImpl;
+  @override
   @useResult
   $Res call(
       {String requestId,
       String toolName,
+      OrderKey order,
       String? toolTitle,
       String? toolKind,
       String argsJson});
@@ -1561,10 +1769,12 @@ class _$ToolRequestTimelineItemCopyWithImpl<$Res>
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
+  @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? requestId = null,
     Object? toolName = null,
+    Object? order = null,
     Object? toolTitle = freezed,
     Object? toolKind = freezed,
     Object? argsJson = null,
@@ -1578,6 +1788,10 @@ class _$ToolRequestTimelineItemCopyWithImpl<$Res>
           ? _self.toolName
           : toolName // ignore: cast_nullable_to_non_nullable
               as String,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
       toolTitle: freezed == toolTitle
           ? _self.toolTitle
           : toolTitle // ignore: cast_nullable_to_non_nullable

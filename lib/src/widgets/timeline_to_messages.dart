@@ -10,7 +10,21 @@ const kUserAuthorId = 'user';
 const kAgentAuthorId = 'assistant';
 
 List<chat_core.Message> timelineToMessages(List<TimelineItem> timeline) {
-  return timeline.map(_toMessage).toList(growable: false);
+  final requestedToolCallIds = {
+    for (final item in timeline)
+      if (item case ToolRequestTimelineItem(requestId: final id)) id,
+    for (final item in timeline)
+      if (item case PermissionRequestTimelineItem(toolCallId: final id?)) id,
+    for (final item in timeline)
+      if (item case ElicitationRequestTimelineItem(toolCallId: final id?)) id,
+  };
+  return timeline
+      .where((item) => switch (item) {
+            ToolCallTimelineItem(:final id) => !requestedToolCallIds.contains(id),
+            _ => true,
+          })
+      .map(_toMessage)
+      .toList(growable: false);
 }
 
 chat_core.Message _toMessage(TimelineItem item) {

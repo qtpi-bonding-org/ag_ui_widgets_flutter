@@ -26,5 +26,45 @@ void main() {
       final message = messages.single as chat_core.CustomMessage;
       expect(message.metadata?['diffs'], isEmpty);
     });
+
+    test('suppresses toolCall bubble when a correlated ToolRequestTimelineItem is live', () {
+      // Both items share the id "tc1" - the ToolRequestTimelineItem is the
+      // live client-side card representing the call; the raw ToolCallTimelineItem
+      // bubble must be filtered out so it doesn't shadow the card.
+      const toolCall = TimelineItem.toolCall(
+        id: 'tc1',
+        name: 'search',
+        order: OrderKey(0),
+      );
+      const toolRequest = TimelineItem.toolRequest(
+        requestId: 'tc1',
+        toolName: 'search',
+        order: OrderKey(1),
+        argsJson: '{}',
+      );
+
+      final messages = timelineToMessages([toolCall, toolRequest]);
+
+      expect(messages, hasLength(1));
+      final message = messages.single as chat_core.CustomMessage;
+      expect(message.id, 'tc1');
+      expect(message.metadata?['kind'], 'toolRequest');
+    });
+
+    test('keeps toolCall bubble when no correlated request is present', () {
+      const toolCall = TimelineItem.toolCall(
+        id: 'tc1',
+        name: 'search',
+        args: '{}',
+        result: 'ok',
+        order: OrderKey(0),
+      );
+
+      final messages = timelineToMessages([toolCall]);
+
+      expect(messages, hasLength(1));
+      final message = messages.single as chat_core.CustomMessage;
+      expect(message.metadata?['kind'], 'toolCall');
+    });
   });
 }

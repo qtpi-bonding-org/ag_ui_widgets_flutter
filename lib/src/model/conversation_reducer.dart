@@ -43,6 +43,22 @@ class ConversationReducer {
   bool _isRunning = false;
   String? _runError;
 
+  /// Called with a tool's name for every incoming `acp.tool_request`; return
+  /// `true` to skip creating a [ToolRequestTimelineItem] for it entirely.
+  ///
+  /// Some tools resolve themselves near-instantly with no user decision
+  /// involved (a local write, no permission dialog) — for those, a pending
+  /// card would be inserted and removed again within one event-loop tick,
+  /// which is pure churn: no UI ever needs to show it, and the insert+remove
+  /// pair was previously left to callers to suppress by calling
+  /// [resolveRequest] synchronously right after dispatch. That worked, but
+  /// pushed a decision that belongs to protocol semantics ("does this tool
+  /// need a human in the loop?") into every caller of [apply]. Leaving this
+  /// null preserves the old always-insert behavior.
+  final bool Function(String toolName)? autoResolveToolRequest;
+
+  ConversationReducer({this.autoResolveToolRequest});
+
   Conversation get current => Conversation(
         timeline: List.unmodifiable(_timeline),
         sessionState: _sessionState(),
@@ -187,14 +203,19 @@ class ConversationReducer {
         if (value is Map) {
           final callId = value['callId'];
           if (callId is String) {
-            _insertTimelineItem(
-              _timeline.length,
-              TimelineItem.toolRequest(
-                requestId: callId,
-                toolName: (value['toolName'] as String?) ?? '',
-                argsJson: (value['args'] as String?) ?? '{}',
-              ),
-            );
+            final toolName = (value['toolName'] as String?) ?? '';
+            if (autoResolveToolRequest?.call(toolName) ?? false) {
+              _resolvedIds.add(callId);
+            } else {
+              _insertTimelineItem(
+                _timeline.length,
+                TimelineItem.toolRequest(
+                  requestId: callId,
+                  toolName: toolName,
+                  argsJson: (value['args'] as String?) ?? '{}',
+                ),
+              );
+            }
           }
         }
       case ag_ui.CustomEvent(name: 'pocketcoder:diff'):

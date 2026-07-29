@@ -332,6 +332,51 @@ void main() {
       expect(item.argsJson, '{"changeId":"c1"}');
     });
 
+    test(
+      'autoResolveToolRequest suppresses the ToolRequestTimelineItem entirely '
+      'for tools it returns true for — no insert-then-remove churn',
+      () {
+        final r = ConversationReducer(
+          autoResolveToolRequest: (toolName) => toolName != 'render_surface',
+        );
+        r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+          'callId': 't1',
+          'toolName': 'add_comment',
+          'args': '{}',
+        }));
+        expect(r.current.timeline, isEmpty);
+
+        r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+          'callId': 't2',
+          'toolName': 'render_surface',
+          'args': '{}',
+        }));
+        expect(r.current.timeline, hasLength(1));
+        expect(
+          (r.current.timeline.single as ToolRequestTimelineItem).requestId,
+          't2',
+        );
+      },
+    );
+
+    test(
+      'a call_id suppressed by autoResolveToolRequest counts as resolved — '
+      'a later resolveRequest for it is a harmless no-op',
+      () {
+        final r = ConversationReducer(
+          autoResolveToolRequest: (toolName) => true,
+        );
+        r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+          'callId': 't1',
+          'toolName': 'add_comment',
+          'args': '{}',
+        }));
+        expect(r.current.timeline, isEmpty);
+        r.resolveRequest('t1');
+        expect(r.current.timeline, isEmpty);
+      },
+    );
+
     test('Adapter B items are independent of Adapter A — resolving one A item does not touch a B item', () {
       final r = ConversationReducer();
       r.apply(const StateSnapshotEvent(snapshot: {

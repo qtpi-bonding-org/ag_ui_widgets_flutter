@@ -1,3 +1,21 @@
+## 0.6.0
+
+- New: `StackedChatStyle`/`BubbleChatStyle` gain `markdownWhileStreaming`
+  (`bool`, default `false` — no behavior change unless set) and
+  `streamingLoadingBuilder`. When `true`, both builder families' generated
+  `textStreamMessageBuilder` renders the in-progress message via
+  `chatMarkdownBody` (the exact same `flutter_markdown_plus` call the
+  completed-message view uses) instead of
+  `FlyerChatTextStreamMessage`/`gpt_markdown`, so a message's formatting no
+  longer visibly changes renderer the instant it finishes streaming.
+  `streamingLoadingBuilder` lets a caller supply their own "no content yet"
+  placeholder (falls back to a plain low-opacity `'...'` otherwise) —
+  written to fix this exact inconsistency for one consumer (episutra), now
+  available to any consumer without writing a full custom builder from
+  scratch. New shared `buildStreamingMarkdownContent` (in
+  `streaming_markdown_content.dart`) does the actual `StreamState`
+  dispatch, used by both builder families rather than duplicated in each.
+
 ## 0.5.2
 
 - Fix: tool-call cards showed the raw MCP wire format for a tool's result —

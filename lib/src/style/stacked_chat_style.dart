@@ -23,5 +23,21 @@ abstract class StackedChatStyle with _$StackedChatStyle {
     MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
     TextStyle? reasoningTextStyle,
     Widget Function(BuildContext context, {required String role, required bool isSentByMe, required bool isReasoning})? roleHeaderBuilder,
+    // Opt-in — default false, zero behavior change unless set. When true,
+    // StackedChatBuilders.textStreamMessageBuilder renders the streaming
+    // message through chatMarkdownBody (flutter_markdown_plus) directly
+    // instead of FlyerChatTextStreamMessage, so it renders through the
+    // exact same call the completed-message view uses — see
+    // streaming_markdown_content.dart's doc comment for the full
+    // rationale (this was built to fix a real observed inconsistency
+    // between "streaming" and "just finished" styling in episutra, one of
+    // this package's consumers).
+    @Default(false) bool markdownWhileStreaming,
+    // Only consulted when markdownWhileStreaming is true. Null falls back
+    // to a plain low-opacity '...' placeholder — callers wanting a
+    // product-specific loading treatment (e.g. episutra's own animated
+    // dots) provide their own here instead of writing a full custom
+    // textStreamMessageBuilder from scratch.
+    Widget Function(BuildContext context, TextStyle? paragraphStyle)? streamingLoadingBuilder,
   }) = _StackedChatStyle;
 }

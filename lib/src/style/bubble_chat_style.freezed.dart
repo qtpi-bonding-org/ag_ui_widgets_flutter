@@ -28,9 +28,15 @@ mixin _$BubbleChatStyle {
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
   TextStyle? get reasoningTextStyle;
   Widget Function(BuildContext context,
-      {required String role,
-      required bool isSentByMe,
-      required bool isReasoning})? get roleHeaderBuilder;
+          {required String role,
+          required bool isSentByMe,
+          required bool isReasoning})?
+      get roleHeaderBuilder; // See StackedChatStyle.markdownWhileStreaming's doc comment — same
+// opt-in, same rationale, mirrored here for BubbleChatBuilders.
+  bool
+      get markdownWhileStreaming; // See StackedChatStyle.streamingLoadingBuilder's doc comment.
+  Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+      get streamingLoadingBuilder;
 
   /// Create a copy of BubbleChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -72,7 +78,12 @@ mixin _$BubbleChatStyle {
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
                 other.reasoningTextStyle == reasoningTextStyle) &&
             (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
-                other.roleHeaderBuilder == roleHeaderBuilder));
+                other.roleHeaderBuilder == roleHeaderBuilder) &&
+            (identical(other.markdownWhileStreaming, markdownWhileStreaming) ||
+                other.markdownWhileStreaming == markdownWhileStreaming) &&
+            (identical(
+                    other.streamingLoadingBuilder, streamingLoadingBuilder) ||
+                other.streamingLoadingBuilder == streamingLoadingBuilder));
   }
 
   @override
@@ -91,11 +102,13 @@ mixin _$BubbleChatStyle {
       diffRemovedColor,
       markdownStyleSheetBuilder,
       reasoningTextStyle,
-      roleHeaderBuilder);
+      roleHeaderBuilder,
+      markdownWhileStreaming,
+      streamingLoadingBuilder);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder, markdownWhileStreaming: $markdownWhileStreaming, streamingLoadingBuilder: $streamingLoadingBuilder)';
   }
 }
 
@@ -123,7 +136,10 @@ abstract mixin class $BubbleChatStyleCopyWith<$Res> {
               {required String role,
               required bool isSentByMe,
               required bool isReasoning})?
-          roleHeaderBuilder});
+          roleHeaderBuilder,
+      bool markdownWhileStreaming,
+      Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+          streamingLoadingBuilder});
 }
 
 /// @nodoc
@@ -153,6 +169,8 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
     Object? roleHeaderBuilder = freezed,
+    Object? markdownWhileStreaming = null,
+    Object? streamingLoadingBuilder = freezed,
   }) {
     return _then(_self.copyWith(
       sentBackground: null == sentBackground
@@ -214,6 +232,15 @@ class _$BubbleChatStyleCopyWithImpl<$Res>
                   {required String role,
                   required bool isSentByMe,
                   required bool isReasoning})?,
+      markdownWhileStreaming: null == markdownWhileStreaming
+          ? _self.markdownWhileStreaming
+          : markdownWhileStreaming // ignore: cast_nullable_to_non_nullable
+              as bool,
+      streamingLoadingBuilder: freezed == streamingLoadingBuilder
+          ? _self.streamingLoadingBuilder
+          : streamingLoadingBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(
+                  BuildContext context, TextStyle? paragraphStyle)?,
     ));
   }
 }
@@ -330,7 +357,10 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
                     {required String role,
                     required bool isSentByMe,
                     required bool isReasoning})?
-                roleHeaderBuilder)?
+                roleHeaderBuilder,
+            bool markdownWhileStreaming,
+            Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+                streamingLoadingBuilder)?
         $default, {
     required TResult orElse(),
   }) {
@@ -351,7 +381,9 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
             _that.reasoningTextStyle,
-            _that.roleHeaderBuilder);
+            _that.roleHeaderBuilder,
+            _that.markdownWhileStreaming,
+            _that.streamingLoadingBuilder);
       case _:
         return orElse();
     }
@@ -391,7 +423,10 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
                     {required String role,
                     required bool isSentByMe,
                     required bool isReasoning})?
-                roleHeaderBuilder)
+                roleHeaderBuilder,
+            bool markdownWhileStreaming,
+            Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+                streamingLoadingBuilder)
         $default,
   ) {
     final _that = this;
@@ -411,7 +446,9 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
             _that.reasoningTextStyle,
-            _that.roleHeaderBuilder);
+            _that.roleHeaderBuilder,
+            _that.markdownWhileStreaming,
+            _that.streamingLoadingBuilder);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -450,7 +487,10 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
                     {required String role,
                     required bool isSentByMe,
                     required bool isReasoning})?
-                roleHeaderBuilder)?
+                roleHeaderBuilder,
+            bool markdownWhileStreaming,
+            Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+                streamingLoadingBuilder)?
         $default,
   ) {
     final _that = this;
@@ -470,7 +510,9 @@ extension BubbleChatStylePatterns on BubbleChatStyle {
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
             _that.reasoningTextStyle,
-            _that.roleHeaderBuilder);
+            _that.roleHeaderBuilder,
+            _that.markdownWhileStreaming,
+            _that.streamingLoadingBuilder);
       case _:
         return null;
     }
@@ -494,7 +536,9 @@ class _BubbleChatStyle implements BubbleChatStyle {
       this.diffRemovedColor = const Color(0xFFC62828),
       this.markdownStyleSheetBuilder,
       this.reasoningTextStyle,
-      this.roleHeaderBuilder});
+      this.roleHeaderBuilder,
+      this.markdownWhileStreaming = false,
+      this.streamingLoadingBuilder});
 
   @override
   final Color sentBackground;
@@ -532,6 +576,15 @@ class _BubbleChatStyle implements BubbleChatStyle {
       {required String role,
       required bool isSentByMe,
       required bool isReasoning})? roleHeaderBuilder;
+// See StackedChatStyle.markdownWhileStreaming's doc comment — same
+// opt-in, same rationale, mirrored here for BubbleChatBuilders.
+  @override
+  @JsonKey()
+  final bool markdownWhileStreaming;
+// See StackedChatStyle.streamingLoadingBuilder's doc comment.
+  @override
+  final Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+      streamingLoadingBuilder;
 
   /// Create a copy of BubbleChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -573,7 +626,12 @@ class _BubbleChatStyle implements BubbleChatStyle {
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
                 other.reasoningTextStyle == reasoningTextStyle) &&
             (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
-                other.roleHeaderBuilder == roleHeaderBuilder));
+                other.roleHeaderBuilder == roleHeaderBuilder) &&
+            (identical(other.markdownWhileStreaming, markdownWhileStreaming) ||
+                other.markdownWhileStreaming == markdownWhileStreaming) &&
+            (identical(
+                    other.streamingLoadingBuilder, streamingLoadingBuilder) ||
+                other.streamingLoadingBuilder == streamingLoadingBuilder));
   }
 
   @override
@@ -592,11 +650,13 @@ class _BubbleChatStyle implements BubbleChatStyle {
       diffRemovedColor,
       markdownStyleSheetBuilder,
       reasoningTextStyle,
-      roleHeaderBuilder);
+      roleHeaderBuilder,
+      markdownWhileStreaming,
+      streamingLoadingBuilder);
 
   @override
   String toString() {
-    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
+    return 'BubbleChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, sentBorder: $sentBorder, receivedBorder: $receivedBorder, textStyle: $textStyle, maxWidth: $maxWidth, sentRadius: $sentRadius, receivedRadius: $receivedRadius, padding: $padding, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder, markdownWhileStreaming: $markdownWhileStreaming, streamingLoadingBuilder: $streamingLoadingBuilder)';
   }
 }
 
@@ -626,7 +686,10 @@ abstract mixin class _$BubbleChatStyleCopyWith<$Res>
               {required String role,
               required bool isSentByMe,
               required bool isReasoning})?
-          roleHeaderBuilder});
+          roleHeaderBuilder,
+      bool markdownWhileStreaming,
+      Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+          streamingLoadingBuilder});
 }
 
 /// @nodoc
@@ -656,6 +719,8 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
     Object? roleHeaderBuilder = freezed,
+    Object? markdownWhileStreaming = null,
+    Object? streamingLoadingBuilder = freezed,
   }) {
     return _then(_BubbleChatStyle(
       sentBackground: null == sentBackground
@@ -717,6 +782,15 @@ class __$BubbleChatStyleCopyWithImpl<$Res>
                   {required String role,
                   required bool isSentByMe,
                   required bool isReasoning})?,
+      markdownWhileStreaming: null == markdownWhileStreaming
+          ? _self.markdownWhileStreaming
+          : markdownWhileStreaming // ignore: cast_nullable_to_non_nullable
+              as bool,
+      streamingLoadingBuilder: freezed == streamingLoadingBuilder
+          ? _self.streamingLoadingBuilder
+          : streamingLoadingBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(
+                  BuildContext context, TextStyle? paragraphStyle)?,
     ));
   }
 }

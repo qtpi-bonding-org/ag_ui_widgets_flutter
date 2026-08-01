@@ -26,9 +26,26 @@ mixin _$StackedChatStyle {
   MarkdownStyleSheet Function(BuildContext)? get markdownStyleSheetBuilder;
   TextStyle? get reasoningTextStyle;
   Widget Function(BuildContext context,
-      {required String role,
-      required bool isSentByMe,
-      required bool isReasoning})? get roleHeaderBuilder;
+          {required String role,
+          required bool isSentByMe,
+          required bool isReasoning})?
+      get roleHeaderBuilder; // Opt-in — default false, zero behavior change unless set. When true,
+// StackedChatBuilders.textStreamMessageBuilder renders the streaming
+// message through chatMarkdownBody (flutter_markdown_plus) directly
+// instead of FlyerChatTextStreamMessage, so it renders through the
+// exact same call the completed-message view uses — see
+// streaming_markdown_content.dart's doc comment for the full
+// rationale (this was built to fix a real observed inconsistency
+// between "streaming" and "just finished" styling in episutra, one of
+// this package's consumers).
+  bool
+      get markdownWhileStreaming; // Only consulted when markdownWhileStreaming is true. Null falls back
+// to a plain low-opacity '...' placeholder — callers wanting a
+// product-specific loading treatment (e.g. episutra's own animated
+// dots) provide their own here instead of writing a full custom
+// textStreamMessageBuilder from scratch.
+  Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+      get streamingLoadingBuilder;
 
   /// Create a copy of StackedChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -66,7 +83,12 @@ mixin _$StackedChatStyle {
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
                 other.reasoningTextStyle == reasoningTextStyle) &&
             (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
-                other.roleHeaderBuilder == roleHeaderBuilder));
+                other.roleHeaderBuilder == roleHeaderBuilder) &&
+            (identical(other.markdownWhileStreaming, markdownWhileStreaming) ||
+                other.markdownWhileStreaming == markdownWhileStreaming) &&
+            (identical(
+                    other.streamingLoadingBuilder, streamingLoadingBuilder) ||
+                other.streamingLoadingBuilder == streamingLoadingBuilder));
   }
 
   @override
@@ -83,11 +105,13 @@ mixin _$StackedChatStyle {
       diffRemovedColor,
       markdownStyleSheetBuilder,
       reasoningTextStyle,
-      roleHeaderBuilder);
+      roleHeaderBuilder,
+      markdownWhileStreaming,
+      streamingLoadingBuilder);
 
   @override
   String toString() {
-    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
+    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder, markdownWhileStreaming: $markdownWhileStreaming, streamingLoadingBuilder: $streamingLoadingBuilder)';
   }
 }
 
@@ -113,7 +137,10 @@ abstract mixin class $StackedChatStyleCopyWith<$Res> {
               {required String role,
               required bool isSentByMe,
               required bool isReasoning})?
-          roleHeaderBuilder});
+          roleHeaderBuilder,
+      bool markdownWhileStreaming,
+      Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+          streamingLoadingBuilder});
 }
 
 /// @nodoc
@@ -141,6 +168,8 @@ class _$StackedChatStyleCopyWithImpl<$Res>
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
     Object? roleHeaderBuilder = freezed,
+    Object? markdownWhileStreaming = null,
+    Object? streamingLoadingBuilder = freezed,
   }) {
     return _then(_self.copyWith(
       sentBackground: null == sentBackground
@@ -194,6 +223,15 @@ class _$StackedChatStyleCopyWithImpl<$Res>
                   {required String role,
                   required bool isSentByMe,
                   required bool isReasoning})?,
+      markdownWhileStreaming: null == markdownWhileStreaming
+          ? _self.markdownWhileStreaming
+          : markdownWhileStreaming // ignore: cast_nullable_to_non_nullable
+              as bool,
+      streamingLoadingBuilder: freezed == streamingLoadingBuilder
+          ? _self.streamingLoadingBuilder
+          : streamingLoadingBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(
+                  BuildContext context, TextStyle? paragraphStyle)?,
     ));
   }
 }
@@ -308,7 +346,10 @@ extension StackedChatStylePatterns on StackedChatStyle {
                     {required String role,
                     required bool isSentByMe,
                     required bool isReasoning})?
-                roleHeaderBuilder)?
+                roleHeaderBuilder,
+            bool markdownWhileStreaming,
+            Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+                streamingLoadingBuilder)?
         $default, {
     required TResult orElse(),
   }) {
@@ -327,7 +368,9 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
             _that.reasoningTextStyle,
-            _that.roleHeaderBuilder);
+            _that.roleHeaderBuilder,
+            _that.markdownWhileStreaming,
+            _that.streamingLoadingBuilder);
       case _:
         return orElse();
     }
@@ -365,7 +408,10 @@ extension StackedChatStylePatterns on StackedChatStyle {
                     {required String role,
                     required bool isSentByMe,
                     required bool isReasoning})?
-                roleHeaderBuilder)
+                roleHeaderBuilder,
+            bool markdownWhileStreaming,
+            Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+                streamingLoadingBuilder)
         $default,
   ) {
     final _that = this;
@@ -383,7 +429,9 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
             _that.reasoningTextStyle,
-            _that.roleHeaderBuilder);
+            _that.roleHeaderBuilder,
+            _that.markdownWhileStreaming,
+            _that.streamingLoadingBuilder);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -420,7 +468,10 @@ extension StackedChatStylePatterns on StackedChatStyle {
                     {required String role,
                     required bool isSentByMe,
                     required bool isReasoning})?
-                roleHeaderBuilder)?
+                roleHeaderBuilder,
+            bool markdownWhileStreaming,
+            Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+                streamingLoadingBuilder)?
         $default,
   ) {
     final _that = this;
@@ -438,7 +489,9 @@ extension StackedChatStylePatterns on StackedChatStyle {
             _that.diffRemovedColor,
             _that.markdownStyleSheetBuilder,
             _that.reasoningTextStyle,
-            _that.roleHeaderBuilder);
+            _that.roleHeaderBuilder,
+            _that.markdownWhileStreaming,
+            _that.streamingLoadingBuilder);
       case _:
         return null;
     }
@@ -460,7 +513,9 @@ class _StackedChatStyle implements StackedChatStyle {
       this.diffRemovedColor = const Color(0xFFC62828),
       this.markdownStyleSheetBuilder,
       this.reasoningTextStyle,
-      this.roleHeaderBuilder});
+      this.roleHeaderBuilder,
+      this.markdownWhileStreaming = false,
+      this.streamingLoadingBuilder});
 
   @override
   final Color sentBackground;
@@ -493,6 +548,26 @@ class _StackedChatStyle implements StackedChatStyle {
       {required String role,
       required bool isSentByMe,
       required bool isReasoning})? roleHeaderBuilder;
+// Opt-in — default false, zero behavior change unless set. When true,
+// StackedChatBuilders.textStreamMessageBuilder renders the streaming
+// message through chatMarkdownBody (flutter_markdown_plus) directly
+// instead of FlyerChatTextStreamMessage, so it renders through the
+// exact same call the completed-message view uses — see
+// streaming_markdown_content.dart's doc comment for the full
+// rationale (this was built to fix a real observed inconsistency
+// between "streaming" and "just finished" styling in episutra, one of
+// this package's consumers).
+  @override
+  @JsonKey()
+  final bool markdownWhileStreaming;
+// Only consulted when markdownWhileStreaming is true. Null falls back
+// to a plain low-opacity '...' placeholder — callers wanting a
+// product-specific loading treatment (e.g. episutra's own animated
+// dots) provide their own here instead of writing a full custom
+// textStreamMessageBuilder from scratch.
+  @override
+  final Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+      streamingLoadingBuilder;
 
   /// Create a copy of StackedChatStyle
   /// with the given fields replaced by the non-null parameter values.
@@ -530,7 +605,12 @@ class _StackedChatStyle implements StackedChatStyle {
             (identical(other.reasoningTextStyle, reasoningTextStyle) ||
                 other.reasoningTextStyle == reasoningTextStyle) &&
             (identical(other.roleHeaderBuilder, roleHeaderBuilder) ||
-                other.roleHeaderBuilder == roleHeaderBuilder));
+                other.roleHeaderBuilder == roleHeaderBuilder) &&
+            (identical(other.markdownWhileStreaming, markdownWhileStreaming) ||
+                other.markdownWhileStreaming == markdownWhileStreaming) &&
+            (identical(
+                    other.streamingLoadingBuilder, streamingLoadingBuilder) ||
+                other.streamingLoadingBuilder == streamingLoadingBuilder));
   }
 
   @override
@@ -547,11 +627,13 @@ class _StackedChatStyle implements StackedChatStyle {
       diffRemovedColor,
       markdownStyleSheetBuilder,
       reasoningTextStyle,
-      roleHeaderBuilder);
+      roleHeaderBuilder,
+      markdownWhileStreaming,
+      streamingLoadingBuilder);
 
   @override
   String toString() {
-    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder)';
+    return 'StackedChatStyle(sentBackground: $sentBackground, receivedBackground: $receivedBackground, textStyle: $textStyle, aiLeadingIconBuilder: $aiLeadingIconBuilder, padding: $padding, cardBorderColor: $cardBorderColor, cardRadius: $cardRadius, diffAddedColor: $diffAddedColor, diffRemovedColor: $diffRemovedColor, markdownStyleSheetBuilder: $markdownStyleSheetBuilder, reasoningTextStyle: $reasoningTextStyle, roleHeaderBuilder: $roleHeaderBuilder, markdownWhileStreaming: $markdownWhileStreaming, streamingLoadingBuilder: $streamingLoadingBuilder)';
   }
 }
 
@@ -579,7 +661,10 @@ abstract mixin class _$StackedChatStyleCopyWith<$Res>
               {required String role,
               required bool isSentByMe,
               required bool isReasoning})?
-          roleHeaderBuilder});
+          roleHeaderBuilder,
+      bool markdownWhileStreaming,
+      Widget Function(BuildContext context, TextStyle? paragraphStyle)?
+          streamingLoadingBuilder});
 }
 
 /// @nodoc
@@ -607,6 +692,8 @@ class __$StackedChatStyleCopyWithImpl<$Res>
     Object? markdownStyleSheetBuilder = freezed,
     Object? reasoningTextStyle = freezed,
     Object? roleHeaderBuilder = freezed,
+    Object? markdownWhileStreaming = null,
+    Object? streamingLoadingBuilder = freezed,
   }) {
     return _then(_StackedChatStyle(
       sentBackground: null == sentBackground
@@ -660,6 +747,15 @@ class __$StackedChatStyleCopyWithImpl<$Res>
                   {required String role,
                   required bool isSentByMe,
                   required bool isReasoning})?,
+      markdownWhileStreaming: null == markdownWhileStreaming
+          ? _self.markdownWhileStreaming
+          : markdownWhileStreaming // ignore: cast_nullable_to_non_nullable
+              as bool,
+      streamingLoadingBuilder: freezed == streamingLoadingBuilder
+          ? _self.streamingLoadingBuilder
+          : streamingLoadingBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(
+                  BuildContext context, TextStyle? paragraphStyle)?,
     ));
   }
 }

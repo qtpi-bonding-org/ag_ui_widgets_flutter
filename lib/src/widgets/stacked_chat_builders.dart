@@ -10,6 +10,7 @@ import '../style/stacked_chat_style.dart';
 import 'ag_ui_chat.dart' show CustomCardBuilder, TextStreamCardBuilder;
 import 'chat_action_cards.dart';
 import 'markdown_body.dart';
+import 'streaming_markdown_content.dart';
 
 /// Full-width, vertically-alternating builder family for [AgUiChat]'s
 /// five builder slots. Sender is differentiated by background tint and
@@ -75,19 +76,53 @@ class StackedChatBuilders {
         final effectiveStyle = isReasoning
             ? (style.reasoningTextStyle ?? style.textStyle.copyWith(fontStyle: FontStyle.italic))
             : style.textStyle;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (style.roleHeaderBuilder != null)
-              style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: isReasoning),
-            chat_stream.FlyerChatTextStreamMessage(
-              message: message,
-              index: index,
-              streamState: streamState,
-              sentTextStyle: effectiveStyle,
-              receivedTextStyle: effectiveStyle,
-            ),
-          ],
+        final roleHeader = style.roleHeaderBuilder != null
+            ? style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: isReasoning)
+            : null;
+
+        if (!style.markdownWhileStreaming) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (roleHeader != null) roleHeader,
+              chat_stream.FlyerChatTextStreamMessage(
+                message: message,
+                index: index,
+                streamState: streamState,
+                sentTextStyle: effectiveStyle,
+                receivedTextStyle: effectiveStyle,
+              ),
+            ],
+          );
+        }
+
+        // Same outer chrome as textMessageBuilder (full-width Container,
+        // margin, padding, background) — matching it is the whole point
+        // of markdownWhileStreaming: no visible "jump" in background/
+        // padding when a streaming bubble gets replaced by its completed
+        // counterpart.
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: style.padding,
+          color: isSentByMe ? style.sentBackground : style.receivedBackground,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (roleHeader != null) roleHeader,
+              buildStreamingMarkdownContent(
+                context,
+                streamState,
+                paragraphStyle: effectiveStyle,
+                styleSheetBuilder: style.markdownStyleSheetBuilder ??
+                    (isReasoning
+                        ? (ctx) =>
+                            MarkdownStyleSheet.fromTheme(Theme.of(ctx)).copyWith(p: effectiveStyle)
+                        : null),
+                loadingBuilder: style.streamingLoadingBuilder,
+              ),
+            ],
+          ),
         );
       };
 

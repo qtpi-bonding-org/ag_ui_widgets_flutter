@@ -10,6 +10,7 @@ import '../style/chat_action_callbacks.dart';
 import 'ag_ui_chat.dart' show CustomCardBuilder, TextStreamCardBuilder;
 import 'chat_action_cards.dart';
 import 'markdown_body.dart';
+import 'streaming_markdown_content.dart';
 
 /// Aligned, max-width-constrained bubble builder family for [AgUiChat]'s
 /// five builder slots. Sent messages align right, received align left.
@@ -72,6 +73,37 @@ class BubbleChatBuilders {
   TextStreamCardBuilder get textStreamMessageBuilder =>
       (context, message, index, {required isSentByMe, groupStatus, required streamState}) {
         final role = message.metadata?['role'] as String? ?? (isSentByMe ? 'user' : 'assistant');
+        // Same per-bubble decoration (background/border/radius) as
+        // textMessageBuilder's inner Container when markdownWhileStreaming
+        // is on — matching it is the point: no visible "jump" in bubble
+        // chrome when a streaming bubble gets replaced by its completed
+        // counterpart. FlyerChatTextStreamMessage (the non-opted-in path)
+        // provides its own decoration internally via ChatTheme, unchanged.
+        final content = style.markdownWhileStreaming
+            ? Container(
+                padding: style.padding,
+                decoration: BoxDecoration(
+                  color: isSentByMe ? style.sentBackground : style.receivedBackground,
+                  border: (isSentByMe ? style.sentBorder : style.receivedBorder) != null
+                      ? Border.all(color: (isSentByMe ? style.sentBorder : style.receivedBorder)!)
+                      : null,
+                  borderRadius: isSentByMe ? style.sentRadius : style.receivedRadius,
+                ),
+                child: buildStreamingMarkdownContent(
+                  context,
+                  streamState,
+                  paragraphStyle: style.textStyle,
+                  styleSheetBuilder: style.markdownStyleSheetBuilder,
+                  loadingBuilder: style.streamingLoadingBuilder,
+                ),
+              )
+            : chat_stream.FlyerChatTextStreamMessage(
+                message: message,
+                index: index,
+                streamState: streamState,
+                sentTextStyle: style.textStyle,
+                receivedTextStyle: style.textStyle,
+              );
         return Align(
           alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
           child: ConstrainedBox(
@@ -83,13 +115,7 @@ class BubbleChatBuilders {
                 children: [
                   if (style.roleHeaderBuilder != null)
                     style.roleHeaderBuilder!(context, role: role, isSentByMe: isSentByMe, isReasoning: false),
-                  chat_stream.FlyerChatTextStreamMessage(
-                    message: message,
-                    index: index,
-                    streamState: streamState,
-                    sentTextStyle: style.textStyle,
-                    receivedTextStyle: style.textStyle,
-                  ),
+                  content,
                 ],
               ),
             ),

@@ -24,5 +24,10 @@ abstract class BubbleChatStyle with _$BubbleChatStyle {
     MarkdownStyleSheet Function(BuildContext)? markdownStyleSheetBuilder,
     TextStyle? reasoningTextStyle,
     Widget Function(BuildContext context, {required String role, required bool isSentByMe, required bool isReasoning})? roleHeaderBuilder,
+    // See StackedChatStyle.markdownWhileStreaming's doc comment — same
+    // opt-in, same rationale, mirrored here for BubbleChatBuilders.
+    @Default(false) bool markdownWhileStreaming,
+    // See StackedChatStyle.streamingLoadingBuilder's doc comment.
+    Widget Function(BuildContext context, TextStyle? paragraphStyle)? streamingLoadingBuilder,
   }) = _BubbleChatStyle;
 }

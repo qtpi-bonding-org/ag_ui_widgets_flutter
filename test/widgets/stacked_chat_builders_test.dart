@@ -365,4 +365,94 @@ void main() {
     ));
     expect(richText.text.style?.color, Colors.orange);
   });
+
+  group('markdownWhileStreaming opt-in', () {
+    testWidgets('false (default): unchanged, still FlyerChatTextStreamMessage, no MarkdownBody',
+        (tester) async {
+      final builders = StackedChatBuilders(
+        style,
+        ChatActionCallbacks(
+          onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+          onElicitationRespond: (_, __) {},
+        ),
+      );
+      await tester.pumpWidget(host(
+        const Conversation(timeline: [
+          TimelineItem.textStream(id: 's1', role: 'assistant', text: '**bold**', order: OrderKey(0)),
+        ]),
+        builders,
+      ));
+      await tester.pump();
+
+      expect(find.byType(MarkdownBody), findsNothing);
+      expect(find.text('bold'), findsNothing); // not rendered as formatted markdown
+    });
+
+    testWidgets(
+      'true: renders via chatMarkdownBody (MarkdownBody), the same call '
+      'textMessageBuilder uses for the completed view — not '
+      'FlyerChatTextStreamMessage at all',
+      (tester) async {
+        const streamingStyle = StackedChatStyle(
+          sentBackground: Colors.blue,
+          receivedBackground: Colors.grey,
+          textStyle: TextStyle(),
+          markdownWhileStreaming: true,
+        );
+        final builders = StackedChatBuilders(
+          streamingStyle,
+          ChatActionCallbacks(
+            onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+            onElicitationRespond: (_, __) {},
+          ),
+        );
+        await tester.pumpWidget(host(
+          const Conversation(timeline: [
+            TimelineItem.textStream(id: 's1', role: 'assistant', text: '**bold**', order: OrderKey(0)),
+          ]),
+          builders,
+        ));
+        await tester.pump();
+
+        expect(find.byType(MarkdownBody), findsOneWidget);
+        expect(find.text('**bold**'), findsNothing);
+        expect(find.textContaining('bold'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'true: an empty accumulated text renders the loadingBuilder fallback, '
+      'not an empty markdown body',
+      (tester) async {
+        var loadingBuilderCalled = false;
+        final streamingStyle = StackedChatStyle(
+          sentBackground: Colors.blue,
+          receivedBackground: Colors.grey,
+          textStyle: const TextStyle(),
+          markdownWhileStreaming: true,
+          streamingLoadingBuilder: (context, paragraphStyle) {
+            loadingBuilderCalled = true;
+            return const Text('LOADING');
+          },
+        );
+        final builders = StackedChatBuilders(
+          streamingStyle,
+          ChatActionCallbacks(
+            onPermissionOptionSelected: (_, {optionId, cancelled = false}) {},
+            onElicitationRespond: (_, __) {},
+          ),
+        );
+        await tester.pumpWidget(host(
+          const Conversation(timeline: [
+            TimelineItem.textStream(id: 's1', role: 'assistant', text: '', order: OrderKey(0)),
+          ]),
+          builders,
+        ));
+        await tester.pump();
+
+        expect(loadingBuilderCalled, isTrue);
+        expect(find.text('LOADING'), findsOneWidget);
+      },
+    );
+  });
 }

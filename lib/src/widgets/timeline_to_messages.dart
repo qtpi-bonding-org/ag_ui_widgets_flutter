@@ -13,6 +13,19 @@ List<chat_core.Message> timelineToMessages(List<TimelineItem> timeline) {
   final requestedToolCallIds = {
     for (final item in timeline)
       if (item case ToolRequestTimelineItem(requestId: final id)) id,
+    // A PermissionRequestTimelineItem's own requestId doubles as its
+    // correlated tool call's id for the direct acp.permission_request path
+    // (see conversation_reducer.dart's case for that event — the ACP
+    // protocol sets callId = the tool call's own id), so it must be
+    // collected unconditionally, not only via the separate toolCallId field
+    // below (which only Adapter A/pocketcoder's state-sync path sets). Both
+    // items now legitimately coexist in ConversationReducer's timeline
+    // (they no longer overwrite each other — see that reducer case's doc
+    // comment), so without this, converting both to Messages would produce
+    // two entries sharing one Message.id, which InMemoryChatController
+    // rejects as a duplicate id.
+    for (final item in timeline)
+      if (item case PermissionRequestTimelineItem(:final requestId)) requestId,
     for (final item in timeline)
       if (item case PermissionRequestTimelineItem(toolCallId: final id?)) id,
     for (final item in timeline)

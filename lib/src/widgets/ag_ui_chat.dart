@@ -1,10 +1,13 @@
 // lib/src/widgets/ag_ui_chat.dart
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart' as chat_ui;
 import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
     as chat_stream;
 import '../model/conversation.dart';
+import 'message_list_sync.dart';
 import 'timeline_to_messages.dart';
 import 'default_builders.dart';
 
@@ -112,8 +115,30 @@ class _AgUiChatState extends State<AgUiChat> {
     _syncMessages();
   }
 
+  /// Incremental, per-message-id sync — NOT a blanket `setMessages` on every
+  /// call. See `message_list_sync.dart`'s doc comment for why: `setMessages`
+  /// runs a full-list diff on every single AG-UI event (every streaming
+  /// text delta included), and `flutter_chat_ui` translates any same-id
+  /// content change into a remove-then-insert of that id, which crashes its
+  /// `SliverAnimatedList` (confirmed via a real crash log, 2026-08-01).
+  /// `computeMessageListSyncActions` classifies each id as removed/updated/
+  /// inserted/unchanged and this method applies exactly that — same-id
+  /// changes go through `updateMessage`, which never touches the animated
+  /// list at all.
   void _syncMessages() {
-    _controller.setMessages(timelineToMessages(widget.conversation.timeline));
+    final newMessages = timelineToMessages(widget.conversation.timeline);
+    for (final action in computeMessageListSyncActions(_controller.messages, newMessages)) {
+      switch (action) {
+        case RemoveAction(:final message):
+          unawaited(_controller.removeMessage(message));
+        case UpdateAction(:final oldMessage, :final newMessage):
+          unawaited(_controller.updateMessage(oldMessage, newMessage));
+        case InsertAction(:final message, :final index):
+          unawaited(_controller.insertMessage(message, index: index));
+        case ResetAction(:final messages):
+          unawaited(_controller.setMessages(messages));
+      }
+    }
     _itemsById = {
       for (final item in widget.conversation.timeline)
         if (item is PermissionRequestTimelineItem) item.requestId: item,

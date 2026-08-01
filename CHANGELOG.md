@@ -1,3 +1,34 @@
+## 0.5.1
+
+- Fix: `AgUiChat` re-diffed and replaced its entire message list
+  (`ChatController.setMessages`) on every single conversation update,
+  including every streaming text delta and tool-call args/result update.
+  `flutter_chat_ui` translates any same-id content change into a
+  remove-then-insert of that id; Flutter's `SliverAnimatedList` performs the
+  insert immediately but defers the remove for its fade animation, so two
+  widgets briefly shared the identical key — corrupting
+  `RenderSliverMultiBoxAdaptor`'s child-index bookkeeping and crashing with
+  `'child == null || indexOf(child) > index'` / `'indexOf(child) ==
+  index'`. `AgUiChat` now computes a minimal diff
+  (`message_list_sync.dart`'s `computeMessageListSyncActions`) and routes
+  same-id content changes through `ChatController.updateMessage` instead,
+  which never touches the animated list at all.
+- Fix: `ConversationReducer`'s `acp.permission_request` case stored a
+  permission card at the bare `callId` key — the same key its correlated
+  `ToolCallTimelineItem` already occupied (an ACP permission request's
+  `callId` IS the tool call's own id by protocol design), so the permission
+  card silently overwrote the tool call's data. Resolving the permission
+  then destroyed that (already-overwritten) entry entirely, so a later
+  `TOOL_CALL_RESULT` had nothing to update and synthesized a new, nameless,
+  detached-at-the-end-of-timeline entry instead. Permission requests now
+  store at a namespaced `'perm:$callId'` key (matching the existing
+  `'req:$callId'` pattern for `ToolRequestTimelineItem`), so they coexist
+  with rather than overwrite the tool call.
+- `timelineToMessages` updated to match: a tool call's raw bubble is now
+  also suppressed while its permission card is live (previously only done
+  for tool-request cards), since the two can now legitimately coexist in
+  the timeline and would otherwise produce two `Message`s sharing one id.
+
 ## 0.4.0
 
 - New: `AgUiChat.textStreamMessageBuilder` — streaming (in-progress) messages are now

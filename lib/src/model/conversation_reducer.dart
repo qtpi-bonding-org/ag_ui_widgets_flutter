@@ -251,14 +251,34 @@ class ConversationReducer {
                       kind: (o['kind'] as String?) ?? '',
                     ))
                 .toList();
+            // Namespaced ('perm:$callId', not bare $callId) — an ACP
+            // permission request's callId IS the tool call's own id by
+            // protocol design (acp-core/src/transport/stdio.rs sets
+            // call_id = req.tool_call.tool_call_id), so storing at the
+            // bare key overwrote the ToolCallTimelineItem already living
+            // there instead of coexisting with it. Once resolveRequest
+            // removed that (overwritten) entry, the tool call's real
+            // name/args were gone — its later TOOL_CALL_RESULT then had
+            // nothing to update and synthesized a new, nameless,
+            // detached-at-the-end entry (see the regression test "a
+            // permission request shares its callId with a tool call").
+            // Same fix shape as `req:$callId` for ToolRequestTimelineItem
+            // just above — including anchoring to the tool call's own
+            // OrderKey (sub-order 1) so the card still lands right after
+            // its call even out of stream-order. Previously this fell out
+            // for free (same key = same order, as a side effect of
+            // overwriting); now that the key is namespaced, it must be
+            // anchored explicitly or the card would land wherever `_seq`
+            // happens to be when the permission event itself arrives.
+            final anchor = _items[callId]?.order;
             _upsert(
-              callId,
+              'perm:$callId',
               (order) => TimelineItem.permissionRequest(
                 requestId: callId,
                 toolTitle: value['toolName'] as String?,
                 description: value['description'] as String?,
                 options: options,
-                order: order,
+                order: anchor != null ? OrderKey(anchor.seq, 1) : order,
               ),
             );
           }
@@ -439,17 +459,25 @@ class ConversationReducer {
   /// deliberately — see that method.
   void resolveRequest(String requestId) {
     _resolvedIds.add(requestId);
-    // The bare `requestId` key may belong to a permission/elicitation card
-    // (which use bare keys) — but for a resolved tool-request, `requestId`
-    // is the same value as its tool call's own key (`callId`), and that
-    // ToolCallTimelineItem must NOT be removed. Only remove the bare key
-    // when it actually holds a request-type item.
+    // The bare `requestId` key may belong to an Adapter A (pocketcoder
+    // state-sync) permission/elicitation card, which still use bare keys —
+    // pocketcoder's own `requestId` is a distinct id from its `toolCallId`
+    // field, so no collision risk there, unlike Adapter B below. But for a
+    // resolved tool-request, `requestId` is the same value as its tool
+    // call's own key (`callId`), and that ToolCallTimelineItem must NOT be
+    // removed. Only remove the bare key when it actually holds a
+    // request-type item.
     final atBareKey = _items[requestId];
     if (atBareKey is PermissionRequestTimelineItem ||
         atBareKey is ElicitationRequestTimelineItem) {
       _removeKey(requestId);
     }
     _removeKey('req:$requestId');
+    // Adapter B's direct `acp.permission_request` CustomEvent path (unlike
+    // Adapter A above) stores at 'perm:$requestId', not the bare key — see
+    // that case in apply()'s doc comment for why. Harmless no-op if this
+    // requestId was never an Adapter B permission (or already resolved).
+    _removeKey('perm:$requestId');
     _adapterAIds.remove(requestId);
   }
 

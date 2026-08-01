@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
+import 'package:ag_ui/ag_ui.dart' as ag_ui;
 
 void main() {
   Widget host(Conversation conversation, {
@@ -122,6 +123,67 @@ void main() {
     // should not be in the tree.
     expect(find.text('TOOL REQUEST CARD'), findsNothing);
   });
+
+  testWidgets(
+    'a realistic event burst (tool call starts, streams args, a permission '
+    'sharing its callId appears and resolves, the result lands) runs through '
+    "AgUiChat end-to-end without error (2026-08-01). NOTE: this does NOT "
+    'reliably reproduce the SliverAnimatedList crash itself — confirmed by '
+    "running it against the pre-fix _syncMessages (bare setMessages): it "
+    "still passed, because the crash is a real Flutter-internal timing race "
+    "(a synchronous widget-test pump doesn't hit the same window a live app "
+    'does). The actual regression coverage for the crash mechanism is '
+    'message_list_sync_test.dart, which asserts the update-not-remove+insert '
+    'contract directly and unconditionally. This test instead covers '
+    'end-to-end correctness of the new sync path through the real widget '
+    'tree (including the reducer key-collision fix — see '
+    'conversation_reducer_test.dart).',
+    (tester) async {
+      final reducer = ConversationReducer();
+      Future<void> pumpEvent(ag_ui.BaseEvent event) async {
+        reducer.apply(event);
+        await tester.pumpWidget(host(reducer.current));
+      }
+
+      await tester.pumpWidget(host(reducer.current));
+      await pumpEvent(
+        const ag_ui.ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'add_comment'),
+      );
+      await pumpEvent(
+        const ag_ui.ToolCallArgsEvent(toolCallId: 'tc1', delta: '{"body":'),
+      );
+      await pumpEvent(
+        const ag_ui.ToolCallArgsEvent(toolCallId: 'tc1', delta: '"hi"}'),
+      );
+      await pumpEvent(const ag_ui.CustomEvent(
+        name: 'acp.permission_request',
+        value: {'callId': 'tc1', 'toolName': 'add_comment', 'optionsJson': '[]'},
+      ));
+      reducer.resolveRequest('tc1');
+      await tester.pumpWidget(host(reducer.current));
+      await pumpEvent(const ag_ui.ToolCallResultEvent(
+        messageId: 'm1',
+        toolCallId: 'tc1',
+        content: 'ok',
+      ));
+      // The exact assertion this regresses: 'child == null ||
+      // indexOf(child) > index' / 'indexOf(child) == index' in
+      // RenderSliverMultiBoxAdaptor, tripped by flutter_chat_ui treating a
+      // same-id content change as a same-key remove+insert. pumpAndSettle
+      // (not a bare pump) lets any in-flight remove animation finish so the
+      // test binding's own end-of-test "no pending timers" invariant check
+      // doesn't fail for an unrelated reason.
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      // Correctness, not just "didn't crash": the tool call's real
+      // name/result must be showing on ONE card (the fix that made
+      // permission and tool-call coexist instead of overwrite must not
+      // have introduced its own duplicate-render bug).
+      expect(find.text('add_comment'), findsOneWidget);
+      expect(find.text('ok'), findsOneWidget);
+    },
+  );
 
   testWidgets('uses the caller-supplied textStreamMessageBuilder when set', (tester) async {
     await tester.pumpWidget(MaterialApp(

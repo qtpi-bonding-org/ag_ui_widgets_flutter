@@ -51,6 +51,38 @@ void main() {
       expect(message.metadata?['kind'], 'toolRequest');
     });
 
+    test(
+      'suppresses toolCall bubble when a correlated PermissionRequestTimelineItem '
+      'is live (regression, 2026-08-01) — both now coexist in the timeline since '
+      'ConversationReducer stopped storing them at the same key',
+      () {
+        // Same id "tc1" on purpose — an ACP permission request's callId IS
+        // its tool call's own id (see conversation_reducer.dart's
+        // acp.permission_request case). Both items now legitimately coexist
+        // in the timeline (they no longer overwrite each other in the
+        // reducer's storage), so without this filter, converting both to
+        // Messages would produce two Message.id 'tc1' entries —
+        // InMemoryChatController asserts against duplicate ids.
+        const toolCall = TimelineItem.toolCall(
+          id: 'tc1',
+          name: 'add_comment',
+          order: OrderKey(0),
+        );
+        const permissionRequest = TimelineItem.permissionRequest(
+          requestId: 'tc1',
+          options: [],
+          order: OrderKey(0, 1),
+        );
+
+        final messages = timelineToMessages([toolCall, permissionRequest]);
+
+        expect(messages, hasLength(1));
+        final message = messages.single as chat_core.CustomMessage;
+        expect(message.id, 'tc1');
+        expect(message.metadata?['kind'], 'permissionRequest');
+      },
+    );
+
     test('keeps toolCall bubble when no correlated request is present', () {
       const toolCall = TimelineItem.toolCall(
         id: 'tc1',

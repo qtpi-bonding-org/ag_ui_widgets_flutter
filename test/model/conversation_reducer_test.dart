@@ -511,6 +511,41 @@ void main() {
       expect(r.current.timeline.whereType<TextStreamTimelineItem>(), hasLength(2));
     });
 
+    test(
+      'a permission request shares its callId with a tool call (protocol-level, not '
+      'a bug — see acp-core stdio.rs) — resolving the permission must not destroy the '
+      "correlated ToolCallTimelineItem's data (regression, 2026-08-01)",
+      () {
+        final r = ConversationReducer()
+          ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'add_comment'))
+          ..apply(const CustomEvent(
+            name: 'acp.permission_request',
+            value: {'callId': 'tc1', 'toolName': 'add_comment', 'optionsJson': '[]'},
+          ));
+        // Both coexist while the permission is pending — the permission card
+        // must not overwrite the tool call's own entry.
+        expect(r.current.timeline.whereType<ToolCallTimelineItem>(), hasLength(1));
+        expect(r.current.timeline.whereType<PermissionRequestTimelineItem>(), hasLength(1));
+
+        r.resolveRequest('tc1');
+        expect(r.current.timeline.whereType<PermissionRequestTimelineItem>(), isEmpty);
+        expect(
+          r.current.timeline.whereType<ToolCallTimelineItem>(),
+          hasLength(1),
+          reason: 'resolving the permission destroyed the original tool call entry',
+        );
+
+        // The tool's real result must land on the ORIGINAL entry — not
+        // synthesize a new nameless/detached one at the end of the timeline
+        // (the exact symptom this regression covers).
+        r.apply(const ToolCallResultEvent(messageId: 'm1', toolCallId: 'tc1', content: 'ok'));
+        final toolCalls = r.current.timeline.whereType<ToolCallTimelineItem>().toList();
+        expect(toolCalls, hasLength(1));
+        expect(toolCalls.single.name, 'add_comment');
+        expect(toolCalls.single.result, 'ok');
+      },
+    );
+
     test('a tool call and its correlated tool-request survive together in the same timeline', () {
       final r = ConversationReducer()
         ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'add_comment'))

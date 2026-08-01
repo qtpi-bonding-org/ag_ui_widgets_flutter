@@ -1,7 +1,37 @@
 // lib/src/widgets/chat_action_cards.dart
+import 'dart:convert' show jsonDecode;
+
 import 'package:flutter/material.dart';
 import '../model/conversation.dart';
 import 'diff_lines_view.dart';
+
+/// A tool call's `result` is the raw MCP wire format for tool output — a
+/// JSON-encoded list of content blocks, `[{"type":"text","text":"..."}]`
+/// being the common case (any MCP server, not backend-specific). Rendered
+/// verbatim, that reads as internal plumbing (`[{"type":"text","text":"[]"}]`
+/// for what's conceptually just an empty result) rather than something a
+/// user should have to parse. This extracts and joins every text block's
+/// content; anything that doesn't match that shape (a different content
+/// type, or `result` not being valid JSON at all — some tools may return
+/// plain text directly) falls back to the raw string unchanged, never
+/// throws, and never hides real content behind a parse failure.
+String prettifyToolResult(String result) {
+  try {
+    final decoded = jsonDecode(result);
+    if (decoded is! List) return result;
+    final texts = <String>[];
+    for (final block in decoded) {
+      if (block is Map && block['type'] == 'text' && block['text'] is String) {
+        texts.add(block['text'] as String);
+      } else {
+        return result; // an unrecognized block shape — don't guess, show raw.
+      }
+    }
+    return texts.join('\n');
+  } on FormatException {
+    return result;
+  }
+}
 
 /// Card content for a pending permission request, shared by every
 /// builder family. Callers resolve their own [decoration]/[textStyle]
@@ -149,7 +179,7 @@ Widget buildToolCallCardContent(
         Text(name, style: textStyle),
         if (result != null) ...[
           const SizedBox(height: 4),
-          Text(result, style: textStyle),
+          Text(prettifyToolResult(result), style: textStyle),
         ],
         if (diffs.isNotEmpty) ...[
           const SizedBox(height: 4),

@@ -1,3 +1,13 @@
+## 0.5.2
+
+- Fix: tool-call cards showed the raw MCP wire format for a tool's result —
+  `[{"type":"text","text":"..."}]` — instead of the actual text. New
+  `prettifyToolResult` extracts and joins text blocks from that
+  content-array shape (the common case for any MCP server, not
+  backend-specific); anything that doesn't match falls back to the raw
+  string unchanged, so no content is ever silently hidden behind a parse
+  failure.
+
 ## 0.5.1
 
 - Fix: `AgUiChat` re-diffed and replaced its entire message list

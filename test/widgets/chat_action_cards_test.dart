@@ -85,4 +85,64 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('Unknown Tool'), findsOneWidget);
   });
+
+  group('prettifyToolResult', () {
+    test('extracts and joins text blocks from the MCP content-array wire format', () {
+      expect(
+        prettifyToolResult('[{"type":"text","text":"hello"}]'),
+        'hello',
+      );
+    });
+
+    test('joins multiple text blocks with a newline', () {
+      expect(
+        prettifyToolResult(
+          '[{"type":"text","text":"first"},{"type":"text","text":"second"}]',
+        ),
+        'first\nsecond',
+      );
+    });
+
+    test('an empty content array produces an empty string, not "[]"', () {
+      expect(prettifyToolResult('[]'), '');
+    });
+
+    test('falls back to the raw string for an unrecognized block shape', () {
+      const raw = '[{"type":"image","data":"..."}]';
+      expect(prettifyToolResult(raw), raw);
+    });
+
+    test('falls back to the raw string when it is not valid JSON at all', () {
+      const raw = 'plain text result, not MCP-wrapped';
+      expect(prettifyToolResult(raw), raw);
+    });
+
+    test('falls back to the raw string when JSON-valid but not a list', () {
+      const raw = '{"status":"ok"}';
+      expect(prettifyToolResult(raw), raw);
+    });
+  });
+
+  testWidgets(
+    'buildToolCallCardContent renders the prettified result, not the raw '
+    'MCP content-array JSON',
+    (tester) async {
+      await tester.pumpWidget(host(Builder(
+        builder: (context) => buildToolCallCardContent(
+          context,
+          name: 'fetch',
+          result: '[{"type":"text","text":"note body here"}]',
+          diffs: const [],
+          decoration: decoration,
+          textStyle: textStyle,
+          diffAddedColor: Colors.green,
+          diffRemovedColor: Colors.red,
+        ),
+      )));
+      await tester.pumpAndSettle();
+
+      expect(find.text('note body here'), findsOneWidget);
+      expect(find.textContaining('"type":"text"'), findsNothing);
+    },
+  );
 }

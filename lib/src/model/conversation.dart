@@ -166,6 +166,12 @@ sealed class SessionState with _$SessionState {
     Map<String, dynamic>? plan,
     String? title,
     @Default(false) bool isRunning,
+    /// Set while the agent process is spawning/handshaking (see
+    /// `acp.session_phase` CustomEvent), before it has produced any real
+    /// output. Independent of isRunning — never derived from it and never
+    /// re-derives it. False for backends that never emit `acp.session_phase`
+    /// (e.g. a local, already-warm model).
+    @Default(false) bool isStarting,
     String? runError,
   }) = _SessionState;
 

@@ -60,6 +60,7 @@ class ConversationReducer {
   final Set<String> _adapterAIds = {};
   final Set<String> _resolvedIds = {};
   bool _isRunning = false;
+  bool _isStarting = false;
   String? _runError;
 
   /// Called with a tool's name for every incoming `acp.tool_request`; return
@@ -128,8 +129,10 @@ class ConversationReducer {
         _runError = null;
       case ag_ui.RunFinishedEvent():
         _isRunning = false;
+        _isStarting = false;
       case ag_ui.RunErrorEvent(:final message):
         _isRunning = false;
+        _isStarting = false;
         _runError = message;
 
       case ag_ui.TextMessageStartEvent():
@@ -328,6 +331,15 @@ class ConversationReducer {
             }
           }
         }
+      case ag_ui.CustomEvent(name: 'acp.session_phase', :final value):
+        if (value is Map) {
+          switch (value['phase']) {
+            case 'starting':
+              _isStarting = true;
+            case 'ready':
+              _isStarting = false;
+          }
+        }
       case ag_ui.CustomEvent(name: 'pocketcoder:diff'):
         final value = event.value;
         if (value is Map) {
@@ -378,6 +390,7 @@ class ConversationReducer {
     _openReasoning.clear();
     _pocketcoder.clear();
     _isRunning = false;
+    _isStarting = false;
     _runError = null;
   }
 
@@ -522,6 +535,7 @@ class ConversationReducer {
       plan: asMap(_pocketcoder['plan']),
       title: sessionInfo?['title'] as String?,
       isRunning: _isRunning,
+      isStarting: _isStarting,
       runError: _runError,
     );
   }

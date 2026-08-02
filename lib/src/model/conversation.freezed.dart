@@ -1817,6 +1817,13 @@ mixin _$SessionState {
   Map<String, dynamic>? get plan;
   String? get title;
   bool get isRunning;
+
+  /// Set while the agent process is spawning/handshaking (see
+  /// `acp.session_phase` CustomEvent), before it has produced any real
+  /// output. Independent of isRunning — never derived from it and never
+  /// re-derives it. False for backends that never emit `acp.session_phase`
+  /// (e.g. a local, already-warm model).
+  bool get isStarting;
   String? get runError;
 
   /// Create a copy of SessionState
@@ -1842,6 +1849,8 @@ mixin _$SessionState {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.isRunning, isRunning) ||
                 other.isRunning == isRunning) &&
+            (identical(other.isStarting, isStarting) ||
+                other.isStarting == isStarting) &&
             (identical(other.runError, runError) ||
                 other.runError == runError));
   }
@@ -1856,11 +1865,12 @@ mixin _$SessionState {
       const DeepCollectionEquality().hash(plan),
       title,
       isRunning,
+      isStarting,
       runError);
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, runError: $runError)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError)';
   }
 }
 
@@ -1878,6 +1888,7 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       Map<String, dynamic>? plan,
       String? title,
       bool isRunning,
+      bool isStarting,
       String? runError});
 }
 
@@ -1900,6 +1911,7 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? plan = freezed,
     Object? title = freezed,
     Object? isRunning = null,
+    Object? isStarting = null,
     Object? runError = freezed,
   }) {
     return _then(_self.copyWith(
@@ -1930,6 +1942,10 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
       isRunning: null == isRunning
           ? _self.isRunning
           : isRunning // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isStarting: null == isStarting
+          ? _self.isStarting
+          : isStarting // ignore: cast_nullable_to_non_nullable
               as bool,
       runError: freezed == runError
           ? _self.runError
@@ -2038,6 +2054,7 @@ extension SessionStatePatterns on SessionState {
             Map<String, dynamic>? plan,
             String? title,
             bool isRunning,
+            bool isStarting,
             String? runError)?
         $default, {
     required TResult orElse(),
@@ -2053,6 +2070,7 @@ extension SessionStatePatterns on SessionState {
             _that.plan,
             _that.title,
             _that.isRunning,
+            _that.isStarting,
             _that.runError);
       case _:
         return orElse();
@@ -2082,6 +2100,7 @@ extension SessionStatePatterns on SessionState {
             Map<String, dynamic>? plan,
             String? title,
             bool isRunning,
+            bool isStarting,
             String? runError)
         $default,
   ) {
@@ -2096,6 +2115,7 @@ extension SessionStatePatterns on SessionState {
             _that.plan,
             _that.title,
             _that.isRunning,
+            _that.isStarting,
             _that.runError);
     }
   }
@@ -2122,6 +2142,7 @@ extension SessionStatePatterns on SessionState {
             Map<String, dynamic>? plan,
             String? title,
             bool isRunning,
+            bool isStarting,
             String? runError)?
         $default,
   ) {
@@ -2136,6 +2157,7 @@ extension SessionStatePatterns on SessionState {
             _that.plan,
             _that.title,
             _that.isRunning,
+            _that.isStarting,
             _that.runError);
       case _:
         return null;
@@ -2154,6 +2176,7 @@ class _SessionState extends SessionState {
       final Map<String, dynamic>? plan,
       this.title,
       this.isRunning = false,
+      this.isStarting = false,
       this.runError})
       : _permission = permission,
         _elicitation = elicitation,
@@ -2217,6 +2240,15 @@ class _SessionState extends SessionState {
   @override
   @JsonKey()
   final bool isRunning;
+
+  /// Set while the agent process is spawning/handshaking (see
+  /// `acp.session_phase` CustomEvent), before it has produced any real
+  /// output. Independent of isRunning — never derived from it and never
+  /// re-derives it. False for backends that never emit `acp.session_phase`
+  /// (e.g. a local, already-warm model).
+  @override
+  @JsonKey()
+  final bool isStarting;
   @override
   final String? runError;
 
@@ -2243,6 +2275,8 @@ class _SessionState extends SessionState {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.isRunning, isRunning) ||
                 other.isRunning == isRunning) &&
+            (identical(other.isStarting, isStarting) ||
+                other.isStarting == isStarting) &&
             (identical(other.runError, runError) ||
                 other.runError == runError));
   }
@@ -2257,11 +2291,12 @@ class _SessionState extends SessionState {
       const DeepCollectionEquality().hash(_plan),
       title,
       isRunning,
+      isStarting,
       runError);
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, runError: $runError)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError)';
   }
 }
 
@@ -2281,6 +2316,7 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       Map<String, dynamic>? plan,
       String? title,
       bool isRunning,
+      bool isStarting,
       String? runError});
 }
 
@@ -2304,6 +2340,7 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? plan = freezed,
     Object? title = freezed,
     Object? isRunning = null,
+    Object? isStarting = null,
     Object? runError = freezed,
   }) {
     return _then(_SessionState(
@@ -2334,6 +2371,10 @@ class __$SessionStateCopyWithImpl<$Res>
       isRunning: null == isRunning
           ? _self.isRunning
           : isRunning // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isStarting: null == isStarting
+          ? _self.isStarting
+          : isStarting // ignore: cast_nullable_to_non_nullable
               as bool,
       runError: freezed == runError
           ? _self.runError

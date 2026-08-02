@@ -458,6 +458,60 @@ void main() {
       expect(r.current.sessionState.isRunning, isFalse);
       expect(r.current.sessionState.runError, isNull);
     });
+
+    test('acp.session_phase starting sets isStarting true', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(
+        name: 'acp.session_phase',
+        value: {'phase': 'starting'},
+      ));
+      expect(r.current.sessionState.isStarting, isTrue);
+    });
+
+    test('acp.session_phase ready clears isStarting', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(
+        name: 'acp.session_phase',
+        value: {'phase': 'starting'},
+      ));
+      r.apply(const CustomEvent(
+        name: 'acp.session_phase',
+        value: {'phase': 'ready'},
+      ));
+      expect(r.current.sessionState.isStarting, isFalse);
+    });
+
+    test('RunFinishedEvent clears isStarting even without a prior ready', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(
+        name: 'acp.session_phase',
+        value: {'phase': 'starting'},
+      ));
+      r.apply(const RunFinishedEvent(threadId: 't1', runId: 'r1'));
+      expect(r.current.sessionState.isStarting, isFalse);
+    });
+
+    test('RunErrorEvent clears isStarting even without a prior ready', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(
+        name: 'acp.session_phase',
+        value: {'phase': 'starting'},
+      ));
+      r.apply(const RunErrorEvent(message: 'boom'));
+      expect(r.current.sessionState.isStarting, isFalse);
+    });
+
+    test('isStarting does not affect isRunning', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(
+        name: 'acp.session_phase',
+        value: {'phase': 'starting'},
+      ));
+      expect(r.current.sessionState.isRunning, isFalse);
+      r.apply(RunStartedEvent(threadId: 't1', runId: 'r1'));
+      expect(r.current.sessionState.isRunning, isTrue);
+      expect(r.current.sessionState.isStarting, isTrue);
+    });
   });
 
   group('deterministic identity', () {

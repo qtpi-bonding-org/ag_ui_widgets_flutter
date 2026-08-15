@@ -1825,6 +1825,7 @@ mixin _$SessionState {
   /// (e.g. a local, already-warm model).
   bool get isStarting;
   String? get runError;
+  RunOutcome? get runOutcome;
 
   /// Create a copy of SessionState
   /// with the given fields replaced by the non-null parameter values.
@@ -1852,7 +1853,9 @@ mixin _$SessionState {
             (identical(other.isStarting, isStarting) ||
                 other.isStarting == isStarting) &&
             (identical(other.runError, runError) ||
-                other.runError == runError));
+                other.runError == runError) &&
+            (identical(other.runOutcome, runOutcome) ||
+                other.runOutcome == runOutcome));
   }
 
   @override
@@ -1866,11 +1869,12 @@ mixin _$SessionState {
       title,
       isRunning,
       isStarting,
-      runError);
+      runError,
+      runOutcome);
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome)';
   }
 }
 
@@ -1889,7 +1893,8 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       String? title,
       bool isRunning,
       bool isStarting,
-      String? runError});
+      String? runError,
+      RunOutcome? runOutcome});
 }
 
 /// @nodoc
@@ -1913,6 +1918,7 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? isRunning = null,
     Object? isStarting = null,
     Object? runError = freezed,
+    Object? runOutcome = freezed,
   }) {
     return _then(_self.copyWith(
       permission: freezed == permission
@@ -1951,6 +1957,10 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
           ? _self.runError
           : runError // ignore: cast_nullable_to_non_nullable
               as String?,
+      runOutcome: freezed == runOutcome
+          ? _self.runOutcome
+          : runOutcome // ignore: cast_nullable_to_non_nullable
+              as RunOutcome?,
     ));
   }
 }
@@ -2055,7 +2065,8 @@ extension SessionStatePatterns on SessionState {
             String? title,
             bool isRunning,
             bool isStarting,
-            String? runError)?
+            String? runError,
+            RunOutcome? runOutcome)?
         $default, {
     required TResult orElse(),
   }) {
@@ -2071,7 +2082,8 @@ extension SessionStatePatterns on SessionState {
             _that.title,
             _that.isRunning,
             _that.isStarting,
-            _that.runError);
+            _that.runError,
+            _that.runOutcome);
       case _:
         return orElse();
     }
@@ -2101,7 +2113,8 @@ extension SessionStatePatterns on SessionState {
             String? title,
             bool isRunning,
             bool isStarting,
-            String? runError)
+            String? runError,
+            RunOutcome? runOutcome)
         $default,
   ) {
     final _that = this;
@@ -2116,7 +2129,8 @@ extension SessionStatePatterns on SessionState {
             _that.title,
             _that.isRunning,
             _that.isStarting,
-            _that.runError);
+            _that.runError,
+            _that.runOutcome);
     }
   }
 
@@ -2143,7 +2157,8 @@ extension SessionStatePatterns on SessionState {
             String? title,
             bool isRunning,
             bool isStarting,
-            String? runError)?
+            String? runError,
+            RunOutcome? runOutcome)?
         $default,
   ) {
     final _that = this;
@@ -2158,7 +2173,8 @@ extension SessionStatePatterns on SessionState {
             _that.title,
             _that.isRunning,
             _that.isStarting,
-            _that.runError);
+            _that.runError,
+            _that.runOutcome);
       case _:
         return null;
     }
@@ -2177,7 +2193,8 @@ class _SessionState extends SessionState {
       this.title,
       this.isRunning = false,
       this.isStarting = false,
-      this.runError})
+      this.runError,
+      this.runOutcome})
       : _permission = permission,
         _elicitation = elicitation,
         _modes = modes,
@@ -2251,6 +2268,8 @@ class _SessionState extends SessionState {
   final bool isStarting;
   @override
   final String? runError;
+  @override
+  final RunOutcome? runOutcome;
 
   /// Create a copy of SessionState
   /// with the given fields replaced by the non-null parameter values.
@@ -2278,7 +2297,9 @@ class _SessionState extends SessionState {
             (identical(other.isStarting, isStarting) ||
                 other.isStarting == isStarting) &&
             (identical(other.runError, runError) ||
-                other.runError == runError));
+                other.runError == runError) &&
+            (identical(other.runOutcome, runOutcome) ||
+                other.runOutcome == runOutcome));
   }
 
   @override
@@ -2292,11 +2313,12 @@ class _SessionState extends SessionState {
       title,
       isRunning,
       isStarting,
-      runError);
+      runError,
+      runOutcome);
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome)';
   }
 }
 
@@ -2317,7 +2339,8 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       String? title,
       bool isRunning,
       bool isStarting,
-      String? runError});
+      String? runError,
+      RunOutcome? runOutcome});
 }
 
 /// @nodoc
@@ -2342,6 +2365,7 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? isRunning = null,
     Object? isStarting = null,
     Object? runError = freezed,
+    Object? runOutcome = freezed,
   }) {
     return _then(_SessionState(
       permission: freezed == permission
@@ -2380,6 +2404,10 @@ class __$SessionStateCopyWithImpl<$Res>
           ? _self.runError
           : runError // ignore: cast_nullable_to_non_nullable
               as String?,
+      runOutcome: freezed == runOutcome
+          ? _self.runOutcome
+          : runOutcome // ignore: cast_nullable_to_non_nullable
+              as RunOutcome?,
     ));
   }
 }

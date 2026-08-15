@@ -62,6 +62,7 @@ class ConversationReducer {
   bool _isRunning = false;
   bool _isStarting = false;
   String? _runError;
+  RunOutcome? _runOutcome;
 
   /// Called with a tool's name for every incoming `acp.tool_request`; return
   /// `true` to skip creating a [ToolRequestTimelineItem] for it entirely.
@@ -127,13 +128,24 @@ class ConversationReducer {
       case ag_ui.RunStartedEvent():
         _isRunning = true;
         _runError = null;
-      case ag_ui.RunFinishedEvent():
+        _runOutcome = null;
+      case ag_ui.RunFinishedEvent(:final result):
         _isRunning = false;
         _isStarting = false;
-      case ag_ui.RunErrorEvent(:final message):
+        final stopReason =
+            result is Map ? result['stopReason'] as String? : null;
+        _runOutcome = switch (stopReason) {
+          'cancelled' => RunOutcome.cancelled,
+          null => RunOutcome.success,
+          _ => RunOutcome.success,
+        };
+      case ag_ui.RunErrorEvent(:final message, :final code):
         _isRunning = false;
         _isStarting = false;
         _runError = message;
+        _runOutcome = code == 'connection_interrupted'
+            ? RunOutcome.interrupted
+            : RunOutcome.failed;
 
       case ag_ui.TextMessageStartEvent():
         final open = _OpenMessage(event.role.value);
@@ -234,7 +246,8 @@ class ConversationReducer {
           ),
         );
       case ag_ui.ToolCallArgsEvent():
-        _updateTool(event.toolCallId, (t) => t.copyWith(args: t.args + event.delta));
+        _updateTool(
+            event.toolCallId, (t) => t.copyWith(args: t.args + event.delta));
       case ag_ui.ToolCallResultEvent():
         _updateTool(event.toolCallId, (t) => t.copyWith(result: event.content));
       case ag_ui.ToolCallEndEvent():
@@ -352,7 +365,8 @@ class ConversationReducer {
               oldText: (value['oldText'] as String?) ?? '',
               newText: newText,
             );
-            _updateTool(toolCallId, (t) => t.copyWith(diffs: [...t.diffs, diff]));
+            _updateTool(
+                toolCallId, (t) => t.copyWith(diffs: [...t.diffs, diff]));
           }
         }
 
@@ -392,6 +406,7 @@ class ConversationReducer {
     _isRunning = false;
     _isStarting = false;
     _runError = null;
+    _runOutcome = null;
   }
 
   void _updateTool(
@@ -497,7 +512,8 @@ class ConversationReducer {
   void _applyPatch(Map<String, dynamic> op) {
     final path = op['path'] as String?;
     if (path == null) return;
-    final segments = path.split('/').where((s) => s.isNotEmpty).toList(growable: false);
+    final segments =
+        path.split('/').where((s) => s.isNotEmpty).toList(growable: false);
     if (segments.isEmpty || segments.first != 'pocketcoder') return;
     if (segments.length == 2) {
       final ns = segments[1];
@@ -513,7 +529,9 @@ class ConversationReducer {
       final ns = segments[1];
       final key = segments[2];
       final existing = _pocketcoder[ns];
-      final sub = existing is Map ? Map<String, dynamic>.from(existing) : <String, dynamic>{};
+      final sub = existing is Map
+          ? Map<String, dynamic>.from(existing)
+          : <String, dynamic>{};
       switch (op['op']) {
         case 'remove':
           sub.remove(key);
@@ -525,7 +543,8 @@ class ConversationReducer {
   }
 
   SessionState _sessionState() {
-    Map<String, dynamic>? asMap(dynamic v) => v is Map ? Map<String, dynamic>.from(v) : null;
+    Map<String, dynamic>? asMap(dynamic v) =>
+        v is Map ? Map<String, dynamic>.from(v) : null;
     final sessionInfo = asMap(_pocketcoder['session_info']);
     return SessionState(
       permission: asMap(_pocketcoder['permission']),
@@ -537,6 +556,7 @@ class ConversationReducer {
       isRunning: _isRunning,
       isStarting: _isStarting,
       runError: _runError,
+      runOutcome: _runOutcome,
     );
   }
 }

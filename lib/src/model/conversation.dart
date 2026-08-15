@@ -5,6 +5,8 @@ part 'conversation.freezed.dart';
 
 enum ChatMessageKind { text, reasoning }
 
+enum RunOutcome { success, cancelled, interrupted, failed }
+
 /// One diff hunk from a tool call's result — the full before/after text for
 /// one file. [oldText] is empty for new-file diffs (the backend's ACP-facing
 /// `ToolDiff.OldText` uses `omitempty`, so a new-file event never carries an
@@ -166,6 +168,7 @@ sealed class SessionState with _$SessionState {
     Map<String, dynamic>? plan,
     String? title,
     @Default(false) bool isRunning,
+
     /// Set while the agent process is spawning/handshaking (see
     /// `acp.session_phase` CustomEvent), before it has produced any real
     /// output. Independent of isRunning — never derived from it and never
@@ -173,6 +176,7 @@ sealed class SessionState with _$SessionState {
     /// (e.g. a local, already-warm model).
     @Default(false) bool isStarting,
     String? runError,
+    RunOutcome? runOutcome,
   }) = _SessionState;
 
   const SessionState._();

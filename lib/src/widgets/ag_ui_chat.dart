@@ -10,6 +10,7 @@ import '../model/conversation.dart';
 import 'message_list_sync.dart';
 import 'timeline_to_messages.dart';
 import 'default_builders.dart';
+import 'timeline_request_index.dart';
 
 typedef CustomCardBuilder = Widget Function(
   BuildContext context,
@@ -139,14 +140,7 @@ class _AgUiChatState extends State<AgUiChat> {
           unawaited(_controller.setMessages(messages));
       }
     }
-    _itemsById = {
-      for (final item in widget.conversation.timeline)
-        if (item is PermissionRequestTimelineItem) item.requestId: item,
-      for (final item in widget.conversation.timeline)
-        if (item is ElicitationRequestTimelineItem) item.requestId: item,
-      for (final item in widget.conversation.timeline)
-        if (item is ToolRequestTimelineItem) item.requestId: item,
-    };
+    _itemsById = timelineRequestIndex(widget.conversation.timeline);
   }
 
   @override

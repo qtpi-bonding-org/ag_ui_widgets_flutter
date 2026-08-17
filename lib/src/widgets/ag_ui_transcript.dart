@@ -107,6 +107,12 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
     final requests = timelineRequestIndex(timeline);
     _scroll.scheduleStick();
 
+    // Read purely to register a dependency: a keyboard inset shrinks the
+    // viewport through a CONSTRAINT change, which re-layouts without
+    // rebuilding. Reading it here turns an inset change into a rebuild, which
+    // then flows through the same post-frame re-stick as everything else.
+    MediaQuery.viewInsetsOf(context);
+
     final list = SliverList.builder(
       itemCount: messages.length,
       findChildIndexCallback: (key) {
@@ -124,15 +130,29 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
       },
     );
 
+    Widget wrapped(Widget scrollView) => NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            _scroll.handleNotification(notification);
+            return false; // never consume — let it keep bubbling.
+          },
+          child: scrollView,
+        );
+
     switch (widget.placement) {
       case ComposerPlacement.pinned:
-        return Column(children: [
-          Expanded(child: CustomScrollView(
-            controller: _scroll.controller, slivers: [list])),
-          widget.composerBuilder(context),
-        ]);
+        return Column(
+          children: [
+            Expanded(
+              child: wrapped(CustomScrollView(
+                controller: _scroll.controller,
+                slivers: [list],
+              )),
+            ),
+            widget.composerBuilder(context),
+          ],
+        );
       case ComposerPlacement.inline:
-        return CustomScrollView(
+        return wrapped(CustomScrollView(
           controller: _scroll.controller,
           slivers: [
             list,
@@ -146,7 +166,7 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
               ),
             ),
           ],
-        );
+        ));
     }
   }
 }

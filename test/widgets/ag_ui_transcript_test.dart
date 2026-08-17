@@ -180,4 +180,42 @@ void main() {
     expect(find.text('STREAMING'), findsNothing);
     expect(find.text('DONE:part done'), findsOneWidget);
   });
+
+  testWidgets(
+      'the real FlyerChatTextStreamMessage renders without a '
+      'missing Provider<ChatTheme> exception',
+      (tester) async {
+    // Regression test: AgUiChat gets Provider<ChatTheme> for free from
+    // flutter_chat_ui's Chat widget. AgUiTranscript bypasses Chat entirely,
+    // so it must supply that provider itself, or any caller-supplied builder
+    // that constructs FlyerChatTextStreamMessage directly (as pocketcoder's
+    // own builders do) throws ProviderNotFoundException at runtime — a gap
+    // the stubbed textStreamMessageBuilder in the other tests above can't
+    // catch, since it never actually builds a FlyerChatTextStreamMessage.
+    final conversation = _conversationWith([
+      const TimelineItem.textStream(
+        id: 's1',
+        role: 'assistant',
+        text: 'partial',
+        order: OrderKey(0),
+      ),
+    ]);
+
+    await tester.pumpWidget(_host(AgUiTranscript(
+      conversation: conversation,
+      currentUserId: 'user',
+      placement: ComposerPlacement.pinned,
+      composerBuilder: (_) => const SizedBox.shrink(),
+      textStreamMessageBuilder: (context, message, index,
+              {required isSentByMe, groupStatus, required streamState}) =>
+          FlyerChatTextStreamMessage(
+        message: message,
+        index: index,
+        streamState: streamState,
+      ),
+    )));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
     as chat_stream;
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../model/conversation.dart';
 import 'ag_ui_chat.dart' show CustomCardBuilder, TextStreamCardBuilder;
@@ -138,9 +140,10 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
           child: scrollView,
         );
 
+    final Widget child;
     switch (widget.placement) {
       case ComposerPlacement.pinned:
-        return Column(
+        child = Column(
           children: [
             Expanded(
               child: wrapped(CustomScrollView(
@@ -152,7 +155,7 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
           ],
         );
       case ComposerPlacement.inline:
-        return wrapped(CustomScrollView(
+        child = wrapped(CustomScrollView(
           controller: _scroll.controller,
           slivers: [
             list,
@@ -168,5 +171,24 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
           ],
         ));
     }
+
+    // AgUiChat gets these for free from flutter_chat_ui's Chat widget, which
+    // wraps its whole subtree in Provider<ChatTheme>, Provider<UserID>, and
+    // Provider<DateFormat>. AgUiTranscript bypasses Chat entirely, so
+    // builders that construct flutter_chat_ui-family widgets directly (e.g.
+    // FlyerChatTextStreamMessage, which reads all three via
+    // context.select/context.read) need the same providers here. AgUiChat
+    // itself has no timeFormat override parameter, so this mirrors that by
+    // hardcoding Chat's own default rather than adding new surface area.
+    return MultiProvider(
+      providers: [
+        Provider<chat_core.ChatTheme>.value(
+          value: widget.theme ?? chat_core.ChatTheme.light(),
+        ),
+        Provider<chat_core.UserID>.value(value: widget.currentUserId),
+        Provider<DateFormat>.value(value: DateFormat('HH:mm')),
+      ],
+      child: child,
+    );
   }
 }

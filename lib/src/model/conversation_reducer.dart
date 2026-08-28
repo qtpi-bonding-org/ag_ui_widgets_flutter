@@ -85,6 +85,30 @@ class ConversationReducer {
         sessionState: _sessionState(),
       );
 
+  /// Inserts a message directly into the timeline, bypassing the AG-UI
+  /// event stream entirely — for a caller that needs to reflect something
+  /// it already knows locally before (or independent of) a backend echo,
+  /// e.g. optimistic display of a just-sent user prompt. Goes through the
+  /// same [_upsert] identity/ordering machinery as every event-sourced
+  /// entry, so a later real event sharing [id] updates this entry in place
+  /// instead of producing a duplicate.
+  void addLocalMessage({
+    required String id,
+    required String role,
+    required String text,
+  }) {
+    _upsert(
+      id,
+      (order) => TimelineItem.text(
+        id: id,
+        kind: ChatMessageKind.text,
+        role: role,
+        text: text,
+        order: order,
+      ),
+    );
+  }
+
   /// Insert-or-replace by stable key. The FIRST time [key] is seen, [build]
   /// receives a fresh [OrderKey] anchored at the current event's sequence
   /// number; every later call for the same [key] reuses that same order, so

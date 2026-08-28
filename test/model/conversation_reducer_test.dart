@@ -61,6 +61,34 @@ void main() {
     });
   });
 
+  group('addLocalMessage', () {
+    test('inserts a text item directly, no event required', () {
+      final r = ConversationReducer();
+      r.addLocalMessage(id: 'local-1', role: 'user', text: 'hello');
+
+      expect(r.current.timeline, hasLength(1));
+      final item = r.current.timeline.single as TextTimelineItem;
+      expect(item.kind, ChatMessageKind.text);
+      expect(item.role, 'user');
+      expect(item.text, 'hello');
+    });
+
+    test('is superseded in place by a real event sharing its id', () {
+      final r = ConversationReducer();
+      r.addLocalMessage(id: 'm1', role: 'user', text: 'hello');
+
+      r.apply(const TextMessageStartEvent(
+          messageId: 'm1', role: TextMessageRole.user));
+      r.apply(const TextMessageContentEvent(
+          messageId: 'm1', delta: 'hello again'));
+      r.apply(const TextMessageEndEvent(messageId: 'm1'));
+
+      expect(r.current.timeline, hasLength(1));
+      final item = r.current.timeline.single as TextTimelineItem;
+      expect(item.text, 'hello again');
+    });
+  });
+
   group('reasoning messages', () {
     test(
         'START -> reasoning textStream item; CONTENT grows in place; END -> replaced by reasoning text item',

@@ -60,7 +60,14 @@ chat_core.Message _toMessage(TimelineItem item) {
           'role': role,
         },
       ),
-    ToolCallTimelineItem(:final id, :final name, :final args, :final result, :final diffs) =>
+    ToolCallTimelineItem(
+      :final id,
+      :final name,
+      :final args,
+      :final result,
+      :final diffs,
+      :final toolKind,
+    ) =>
       chat_core.Message.custom(
         id: id,
         authorId: kAgentAuthorId,
@@ -72,6 +79,7 @@ chat_core.Message _toMessage(TimelineItem item) {
           'diffs': diffs
               .map((d) => {'path': d.path, 'oldText': d.oldText, 'newText': d.newText})
               .toList(),
+          'toolKind': toolKind,
         },
       ),
     PermissionRequestTimelineItem(:final requestId) => chat_core.Message.custom(

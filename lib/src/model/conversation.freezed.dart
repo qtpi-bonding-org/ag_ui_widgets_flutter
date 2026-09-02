@@ -852,7 +852,7 @@ extension TimelineItemPatterns on TimelineItem {
             OrderKey order)?
         textStream,
     TResult Function(String id, String name, OrderKey order, String args,
-            String? result, List<ToolDiff> diffs)?
+            String? result, List<ToolDiff> diffs, String? toolKind)?
         toolCall,
     TResult Function(
             String requestId,
@@ -887,7 +887,7 @@ extension TimelineItemPatterns on TimelineItem {
             _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(_that.id, _that.name, _that.order, _that.args,
-            _that.result, _that.diffs);
+            _that.result, _that.diffs, _that.toolKind);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(
             _that.requestId,
@@ -931,7 +931,7 @@ extension TimelineItemPatterns on TimelineItem {
             String text, OrderKey order)
         textStream,
     required TResult Function(String id, String name, OrderKey order,
-            String args, String? result, List<ToolDiff> diffs)
+            String args, String? result, List<ToolDiff> diffs, String? toolKind)
         toolCall,
     required TResult Function(
             String requestId,
@@ -965,7 +965,7 @@ extension TimelineItemPatterns on TimelineItem {
             _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem():
         return toolCall(_that.id, _that.name, _that.order, _that.args,
-            _that.result, _that.diffs);
+            _that.result, _that.diffs, _that.toolKind);
       case PermissionRequestTimelineItem():
         return permissionRequest(
             _that.requestId,
@@ -1006,7 +1006,7 @@ extension TimelineItemPatterns on TimelineItem {
             OrderKey order)?
         textStream,
     TResult? Function(String id, String name, OrderKey order, String args,
-            String? result, List<ToolDiff> diffs)?
+            String? result, List<ToolDiff> diffs, String? toolKind)?
         toolCall,
     TResult? Function(
             String requestId,
@@ -1040,7 +1040,7 @@ extension TimelineItemPatterns on TimelineItem {
             _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(_that.id, _that.name, _that.order, _that.args,
-            _that.result, _that.diffs);
+            _that.result, _that.diffs, _that.toolKind);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(
             _that.requestId,
@@ -1288,7 +1288,8 @@ class ToolCallTimelineItem extends TimelineItem {
       required this.order,
       this.args = '',
       this.result,
-      final List<ToolDiff> diffs = const <ToolDiff>[]})
+      final List<ToolDiff> diffs = const <ToolDiff>[],
+      this.toolKind})
       : _diffs = diffs,
         super._();
 
@@ -1306,6 +1307,8 @@ class ToolCallTimelineItem extends TimelineItem {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_diffs);
   }
+
+  final String? toolKind;
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
@@ -1326,16 +1329,18 @@ class ToolCallTimelineItem extends TimelineItem {
             (identical(other.order, order) || other.order == order) &&
             (identical(other.args, args) || other.args == args) &&
             (identical(other.result, result) || other.result == result) &&
-            const DeepCollectionEquality().equals(other._diffs, _diffs));
+            const DeepCollectionEquality().equals(other._diffs, _diffs) &&
+            (identical(other.toolKind, toolKind) ||
+                other.toolKind == toolKind));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, id, name, order, args, result,
-      const DeepCollectionEquality().hash(_diffs));
+      const DeepCollectionEquality().hash(_diffs), toolKind);
 
   @override
   String toString() {
-    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs)';
+    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind)';
   }
 }
 
@@ -1353,7 +1358,8 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
       OrderKey order,
       String args,
       String? result,
-      List<ToolDiff> diffs});
+      List<ToolDiff> diffs,
+      String? toolKind});
 }
 
 /// @nodoc
@@ -1375,6 +1381,7 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
     Object? args = null,
     Object? result = freezed,
     Object? diffs = null,
+    Object? toolKind = freezed,
   }) {
     return _then(ToolCallTimelineItem(
       id: null == id
@@ -1401,6 +1408,10 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self._diffs
           : diffs // ignore: cast_nullable_to_non_nullable
               as List<ToolDiff>,
+      toolKind: freezed == toolKind
+          ? _self.toolKind
+          : toolKind // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

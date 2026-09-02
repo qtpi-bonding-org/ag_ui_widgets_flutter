@@ -99,13 +99,18 @@ sealed class TimelineItem with _$TimelineItem {
   /// A pending permission request — full payload, not a marker. `toolTitle`/
   /// `toolKind` are ACP's `ToolCallUpdate.Title`/`Kind`, both optional on the
   /// wire; `description` is never protocol-native (only a bridge may
-  /// synthesize one). `options` is the per-request `PermissionOption` list.
+  /// synthesize one). `toolArgs` is never wire-native either — the reducer
+  /// fills it in by correlating `toolCallId` to that tool's own
+  /// `ToolCallTimelineItem.args`, since ACP's permission-request payload
+  /// itself never carries the invocation's raw arguments. `options` is the
+  /// per-request `PermissionOption` list.
   const factory TimelineItem.permissionRequest({
     required String requestId,
     String? toolTitle,
     String? toolCallId,
     String? toolKind,
     String? description,
+    String? toolArgs,
     required List<PermissionOption> options,
     required OrderKey order,
   }) = PermissionRequestTimelineItem;

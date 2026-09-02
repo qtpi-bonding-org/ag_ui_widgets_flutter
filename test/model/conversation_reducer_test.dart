@@ -334,6 +334,51 @@ void main() {
         expect(item.toolTitle, 'Run shell command');
         expect(item.toolKind, 'execute');
       });
+
+      test(
+          'correlates toolCallId to the matching tool call\'s own args, '
+          'since the permission payload never carries them directly', () {
+        final r = ConversationReducer()
+          ..apply(const ToolCallStartEvent(
+              toolCallId: 't1', toolCallName: 'shell'))
+          ..apply(const ToolCallArgsEvent(
+              toolCallId: 't1', delta: '{"command":"echo hi"}'));
+        r.apply(const StateSnapshotEvent(snapshot: {
+          'pocketcoder': {
+            'permission': {
+              'requestId': 'p3',
+              'status': 'pending',
+              'toolCallId': 't1',
+              'kind': 'execute',
+              'options': [
+                {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
+              ],
+            }
+          }
+        }));
+        final item = r.current.timeline
+            .whereType<PermissionRequestTimelineItem>()
+            .single;
+        expect(item.toolCallId, 't1');
+        expect(item.toolArgs, '{"command":"echo hi"}');
+      });
+
+      test('toolArgs is null when toolCallId has no correlated tool call',
+          () {
+        final r = ConversationReducer();
+        r.apply(const StateSnapshotEvent(snapshot: {
+          'pocketcoder': {
+            'permission': {
+              'requestId': 'p4',
+              'status': 'pending',
+              'toolCallId': 'does-not-exist',
+              'options': [],
+            }
+          }
+        }));
+        final item = r.current.timeline.single as PermissionRequestTimelineItem;
+        expect(item.toolArgs, isNull);
+      });
     });
 
     test(
@@ -432,6 +477,26 @@ void main() {
       expect(item.description, 'bash: run ls');
       expect(item.options.single.optionId, 'allow');
       expect(item.options.single.label, 'Allow');
+    });
+
+    test(
+        'acp.permission_request correlates callId to the tool call sharing '
+        'that same id (protocol-level, not a coincidence) for toolCallId/'
+        'toolArgs', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 'p2', toolCallName: 'bash'))
+        ..apply(const ToolCallArgsEvent(
+            toolCallId: 'p2', delta: '{"command":"ls -la"}'));
+      r.apply(const CustomEvent(name: 'acp.permission_request', value: {
+        'callId': 'p2',
+        'toolName': 'bash',
+        'optionsJson': '[]',
+      }));
+      final item = r.current.timeline
+          .whereType<PermissionRequestTimelineItem>()
+          .single;
+      expect(item.toolCallId, 'p2');
+      expect(item.toolArgs, '{"command":"ls -la"}');
     });
 
     test('acp.tool_request produces a ToolRequestTimelineItem', () {

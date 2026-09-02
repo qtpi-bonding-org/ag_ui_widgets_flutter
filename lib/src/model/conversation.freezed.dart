@@ -860,6 +860,7 @@ extension TimelineItemPatterns on TimelineItem {
             String? toolCallId,
             String? toolKind,
             String? description,
+            String? toolArgs,
             List<PermissionOption> options,
             OrderKey order)?
         permissionRequest,
@@ -894,6 +895,7 @@ extension TimelineItemPatterns on TimelineItem {
             _that.toolCallId,
             _that.toolKind,
             _that.description,
+            _that.toolArgs,
             _that.options,
             _that.order);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
@@ -937,6 +939,7 @@ extension TimelineItemPatterns on TimelineItem {
             String? toolCallId,
             String? toolKind,
             String? description,
+            String? toolArgs,
             List<PermissionOption> options,
             OrderKey order)
         permissionRequest,
@@ -970,6 +973,7 @@ extension TimelineItemPatterns on TimelineItem {
             _that.toolCallId,
             _that.toolKind,
             _that.description,
+            _that.toolArgs,
             _that.options,
             _that.order);
       case ElicitationRequestTimelineItem():
@@ -1010,6 +1014,7 @@ extension TimelineItemPatterns on TimelineItem {
             String? toolCallId,
             String? toolKind,
             String? description,
+            String? toolArgs,
             List<PermissionOption> options,
             OrderKey order)?
         permissionRequest,
@@ -1043,6 +1048,7 @@ extension TimelineItemPatterns on TimelineItem {
             _that.toolCallId,
             _that.toolKind,
             _that.description,
+            _that.toolArgs,
             _that.options,
             _that.order);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
@@ -1408,6 +1414,7 @@ class PermissionRequestTimelineItem extends TimelineItem {
       this.toolCallId,
       this.toolKind,
       this.description,
+      this.toolArgs,
       required final List<PermissionOption> options,
       required this.order})
       : _options = options,
@@ -1418,6 +1425,7 @@ class PermissionRequestTimelineItem extends TimelineItem {
   final String? toolCallId;
   final String? toolKind;
   final String? description;
+  final String? toolArgs;
   final List<PermissionOption> _options;
   List<PermissionOption> get options {
     if (_options is EqualUnmodifiableListView) return _options;
@@ -1452,6 +1460,8 @@ class PermissionRequestTimelineItem extends TimelineItem {
                 other.toolKind == toolKind) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            (identical(other.toolArgs, toolArgs) ||
+                other.toolArgs == toolArgs) &&
             const DeepCollectionEquality().equals(other._options, _options) &&
             (identical(other.order, order) || other.order == order));
   }
@@ -1464,12 +1474,13 @@ class PermissionRequestTimelineItem extends TimelineItem {
       toolCallId,
       toolKind,
       description,
+      toolArgs,
       const DeepCollectionEquality().hash(_options),
       order);
 
   @override
   String toString() {
-    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolCallId: $toolCallId, toolKind: $toolKind, description: $description, options: $options, order: $order)';
+    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolCallId: $toolCallId, toolKind: $toolKind, description: $description, toolArgs: $toolArgs, options: $options, order: $order)';
   }
 }
 
@@ -1488,6 +1499,7 @@ abstract mixin class $PermissionRequestTimelineItemCopyWith<$Res>
       String? toolCallId,
       String? toolKind,
       String? description,
+      String? toolArgs,
       List<PermissionOption> options,
       OrderKey order});
 }
@@ -1510,6 +1522,7 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
     Object? toolCallId = freezed,
     Object? toolKind = freezed,
     Object? description = freezed,
+    Object? toolArgs = freezed,
     Object? options = null,
     Object? order = null,
   }) {
@@ -1533,6 +1546,10 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      toolArgs: freezed == toolArgs
+          ? _self.toolArgs
+          : toolArgs // ignore: cast_nullable_to_non_nullable
               as String?,
       options: null == options
           ? _self._options

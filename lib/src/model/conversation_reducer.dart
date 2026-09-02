@@ -310,13 +310,18 @@ class ConversationReducer {
             // overwriting); now that the key is namespaced, it must be
             // anchored explicitly or the card would land wherever `_seq`
             // happens to be when the permission event itself arrives.
-            final anchor = _items[callId]?.order;
+            final correlatedTool = _items[callId];
+            final anchor = correlatedTool?.order;
             _upsert(
               'perm:$callId',
               (order) => TimelineItem.permissionRequest(
                 requestId: callId,
                 toolTitle: value['toolName'] as String?,
                 description: value['description'] as String?,
+                toolCallId: callId,
+                toolArgs: correlatedTool is ToolCallTimelineItem
+                    ? correlatedTool.args
+                    : null,
                 options: options,
                 order: anchor != null ? OrderKey(anchor.seq, 1) : order,
               ),
@@ -463,7 +468,9 @@ class ConversationReducer {
             ))
         .toList();
     final toolCallId = permission['toolCallId'];
-    final anchor = toolCallId is String ? _items[toolCallId]?.order : null;
+    final correlatedTool =
+        toolCallId is String ? _items[toolCallId] : null;
+    final anchor = correlatedTool?.order;
     _adapterAIds.add(requestId);
     _upsert(
       requestId,
@@ -472,6 +479,9 @@ class ConversationReducer {
         toolTitle: permission['title'] as String?,
         toolKind: permission['kind'] as String?,
         toolCallId: toolCallId is String ? toolCallId : null,
+        toolArgs: correlatedTool is ToolCallTimelineItem
+            ? correlatedTool.args
+            : null,
         options: options,
         order: anchor != null ? OrderKey(anchor.seq, 1) : order,
       ),

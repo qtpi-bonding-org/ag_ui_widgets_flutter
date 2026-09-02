@@ -94,6 +94,7 @@ sealed class TimelineItem with _$TimelineItem {
     @Default('') String args,
     String? result,
     @Default(<ToolDiff>[]) List<ToolDiff> diffs,
+    String? toolKind,
   }) = ToolCallTimelineItem;
 
   /// A pending permission request — full payload, not a marker. `toolTitle`/

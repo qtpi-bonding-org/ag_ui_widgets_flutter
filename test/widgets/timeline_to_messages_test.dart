@@ -27,6 +27,23 @@ void main() {
       expect(message.metadata?['diffs'], isEmpty);
     });
 
+    test('toolCall item forwards toolKind in metadata', () {
+      const item = TimelineItem.toolCall(
+        id: 't1',
+        name: 'bash',
+        toolKind: 'execute',
+        order: OrderKey(0),
+      );
+      final message = timelineToMessages([item]).single as chat_core.CustomMessage;
+      expect(message.metadata?['toolKind'], 'execute');
+    });
+
+    test('toolCall item with a null toolKind forwards a null metadata value', () {
+      const item = TimelineItem.toolCall(id: 't1', name: 'search', order: OrderKey(0));
+      final message = timelineToMessages([item]).single as chat_core.CustomMessage;
+      expect(message.metadata?['toolKind'], isNull);
+    });
+
     test('suppresses toolCall bubble when a correlated ToolRequestTimelineItem is live', () {
       // Both items share the id "tc1" - the ToolRequestTimelineItem is the
       // live client-side card representing the call; the raw ToolCallTimelineItem

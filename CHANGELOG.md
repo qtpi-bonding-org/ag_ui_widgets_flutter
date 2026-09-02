@@ -1,3 +1,11 @@
+## 0.7.0
+
+- New: `ToolCallTimelineItem` gains `toolKind` (`String?`) — ACP's `ToolCallUpdate.Kind`
+  (`execute`/`edit`/`read`/etc.), carried by the previously-unhandled `pocketcoder:tool` CUSTOM
+  event and forwarded into `Message.metadata['toolKind']`. Lets a consumer distinguish a shell/
+  "execute" tool call from any other kind for display purposes without guessing from `name`/`args`
+  alone.
+
 ## 0.6.0
 
 - New: `StackedChatStyle`/`BubbleChatStyle` gain `markdownWhileStreaming`

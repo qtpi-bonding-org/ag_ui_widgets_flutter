@@ -261,14 +261,24 @@ class ConversationReducer {
         }
 
       case ag_ui.ToolCallStartEvent():
-        _upsert(
-          event.toolCallId,
-          (order) => TimelineItem.toolCall(
-            id: event.toolCallId,
-            name: event.toolCallName,
-            order: order,
-          ),
-        );
+        // Merges into any entry already synthesized by an earlier
+        // pocketcoder:tool/diff/etc. event instead of overwriting it — a
+        // fresh construction here would clobber toolKind/diffs/result that
+        // arrived before this event (see the reducer test covering that
+        // ordering).
+        _upsert(event.toolCallId, (order) {
+          final existing = _items[event.toolCallId];
+          final base = existing is ToolCallTimelineItem
+              ? existing
+              : TimelineItem.toolCall(
+                  id: event.toolCallId,
+                  name: event.toolCallName,
+                  order: order,
+                ) as ToolCallTimelineItem;
+          return base.copyWith(
+            name: event.toolCallName.isNotEmpty ? event.toolCallName : base.name,
+          );
+        });
       case ag_ui.ToolCallArgsEvent():
         _updateTool(
             event.toolCallId, (t) => t.copyWith(args: t.args + event.delta));
@@ -276,6 +286,25 @@ class ConversationReducer {
         _updateTool(event.toolCallId, (t) => t.copyWith(result: event.content));
       case ag_ui.ToolCallEndEvent():
         break; // terminal state is "has a result"; nothing to flip here.
+
+      case ag_ui.CustomEvent(name: 'pocketcoder:tool'):
+        final value = event.value;
+        if (value is Map) {
+          final toolCallId = value['toolCallId'];
+          if (toolCallId is String) {
+            final title = value['title'];
+            final kind = value['kind'];
+            _updateTool(
+              toolCallId,
+              (t) => t.copyWith(
+                name: t.name.isEmpty && title is String && title.isNotEmpty
+                    ? title
+                    : t.name,
+                toolKind: kind is String && kind.isNotEmpty ? kind : t.toolKind,
+              ),
+            );
+          }
+        }
 
       case ag_ui.CustomEvent(name: 'acp.permission_request', :final value):
         if (value is Map) {

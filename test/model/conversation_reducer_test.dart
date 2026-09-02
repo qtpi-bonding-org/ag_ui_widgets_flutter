@@ -228,6 +228,60 @@ void main() {
     });
   });
 
+  group('tool call kind', () {
+    CustomEvent toolEvent(String toolCallId, {String? title, String? kind}) =>
+        CustomEvent(name: 'pocketcoder:tool', value: {
+          'toolCallId': toolCallId,
+          if (title != null) 'title': title,
+          if (kind != null) 'kind': kind,
+          'status': 'in_progress',
+          'locations': <Map<String, dynamic>>[],
+        });
+
+    test('pocketcoder:tool event sets toolKind on the matching tool call', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(toolEvent('t1', kind: 'execute'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.toolKind, 'execute');
+      expect(item.name, 'shell', reason: 'a non-empty existing name is not overwritten');
+    });
+
+    test('pocketcoder:tool event backfills an empty name from title', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: ''))
+        ..apply(toolEvent('t1', title: 'Run shell command', kind: 'execute'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.name, 'Run shell command');
+      expect(item.toolKind, 'execute');
+    });
+
+    test(
+        'pocketcoder:tool event arriving before TOOL_CALL_START still lands on the '
+        'eventual tool call', () {
+      final r = ConversationReducer()
+        ..apply(toolEvent('t1', title: 'Run shell command', kind: 'execute'))
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: ''));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.toolKind, 'execute');
+      // ToolCallStartEvent's own (empty) name must not clobber the earlier backfill.
+      expect(item.name, 'Run shell command');
+    });
+
+    test('a pocketcoder:tool event with a non-Map value or missing toolCallId is a no-op', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: 'not a map'))
+        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {'kind': 'execute'}));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.toolKind, isNull);
+    });
+  });
+
   group('permission/elicitation via state delta', () {
     group('elicitation (Adapter A: pocketcoder StateDelta)', () {
       test(

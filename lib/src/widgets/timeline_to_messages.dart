@@ -67,6 +67,7 @@ chat_core.Message _toMessage(TimelineItem item) {
       :final result,
       :final diffs,
       :final toolKind,
+      :final hasEnded,
     ) =>
       chat_core.Message.custom(
         id: id,
@@ -80,6 +81,7 @@ chat_core.Message _toMessage(TimelineItem item) {
               .map((d) => {'path': d.path, 'oldText': d.oldText, 'newText': d.newText})
               .toList(),
           'toolKind': toolKind,
+          'hasEnded': hasEnded,
         },
       ),
     PermissionRequestTimelineItem(:final requestId) => chat_core.Message.custom(

@@ -86,7 +86,13 @@ sealed class TimelineItem with _$TimelineItem {
 
   /// One tool invocation. Enters the timeline on `TOOL_CALL_START`.
   /// `args`/`result` fill in as `TOOL_CALL_ARGS`/`_RESULT` arrive; an empty
-  /// `args`/`null` result means "still running".
+  /// `args` means no arguments have streamed in yet. `result` is NOT a
+  /// completion signal on its own — some backends emit an interim/premature
+  /// `TOOL_CALL_RESULT` well before the call actually finishes. [hasEnded]
+  /// is the real "done" signal: it only flips true once `TOOL_CALL_END` has
+  /// been seen for this call, tracked independently of `result` so a call
+  /// that ends with no result at all (e.g. rejected by a sandbox) still
+  /// resolves out of "running" instead of spinning forever.
   const factory TimelineItem.toolCall({
     required String id,
     required String name,
@@ -95,6 +101,7 @@ sealed class TimelineItem with _$TimelineItem {
     String? result,
     @Default(<ToolDiff>[]) List<ToolDiff> diffs,
     String? toolKind,
+    @Default(false) bool hasEnded,
   }) = ToolCallTimelineItem;
 
   /// A pending permission request — full payload, not a marker. `toolTitle`/

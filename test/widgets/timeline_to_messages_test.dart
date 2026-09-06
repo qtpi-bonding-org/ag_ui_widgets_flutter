@@ -44,6 +44,30 @@ void main() {
       expect(message.metadata?['toolKind'], isNull);
     });
 
+    test('toolCall item forwards hasEnded: false while still running, even '
+        'with a non-null (interim) result', () {
+      const item = TimelineItem.toolCall(
+        id: 't1',
+        name: 'search',
+        result: 'interim',
+        order: OrderKey(0),
+      );
+      final message = timelineToMessages([item]).single as chat_core.CustomMessage;
+      expect(message.metadata?['hasEnded'], isFalse);
+    });
+
+    test('toolCall item forwards hasEnded: true once the call has ended', () {
+      const item = TimelineItem.toolCall(
+        id: 't1',
+        name: 'search',
+        result: 'ok',
+        hasEnded: true,
+        order: OrderKey(0),
+      );
+      final message = timelineToMessages([item]).single as chat_core.CustomMessage;
+      expect(message.metadata?['hasEnded'], isTrue);
+    });
+
     test('suppresses toolCall bubble when a correlated ToolRequestTimelineItem is live', () {
       // Both items share the id "tc1" - the ToolRequestTimelineItem is the
       // live client-side card representing the call; the raw ToolCallTimelineItem

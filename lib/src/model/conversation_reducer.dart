@@ -285,7 +285,7 @@ class ConversationReducer {
       case ag_ui.ToolCallResultEvent():
         _updateTool(event.toolCallId, (t) => t.copyWith(result: event.content));
       case ag_ui.ToolCallEndEvent():
-        break; // terminal state is "has a result"; nothing to flip here.
+        _updateTool(event.toolCallId, (t) => t.copyWith(hasEnded: true));
 
       case ag_ui.CustomEvent(name: 'pocketcoder:tool'):
         final value = event.value;

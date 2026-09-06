@@ -148,6 +148,158 @@ void main() {
       expect(item.args, '{"q":"x"}');
       expect(item.result, 'ok');
     });
+
+    test('a fresh toolCall item defaults hasEnded to false', () {
+      final r = ConversationReducer()
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.hasEnded, isFalse);
+    });
+
+    test(
+        'a premature/interim ToolCallResultEvent does not mark the call as ended',
+        () {
+      // Regression test for the harness quirk where ToolCallResultEvent
+      // fires almost immediately with an interim payload, well before the
+      // tool call actually finishes -- the real completion signal is
+      // ToolCallEndEvent, arriving much later. Reported by a live device
+      // log: ToolCallResultEvent arrived 172ms after start, ToolCallEndEvent
+      // 32s after that. `result != null` alone must never be read as "done".
+      final r = ConversationReducer()
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
+        ..apply(const ToolCallResultEvent(
+            messageId: 'm1', toolCallId: 't1', content: 'interim'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.result, 'interim');
+      expect(item.hasEnded, isFalse);
+    });
+
+    test('ToolCallEndEvent after a result marks the call as ended', () {
+      final r = ConversationReducer()
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
+        ..apply(const ToolCallResultEvent(
+            messageId: 'm1', toolCallId: 't1', content: 'ok'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.result, 'ok');
+      expect(item.hasEnded, isTrue);
+    });
+
+    test(
+        'ToolCallEndEvent with no ToolCallResultEvent at all still marks the '
+        'call as ended, so it does not spin forever', () {
+      // Regression test for the second bug found alongside the premature-
+      // result one: a tool call rejected by the harness's own sandbox can
+      // get START + END with no RESULT ever arriving. hasEnded must be
+      // driven by ToolCallEndEvent independently of result so this case
+      // still resolves out of the "running" state.
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(
+            toolCallId: 't1', toolCallName: 'list_files'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.result, isNull);
+      expect(item.hasEnded, isTrue);
+    });
+
+    test(
+        'ToolCallEndEvent for one of two concurrent tool calls only ends '
+        'that one', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'a'))
+        ..apply(const ToolCallStartEvent(toolCallId: 't2', toolCallName: 'b'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'));
+
+      final items = r.current.timeline.cast<ToolCallTimelineItem>();
+      final t1 = items.firstWhere((i) => i.id == 't1');
+      final t2 = items.firstWhere((i) => i.id == 't2');
+      expect(t1.hasEnded, isTrue);
+      expect(t2.hasEnded, isFalse);
+    });
+
+    test(
+        'a ToolCallEndEvent arriving before its ToolCallStartEvent still '
+        'marks the eventual item as ended', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.name, 'search');
+      expect(item.hasEnded, isTrue);
+    });
+
+    test(
+        'events arriving after ToolCallEndEvent (args, diff, tool kind) do '
+        'not un-end the call', () {
+      final r = ConversationReducer()
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'))
+        ..apply(const ToolCallArgsEvent(toolCallId: 't1', delta: '{}'))
+        ..apply(const CustomEvent(name: 'pocketcoder:diff', value: {
+          'toolCallId': 't1',
+          'path': 'lib/a.dart',
+          'newText': 'x',
+        }))
+        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {
+          'toolCallId': 't1',
+          'kind': 'execute',
+        }));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.hasEnded, isTrue);
+    });
+
+    test(
+        'a ToolCallResultEvent arriving after ToolCallEndEvent still updates '
+        'result, without un-ending the call', () {
+      final r = ConversationReducer()
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'))
+        ..apply(const ToolCallResultEvent(
+            messageId: 'm1', toolCallId: 't1', content: 'final'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.result, 'final');
+      expect(item.hasEnded, isTrue);
+    });
+
+    test(
+        'a replace-marker reset clears hasEnded so a replayed tool call '
+        'starts fresh', () {
+      final r = ConversationReducer()
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'))
+        ..apply(const CustomEvent(
+            name: 'pocketcoder:sync', value: {'mode': 'replace'}))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.hasEnded, isFalse);
+    });
+
+    test('a ToolCallEndEvent for an unknown toolCallId creates an orphan '
+        'entry already marked ended', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallEndEvent(toolCallId: 'unknown'));
+
+      expect(r.current.timeline, hasLength(1));
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.id, 'unknown');
+      expect(item.hasEnded, isTrue);
+    });
   });
 
   group('tool call diffs', () {

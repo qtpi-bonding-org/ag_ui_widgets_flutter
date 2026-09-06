@@ -68,6 +68,17 @@ void main() {
       expect(message.metadata?['hasEnded'], isTrue);
     });
 
+    test('toolCall item forwards status in metadata', () {
+      const item = TimelineItem.toolCall(
+        id: 't1',
+        name: 'search',
+        status: 'failed',
+        order: OrderKey(0),
+      );
+      final message = timelineToMessages([item]).single as chat_core.CustomMessage;
+      expect(message.metadata?['status'], 'failed');
+    });
+
     test('suppresses toolCall bubble when a correlated ToolRequestTimelineItem is live', () {
       // Both items share the id "tc1" - the ToolRequestTimelineItem is the
       // live client-side card representing the call; the raw ToolCallTimelineItem

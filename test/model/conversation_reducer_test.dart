@@ -381,12 +381,12 @@ void main() {
   });
 
   group('tool call kind', () {
-    CustomEvent toolEvent(String toolCallId, {String? title, String? kind}) =>
+    CustomEvent toolEvent(String toolCallId, {String? title, String? kind, String status = 'in_progress'}) =>
         CustomEvent(name: 'pocketcoder:tool', value: {
           'toolCallId': toolCallId,
           if (title != null) 'title': title,
           if (kind != null) 'kind': kind,
-          'status': 'in_progress',
+          'status': status,
           'locations': <Map<String, dynamic>>[],
         });
 
@@ -431,6 +431,37 @@ void main() {
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
       expect(item.toolKind, isNull);
+    });
+
+    test('pocketcoder:tool event with status "failed" marks the tool call failed', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(toolEvent('t1', kind: 'execute', status: 'failed'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.status, 'failed');
+      expect(item.isFailed, isTrue);
+    });
+
+    test('pocketcoder:tool event with status "completed" is not failed', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(toolEvent('t1', kind: 'execute', status: 'completed'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.status, 'completed');
+      expect(item.isFailed, isFalse);
+    });
+
+    test('a later in_progress status does not erase an earlier failed status', () {
+      final r = ConversationReducer()
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(toolEvent('t1', kind: 'execute', status: 'failed'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'));
+
+      final item = r.current.timeline.single as ToolCallTimelineItem;
+      expect(item.status, 'failed');
+      expect(item.isFailed, isTrue, reason: 'TOOL_CALL_END must not clear a known failure status');
     });
   });
 

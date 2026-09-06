@@ -294,6 +294,7 @@ class ConversationReducer {
           if (toolCallId is String) {
             final title = value['title'];
             final kind = value['kind'];
+            final status = value['status'];
             _updateTool(
               toolCallId,
               (t) => t.copyWith(
@@ -301,6 +302,7 @@ class ConversationReducer {
                     ? title
                     : t.name,
                 toolKind: kind is String && kind.isNotEmpty ? kind : t.toolKind,
+                status: status is String && status.isNotEmpty ? status : t.status,
               ),
             );
           }

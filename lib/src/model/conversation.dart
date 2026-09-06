@@ -93,6 +93,10 @@ sealed class TimelineItem with _$TimelineItem {
   /// been seen for this call, tracked independently of `result` so a call
   /// that ends with no result at all (e.g. rejected by a sandbox) still
   /// resolves out of "running" instead of spinning forever.
+  /// [status] mirrors ACP's `ToolCallStatus` string ("pending"/"in_progress"/
+  /// "completed"/"failed") as forwarded by the `pocketcoder:tool` CUSTOM
+  /// event; null until that event's first arrival. [isFailed] is the
+  /// UI-facing check on it.
   const factory TimelineItem.toolCall({
     required String id,
     required String name,
@@ -102,6 +106,7 @@ sealed class TimelineItem with _$TimelineItem {
     @Default(<ToolDiff>[]) List<ToolDiff> diffs,
     String? toolKind,
     @Default(false) bool hasEnded,
+    String? status,
   }) = ToolCallTimelineItem;
 
   /// A pending permission request — full payload, not a marker. `toolTitle`/
@@ -210,4 +215,8 @@ sealed class Conversation with _$Conversation {
   const Conversation._();
 
   static const empty = Conversation();
+}
+
+extension ToolCallTimelineItemStatus on ToolCallTimelineItem {
+  bool get isFailed => status == 'failed';
 }

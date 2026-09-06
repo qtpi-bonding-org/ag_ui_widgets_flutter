@@ -859,7 +859,8 @@ extension TimelineItemPatterns on TimelineItem {
             String? result,
             List<ToolDiff> diffs,
             String? toolKind,
-            bool hasEnded)?
+            bool hasEnded,
+            String? status)?
         toolCall,
     TResult Function(
             String requestId,
@@ -893,8 +894,16 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(
             _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem() when toolCall != null:
-        return toolCall(_that.id, _that.name, _that.order, _that.args,
-            _that.result, _that.diffs, _that.toolKind, _that.hasEnded);
+        return toolCall(
+            _that.id,
+            _that.name,
+            _that.order,
+            _that.args,
+            _that.result,
+            _that.diffs,
+            _that.toolKind,
+            _that.hasEnded,
+            _that.status);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(
             _that.requestId,
@@ -945,7 +954,8 @@ extension TimelineItemPatterns on TimelineItem {
             String? result,
             List<ToolDiff> diffs,
             String? toolKind,
-            bool hasEnded)
+            bool hasEnded,
+            String? status)
         toolCall,
     required TResult Function(
             String requestId,
@@ -978,8 +988,16 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(
             _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem():
-        return toolCall(_that.id, _that.name, _that.order, _that.args,
-            _that.result, _that.diffs, _that.toolKind, _that.hasEnded);
+        return toolCall(
+            _that.id,
+            _that.name,
+            _that.order,
+            _that.args,
+            _that.result,
+            _that.diffs,
+            _that.toolKind,
+            _that.hasEnded,
+            _that.status);
       case PermissionRequestTimelineItem():
         return permissionRequest(
             _that.requestId,
@@ -1027,7 +1045,8 @@ extension TimelineItemPatterns on TimelineItem {
             String? result,
             List<ToolDiff> diffs,
             String? toolKind,
-            bool hasEnded)?
+            bool hasEnded,
+            String? status)?
         toolCall,
     TResult? Function(
             String requestId,
@@ -1060,8 +1079,16 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(
             _that.id, _that.kind, _that.role, _that.text, _that.order);
       case ToolCallTimelineItem() when toolCall != null:
-        return toolCall(_that.id, _that.name, _that.order, _that.args,
-            _that.result, _that.diffs, _that.toolKind, _that.hasEnded);
+        return toolCall(
+            _that.id,
+            _that.name,
+            _that.order,
+            _that.args,
+            _that.result,
+            _that.diffs,
+            _that.toolKind,
+            _that.hasEnded,
+            _that.status);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(
             _that.requestId,
@@ -1311,7 +1338,8 @@ class ToolCallTimelineItem extends TimelineItem {
       this.result,
       final List<ToolDiff> diffs = const <ToolDiff>[],
       this.toolKind,
-      this.hasEnded = false})
+      this.hasEnded = false,
+      this.status})
       : _diffs = diffs,
         super._();
 
@@ -1333,6 +1361,7 @@ class ToolCallTimelineItem extends TimelineItem {
   final String? toolKind;
   @JsonKey()
   final bool hasEnded;
+  final String? status;
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
@@ -1357,16 +1386,17 @@ class ToolCallTimelineItem extends TimelineItem {
             (identical(other.toolKind, toolKind) ||
                 other.toolKind == toolKind) &&
             (identical(other.hasEnded, hasEnded) ||
-                other.hasEnded == hasEnded));
+                other.hasEnded == hasEnded) &&
+            (identical(other.status, status) || other.status == status));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, id, name, order, args, result,
-      const DeepCollectionEquality().hash(_diffs), toolKind, hasEnded);
+      const DeepCollectionEquality().hash(_diffs), toolKind, hasEnded, status);
 
   @override
   String toString() {
-    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind, hasEnded: $hasEnded)';
+    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind, hasEnded: $hasEnded, status: $status)';
   }
 }
 
@@ -1386,7 +1416,8 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
       String? result,
       List<ToolDiff> diffs,
       String? toolKind,
-      bool hasEnded});
+      bool hasEnded,
+      String? status});
 }
 
 /// @nodoc
@@ -1410,6 +1441,7 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
     Object? diffs = null,
     Object? toolKind = freezed,
     Object? hasEnded = null,
+    Object? status = freezed,
   }) {
     return _then(ToolCallTimelineItem(
       id: null == id
@@ -1444,6 +1476,10 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self.hasEnded
           : hasEnded // ignore: cast_nullable_to_non_nullable
               as bool,
+      status: freezed == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

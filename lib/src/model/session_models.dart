@@ -201,14 +201,20 @@ abstract class CommandsState with _$CommandsState {
 
   static const _known = {'commands', 'meta'};
 
+  static List<AvailableCommand> _commandsOf(Object? raw) => [
+        for (final e in asJsonMapList(raw))
+          if (AvailableCommand.parse(e) case final c?) c,
+      ];
+
   static CommandsState? parse(Object? raw) {
+    // pocketcoder sends the commands as a bare list of {name, description}.
+    if (raw is List) {
+      return CommandsState(commands: _commandsOf(raw));
+    }
     final m = asJsonMap(raw);
     if (m == null) return null;
     return CommandsState(
-      commands: [
-        for (final e in asJsonMapList(m['commands']))
-          AvailableCommand.parse(e)!,
-      ],
+      commands: _commandsOf(m['commands']),
       meta: asJsonMap(m['meta']),
       extras: extrasOf(m, _known),
     );

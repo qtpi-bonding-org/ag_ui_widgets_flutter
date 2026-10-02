@@ -211,4 +211,33 @@ void main() {
       expect(r.current.sessionState.usage?.size, 10);
     });
   });
+
+  group('I5 commands as a bare list', () {
+    test('a bare list of commands parses, with no diagnostic', () {
+      final r = ConversationReducer()
+        ..apply(snap({
+          'commands': [
+            {'name': 'help', 'description': 'Show help'},
+            'junk',
+            {'name': 'x'},
+          ],
+        }));
+      final c = r.current.sessionState.commands!;
+      expect(c.commands.map((e) => e.name), ['help', 'x']);
+      expect(c.commands.first.description, 'Show help');
+      expect(r.current.diagnostics, isEmpty);
+    });
+
+    test('the map shape still parses', () {
+      final r = ConversationReducer()
+        ..apply(snap({
+          'commands': {
+            'commands': [
+              {'name': 'a'}
+            ]
+          },
+        }));
+      expect(r.current.sessionState.commands!.commands.single.name, 'a');
+    });
+  });
 }

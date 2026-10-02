@@ -11,13 +11,14 @@ import 'dart:convert';
 import 'package:ag_ui/ag_ui.dart' as ag_ui;
 import 'conversation.dart';
 
-/// True for the cold-replay reset marker c1/goose-style backends emit to
-/// signal "the client should discard history and rebuild from here" —
-/// pocketcoder's specific wire vocabulary, harmless to recognize
-/// universally since no other backend emits a CustomEvent with this name.
-bool isReplaceMarker(ag_ui.BaseEvent event) =>
+/// True for the cold-replay reset marker backends emit to signal "the client
+/// should discard history and rebuild from here": a `<namespace>:sync`
+/// CustomEvent whose value has `mode: replace`. [namespace] defaults to
+/// `pocketcoder`; pass the same value the reducer was constructed with.
+bool isReplaceMarker(ag_ui.BaseEvent event,
+        {String namespace = 'pocketcoder'}) =>
     event is ag_ui.CustomEvent &&
-    event.name == 'pocketcoder:sync' &&
+    event.name == '$namespace:sync' &&
     (event.value is Map && (event.value as Map)['mode'] == 'replace');
 
 class _OpenMessage {
@@ -64,7 +65,7 @@ class ConversationReducer {
   String? _runError;
   RunOutcome? _runOutcome;
 
-  /// Called with a tool's name for every incoming `acp.tool_request`; return
+  /// Called with a tool's name for every incoming `acp.client_execute_request`; return
   /// `true` to skip creating a [ToolRequestTimelineItem] for it entirely.
   ///
   /// Some tools resolve themselves near-instantly with no user decision
@@ -78,7 +79,20 @@ class ConversationReducer {
   /// null preserves the old always-insert behavior.
   final bool Function(String toolName)? autoResolveToolRequest;
 
-  ConversationReducer({this.autoResolveToolRequest});
+  /// The backend's wire namespace. Backends that project state and tool
+  /// metadata namespace their CustomEvents as `<namespace>:tool`,
+  /// `<namespace>:diff` and `<namespace>:sync`, and root their state tree
+  /// (STATE_SNAPSHOT key, STATE_DELTA path prefix) at `/<namespace>`. Defaults
+  /// to `pocketcoder`, the vocabulary this package was first written against;
+  /// other backends (e.g. episutra's `acp-agui-adapter`, which is constructed
+  /// with a namespace of its own) pass theirs. Fixed protocol-level events
+  /// (`acp.*`) are not namespaced and do not depend on this.
+  final String namespace;
+
+  ConversationReducer({
+    this.namespace = 'pocketcoder',
+    this.autoResolveToolRequest,
+  });
 
   Conversation get current => Conversation(
         timeline: List.unmodifiable(_sortedTimeline),
@@ -144,7 +158,7 @@ class ConversationReducer {
 
   void apply(ag_ui.BaseEvent event) {
     _seq++;
-    if (isReplaceMarker(event)) {
+    if (isReplaceMarker(event, namespace: namespace)) {
       _reset();
       return;
     }
@@ -287,7 +301,7 @@ class ConversationReducer {
       case ag_ui.ToolCallEndEvent():
         _updateTool(event.toolCallId, (t) => t.copyWith(hasEnded: true));
 
-      case ag_ui.CustomEvent(name: 'pocketcoder:tool'):
+      case ag_ui.CustomEvent(name: final name) when name == '$namespace:tool':
         final value = event.value;
         if (value is Map) {
           final toolCallId = value['toolCallId'];
@@ -378,7 +392,7 @@ class ConversationReducer {
             );
           }
         }
-      case ag_ui.CustomEvent(name: 'acp.tool_request', :final value):
+      case ag_ui.CustomEvent(name: 'acp.client_execute_request', :final value):
         if (value is Map) {
           final callId = value['callId'];
           if (callId is String) {
@@ -397,7 +411,7 @@ class ConversationReducer {
                 (order) => TimelineItem.toolRequest(
                   requestId: callId,
                   toolName: toolName,
-                  argsJson: (value['args'] as String?) ?? '{}',
+                  argsJson: _argsToJson(value['args']),
                   order: anchor != null ? OrderKey(anchor.seq, 1) : order,
                 ),
               );
@@ -413,7 +427,7 @@ class ConversationReducer {
               _isStarting = false;
           }
         }
-      case ag_ui.CustomEvent(name: 'pocketcoder:diff'):
+      case ag_ui.CustomEvent(name: final name) when name == '$namespace:diff':
         final value = event.value;
         if (value is Map) {
           final toolCallId = value['toolCallId'];
@@ -434,7 +448,7 @@ class ConversationReducer {
         final snapshot = event.snapshot;
         _pocketcoder.clear();
         if (snapshot is Map) {
-          final pocketcoder = snapshot['pocketcoder'];
+          final pocketcoder = snapshot[namespace];
           _pocketcoder.addAll(
               pocketcoder is Map ? Map<String, dynamic>.from(pocketcoder) : {});
         }
@@ -574,12 +588,22 @@ class ConversationReducer {
     _adapterAIds.remove(requestId);
   }
 
+  /// `acp.client_execute_request` carries the tool's arguments as a JSON
+  /// value (an object for a normal call). A producer that already holds the
+  /// encoded text may send a string instead; both land as the JSON text
+  /// [TimelineItem.toolRequest] stores. Absent or null means no arguments.
+  static String _argsToJson(Object? args) {
+    if (args == null) return '{}';
+    if (args is String) return args;
+    return jsonEncode(args);
+  }
+
   void _applyPatch(Map<String, dynamic> op) {
     final path = op['path'] as String?;
     if (path == null) return;
     final segments =
         path.split('/').where((s) => s.isNotEmpty).toList(growable: false);
-    if (segments.isEmpty || segments.first != 'pocketcoder') return;
+    if (segments.isEmpty || segments.first != namespace) return;
     if (segments.length == 2) {
       final ns = segments[1];
       switch (op['op']) {
@@ -630,8 +654,11 @@ class ConversationReducer {
 /// pocketcoder's cache-replay `AgentChatRepository.watch()` — see Task 8).
 /// Equivalent to constructing a fresh [ConversationReducer] and applying
 /// every event in order.
-Conversation reduce(List<ag_ui.BaseEvent> events) {
-  final r = ConversationReducer();
+Conversation reduce(
+  List<ag_ui.BaseEvent> events, {
+  String namespace = 'pocketcoder',
+}) {
+  final r = ConversationReducer(namespace: namespace);
   for (final event in events) {
     r.apply(event);
   }

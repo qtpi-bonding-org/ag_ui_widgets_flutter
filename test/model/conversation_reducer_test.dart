@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ag_ui/ag_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
@@ -736,9 +738,45 @@ void main() {
       expect(item.toolArgs, '{"command":"ls -la"}');
     });
 
-    test('acp.tool_request produces a ToolRequestTimelineItem', () {
+    test('client_execute_request args sent as a JSON object are re-encoded', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
+        'callId': 't1',
+        'toolName': 'propose_edit',
+        'args': {'changeId': 'c1', 'n': 2},
+      }));
+      final item = r.current.timeline.single as ToolRequestTimelineItem;
+      expect(jsonDecode(item.argsJson), {'changeId': 'c1', 'n': 2});
+    });
+
+    test('client_execute_request with missing or null args defaults to {}', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
+        'callId': 't1',
+        'toolName': 'a',
+      }));
+      r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
+        'callId': 't2',
+        'toolName': 'b',
+        'args': null,
+      }));
+      final items = r.current.timeline.cast<ToolRequestTimelineItem>();
+      expect(items.map((i) => i.argsJson), ['{}', '{}']);
+    });
+
+    test('the retired acp.tool_request name no longer produces an item', () {
       final r = ConversationReducer();
       r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+        'callId': 't1',
+        'toolName': 'propose_edit',
+        'args': '{}',
+      }));
+      expect(r.current.timeline, isEmpty);
+    });
+
+    test('acp.client_execute_request produces a ToolRequestTimelineItem', () {
+      final r = ConversationReducer();
+      r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
         'callId': 't1',
         'toolName': 'propose_edit',
         'args': '{"changeId":"c1"}',
@@ -756,14 +794,14 @@ void main() {
         final r = ConversationReducer(
           autoResolveToolRequest: (toolName) => toolName != 'render_surface',
         );
-        r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+        r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
           'callId': 't1',
           'toolName': 'add_comment',
           'args': '{}',
         }));
         expect(r.current.timeline, isEmpty);
 
-        r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+        r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
           'callId': 't2',
           'toolName': 'render_surface',
           'args': '{}',
@@ -783,7 +821,7 @@ void main() {
         final r = ConversationReducer(
           autoResolveToolRequest: (toolName) => true,
         );
-        r.apply(const CustomEvent(name: 'acp.tool_request', value: {
+        r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
           'callId': 't1',
           'toolName': 'add_comment',
           'args': '{}',
@@ -970,7 +1008,7 @@ void main() {
         ..apply(const ToolCallStartEvent(
             toolCallId: 'tc1', toolCallName: 'add_comment'))
         ..apply(const CustomEvent(
-          name: 'acp.tool_request',
+          name: 'acp.client_execute_request',
           value: {'callId': 'tc1', 'toolName': 'add_comment', 'args': '{}'},
         ));
       r.resolveRequest('tc1');
@@ -1074,7 +1112,7 @@ void main() {
         ..apply(const ToolCallStartEvent(
             toolCallId: 'tc1', toolCallName: 'add_comment'))
         ..apply(const CustomEvent(
-          name: 'acp.tool_request',
+          name: 'acp.client_execute_request',
           value: {'callId': 'tc1', 'toolName': 'add_comment', 'args': '{}'},
         ));
       expect(

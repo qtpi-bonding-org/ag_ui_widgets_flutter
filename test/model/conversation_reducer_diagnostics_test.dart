@@ -14,7 +14,7 @@ void main() {
   });
 
   test('source volume cannot evict a real diagnostic', () {
-    final r = ConversationReducer()
+    final r = ConversationReducer(namespace: 'episutra')
       ..apply(const CustomEvent(name: 'something:new', value: 1));
     for (var i = 0; i < 250; i++) {
       r.apply(CustomEvent(name: 'acp:source', value: {'sourceEventId': 's$i'}));
@@ -25,7 +25,7 @@ void main() {
   });
 
   test('a RAW event is recorded with its payload', () {
-    final r = ConversationReducer()
+    final r = ConversationReducer(namespace: 'episutra')
       ..apply(const RawEvent(
           event: {'unmapped': 'tool_call_content', 'raw': {'a': 1}}));
     final d = r.current.diagnostics.single;
@@ -34,7 +34,7 @@ void main() {
   });
 
   test('an unknown CUSTOM event is recorded by name', () {
-    final r = ConversationReducer()
+    final r = ConversationReducer(namespace: 'episutra')
       ..apply(const CustomEvent(name: 'something:new', value: 1));
     expect(r.current.diagnostics.single.kind, DiagnosticKind.unknownCustom);
     expect(r.current.diagnostics.single.name, 'something:new');
@@ -43,12 +43,12 @@ void main() {
   test("another namespace's events are recorded, not silently ignored", () {
     final r = ConversationReducer(namespace: 'episutra')
       ..apply(const CustomEvent(
-          name: 'pocketcoder:tool', value: {'toolCallId': 't'}));
+          name: 'other:tool', value: {'toolCallId': 't'}));
     expect(r.current.diagnostics.single.kind, DiagnosticKind.unknownCustom);
   });
 
   test('an unhandled standard event type is recorded by type', () {
-    final r = ConversationReducer()
+    final r = ConversationReducer(namespace: 'episutra')
       ..apply(const StepStartedEvent(stepName: 'plan'));
     final d = r.current.diagnostics.single;
     expect(d.kind, DiagnosticKind.unhandledEvent);
@@ -56,7 +56,7 @@ void main() {
   });
 
   test('handled events record nothing', () {
-    final r = ConversationReducer()
+    final r = ConversationReducer(namespace: 'episutra')
       ..apply(const ToolCallStartEvent(toolCallId: 't', toolCallName: 'x'))
       ..apply(const CustomEvent(
           name: 'acp.session_phase', value: {'phase': 'ready'}));
@@ -64,7 +64,7 @@ void main() {
   });
 
   test('diagnostics are capped, oldest dropped', () {
-    final r = ConversationReducer();
+    final r = ConversationReducer(namespace: 'episutra');
     for (var i = 0; i < 250; i++) {
       r.apply(CustomEvent(name: 'n$i', value: i));
     }

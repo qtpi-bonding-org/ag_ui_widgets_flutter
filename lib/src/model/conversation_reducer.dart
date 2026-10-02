@@ -14,10 +14,9 @@ import 'wire_parse.dart';
 
 /// True for the cold-replay reset marker backends emit to signal "the client
 /// should discard history and rebuild from here": a `<namespace>:sync`
-/// CustomEvent whose value has `mode: replace`. [namespace] defaults to
-/// `pocketcoder`; pass the same value the reducer was constructed with.
-bool isReplaceMarker(ag_ui.BaseEvent event,
-        {String namespace = 'pocketcoder'}) =>
+/// CustomEvent whose value has `mode: replace`. [namespace] is required; pass
+/// the same value the reducer was constructed with.
+bool isReplaceMarker(ag_ui.BaseEvent event, {required String namespace}) =>
     event is ag_ui.CustomEvent &&
     event.name == '$namespace:sync' &&
     (event.value is Map && (event.value as Map)['mode'] == 'replace');
@@ -50,7 +49,7 @@ class ConversationReducer {
 
   final Map<String, _OpenMessage> _openText = {};
   final Map<String, _OpenMessage> _openReasoning = {};
-  final Map<String, dynamic> _pocketcoder = {};
+  final Map<String, dynamic> _state = {};
 
   /// Ids of permission/elicitation cards currently shown *because* the
   /// pocketcoder state-sync path (`_syncPermission`/`_syncElicitation`)
@@ -115,15 +114,14 @@ class ConversationReducer {
   /// The backend's wire namespace. Backends that project state and tool
   /// metadata namespace their CustomEvents as `<namespace>:tool`,
   /// `<namespace>:diff` and `<namespace>:sync`, and root their state tree
-  /// (STATE_SNAPSHOT key, STATE_DELTA path prefix) at `/<namespace>`. Defaults
-  /// to `pocketcoder`, the vocabulary this package was first written against;
-  /// other backends (e.g. episutra's `acp-agui-adapter`, which is constructed
-  /// with a namespace of its own) pass theirs. Fixed protocol-level events
+  /// (STATE_SNAPSHOT key, STATE_DELTA path prefix) at `/<namespace>`. Required,
+  /// with no default: each backend passes its own (e.g. episutra's
+  /// `acp-agui-adapter` is constructed with a namespace of its own). Fixed protocol-level events
   /// (`acp.*`) are not namespaced and do not depend on this.
   final String namespace;
 
   ConversationReducer({
-    this.namespace = 'pocketcoder',
+    required this.namespace,
     this.autoResolveToolRequest,
   });
 
@@ -597,16 +595,16 @@ class ConversationReducer {
 
       case ag_ui.StateSnapshotEvent():
         final snapshot = event.snapshot;
-        _pocketcoder.clear();
+        _state.clear();
         if (snapshot is Map) {
-          final pocketcoder = snapshot[namespace];
-          if (pocketcoder is Map) {
-            _pocketcoder.addAll(Map<String, dynamic>.from(pocketcoder));
-          } else if (pocketcoder != null) {
+          final nsState = snapshot[namespace];
+          if (nsState is Map) {
+            _state.addAll(Map<String, dynamic>.from(nsState));
+          } else if (nsState != null) {
             // The snapshot stays authoritative (state is cleared), but a
             // namespace entry that is not a map is a wire problem.
             _diagnose(
-                DiagnosticKind.malformedPayload, 'snapshot/$namespace', pocketcoder);
+                DiagnosticKind.malformedPayload, 'snapshot/$namespace', nsState);
           }
         }
         _syncPermission();
@@ -650,7 +648,7 @@ class ConversationReducer {
     _sortedCache = null;
     _openText.clear();
     _openReasoning.clear();
-    _pocketcoder.clear();
+    _state.clear();
     _isRunning = false;
     _isStarting = false;
     _runError = null;
@@ -738,7 +736,7 @@ class ConversationReducer {
   /// every state change. State is mirrored: a key that is gone becomes null.
   void _onStateChanged() {
     T? typed<T>(String key, T? Function(Object?) parse) {
-      final raw = _pocketcoder[key];
+      final raw = _state[key];
       if (raw == null) {
         _reportedMalformed.remove(key);
         return null;
@@ -763,14 +761,14 @@ class ConversationReducer {
     _plans = typed('plans', PlansState.parse) ?? const PlansState();
 
     final unknownNow = {
-      for (final k in _pocketcoder.keys)
+      for (final k in _state.keys)
         if (!_knownStateKeys.contains(k)) k,
     };
     _reportedUnknown.retainAll(unknownNow);
     for (final key in unknownNow) {
       if (_reportedUnknown.add(key)) {
         _diagnose(DiagnosticKind.unknownStateKey, '$namespace/$key',
-            _pocketcoder[key]);
+            _state[key]);
       }
     }
   }
@@ -786,9 +784,9 @@ class ConversationReducer {
   /// single slot (`<legacyKey>`, one entry — pocketcoder) and the keyed map
   /// (`<byIdKey>.by-id`, any number pending at once — acp-agui-adapter).
   Iterable<Map> _stateEntries(String legacyKey, String byIdKey) sync* {
-    final legacy = _pocketcoder[legacyKey];
+    final legacy = _state[legacyKey];
     if (legacy is Map) yield legacy;
-    final keyed = _pocketcoder[byIdKey];
+    final keyed = _state[byIdKey];
     final byId = keyed is Map ? keyed['by-id'] : null;
     if (byId is Map) {
       for (final entry in byId.values) {
@@ -989,11 +987,11 @@ class ConversationReducer {
         _diagnose(DiagnosticKind.malformedPayload, '$namespace/patch', op);
         return;
       }
-      _pocketcoder.clear();
+      _state.clear();
       if (kind != 'remove') {
-        _pocketcoder.addAll(Map<String, dynamic>.from(value as Map));
+        _state.addAll(Map<String, dynamic>.from(value as Map));
       }
-    } else if (!_setAt(_pocketcoder, keys, op['value'],
+    } else if (!_setAt(_state, keys, op['value'],
         remove: kind == 'remove')) {
       // Descends through a value that exists but is not a map (e.g. a list
       // index). Leave the state untouched rather than corrupt it, and say so.
@@ -1049,11 +1047,11 @@ class ConversationReducer {
     Map<String, dynamic>? asMap(dynamic v) =>
         v is Map ? Map<String, dynamic>.from(v) : null;
     return SessionState(
-      permission: asMap(_pocketcoder['permission']),
-      elicitation: asMap(_pocketcoder['elicitation']),
-      modes: asMap(_pocketcoder['modes']),
-      config: asMap(_pocketcoder['config']),
-      plan: asMap(_pocketcoder['plan']),
+      permission: asMap(_state['permission']),
+      elicitation: asMap(_state['elicitation']),
+      modes: asMap(_state['modes']),
+      config: asMap(_state['config']),
+      plan: asMap(_state['plan']),
       title: _sessionInfo?.title,
       isRunning: _isRunning,
       isStarting: _isStarting,
@@ -1081,7 +1079,7 @@ class ConversationReducer {
 /// every event in order.
 Conversation reduce(
   List<ag_ui.BaseEvent> events, {
-  String namespace = 'pocketcoder',
+  required String namespace,
 }) {
   final r = ConversationReducer(namespace: namespace);
   for (final event in events) {

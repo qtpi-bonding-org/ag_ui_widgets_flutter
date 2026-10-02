@@ -15,10 +15,6 @@ ConversationReducer _withTool(String namespace) {
 
 void main() {
   group('configurable namespace', () {
-    test('defaults to pocketcoder', () {
-      expect(ConversationReducer().namespace, 'pocketcoder');
-    });
-
     test('<ns>:tool sets toolKind and status for a custom namespace', () {
       final r = _withTool('episutra')
         ..apply(const CustomEvent(name: 'episutra:tool', value: {

@@ -6,7 +6,7 @@ import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation_reducer.dart';
 
 BaseEvent _sync() =>
-    const CustomEvent(name: 'pocketcoder:sync', value: {'mode': 'replace'});
+    const CustomEvent(name: 'episutra:sync', value: {'mode': 'replace'});
 
 StateDeltaEvent _delta(String path, {String op = 'add', dynamic value}) {
   return StateDeltaEvent(delta: [
@@ -17,7 +17,7 @@ StateDeltaEvent _delta(String path, {String op = 'add', dynamic value}) {
 void main() {
   test('RunFinishedEvent with stopReason cancelled sets a cancelled outcome',
       () {
-    final reducer = ConversationReducer();
+    final reducer = ConversationReducer(namespace: 'episutra');
     reducer.apply(RunStartedEvent(threadId: 't', runId: 'r'));
     reducer.apply(const RunFinishedEvent(
       threadId: 't',
@@ -30,7 +30,7 @@ void main() {
   test(
       'RunErrorEvent with connection_interrupted code sets an interrupted outcome',
       () {
-    final reducer = ConversationReducer();
+    final reducer = ConversationReducer(namespace: 'episutra');
     reducer.apply(RunStartedEvent(threadId: 't', runId: 'r'));
     reducer.apply(const RunErrorEvent(
       message: 'goose turn failed',
@@ -43,7 +43,7 @@ void main() {
     test(
         'START -> textStream item; CONTENT x2 -> grows in place; END -> replaced by text item',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const TextMessageStartEvent(
           messageId: 'm1', role: TextMessageRole.assistant));
       expect(r.current.timeline, hasLength(1));
@@ -65,7 +65,7 @@ void main() {
 
   group('addLocalMessage', () {
     test('inserts a text item directly, no event required', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.addLocalMessage(id: 'local-1', role: 'user', text: 'hello');
 
       expect(r.current.timeline, hasLength(1));
@@ -76,7 +76,7 @@ void main() {
     });
 
     test('is superseded in place by a real event sharing its id', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.addLocalMessage(id: 'm1', role: 'user', text: 'hello');
 
       r.apply(const TextMessageStartEvent(
@@ -95,7 +95,7 @@ void main() {
     test(
         'START -> reasoning textStream item; CONTENT grows in place; END -> replaced by reasoning text item',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const ReasoningMessageStartEvent(messageId: 'r1'));
       expect(r.current.timeline, hasLength(1));
       final streaming = r.current.timeline.single as TextStreamTimelineItem;
@@ -117,7 +117,7 @@ void main() {
 
     test('reasoning streams in place even when a tool call starts afterward',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ReasoningMessageStartEvent(messageId: 'r1'))
         ..apply(const ReasoningMessageContentEvent(
             messageId: 'r1', delta: 'first '))
@@ -136,7 +136,7 @@ void main() {
 
   group('tool calls', () {
     test('START/ARGS/RESULT builds one toolCall item in place', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
         ..apply(const ToolCallArgsEvent(toolCallId: 't1', delta: '{"q":'))
@@ -152,7 +152,7 @@ void main() {
     });
 
     test('a fresh toolCall item defaults hasEnded to false', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'));
 
@@ -169,7 +169,7 @@ void main() {
       // ToolCallEndEvent, arriving much later. Reported by a live device
       // log: ToolCallResultEvent arrived 172ms after start, ToolCallEndEvent
       // 32s after that. `result != null` alone must never be read as "done".
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
         ..apply(const ToolCallResultEvent(
@@ -181,7 +181,7 @@ void main() {
     });
 
     test('ToolCallEndEvent after a result marks the call as ended', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
         ..apply(const ToolCallResultEvent(
@@ -201,7 +201,7 @@ void main() {
       // get START + END with no RESULT ever arriving. hasEnded must be
       // driven by ToolCallEndEvent independently of result so this case
       // still resolves out of the "running" state.
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'list_files'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'));
@@ -214,7 +214,7 @@ void main() {
     test(
         'ToolCallEndEvent for one of two concurrent tool calls only ends '
         'that one', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'a'))
         ..apply(const ToolCallStartEvent(toolCallId: 't2', toolCallName: 'b'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'));
@@ -229,7 +229,7 @@ void main() {
     test(
         'a ToolCallEndEvent arriving before its ToolCallStartEvent still '
         'marks the eventual item as ended', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallEndEvent(toolCallId: 't1'))
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'));
@@ -242,17 +242,17 @@ void main() {
     test(
         'events arriving after ToolCallEndEvent (args, diff, tool kind) do '
         'not un-end the call', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'))
         ..apply(const ToolCallArgsEvent(toolCallId: 't1', delta: '{}'))
-        ..apply(const CustomEvent(name: 'pocketcoder:diff', value: {
+        ..apply(const CustomEvent(name: 'episutra:diff', value: {
           'toolCallId': 't1',
           'path': 'lib/a.dart',
           'newText': 'x',
         }))
-        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {
+        ..apply(const CustomEvent(name: 'episutra:tool', value: {
           'toolCallId': 't1',
           'kind': 'execute',
         }));
@@ -264,7 +264,7 @@ void main() {
     test(
         'a ToolCallResultEvent arriving after ToolCallEndEvent still updates '
         'result, without un-ending the call', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'))
@@ -279,12 +279,12 @@ void main() {
     test(
         'a replace-marker reset clears hasEnded so a replayed tool call '
         'starts fresh', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'))
         ..apply(const CustomEvent(
-            name: 'pocketcoder:sync', value: {'mode': 'replace'}))
+            name: 'episutra:sync', value: {'mode': 'replace'}))
         ..apply(
             const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'search'));
 
@@ -294,7 +294,7 @@ void main() {
 
     test('a ToolCallEndEvent for an unknown toolCallId creates an orphan '
         'entry already marked ended', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallEndEvent(toolCallId: 'unknown'));
 
       expect(r.current.timeline, hasLength(1));
@@ -307,16 +307,16 @@ void main() {
   group('tool call diffs', () {
     BaseEvent diffEvent(String toolCallId, String path,
             {String? oldText, required String newText}) =>
-        CustomEvent(name: 'pocketcoder:diff', value: {
+        CustomEvent(name: 'episutra:diff', value: {
           'toolCallId': toolCallId,
           'path': path,
           if (oldText != null) 'oldText': oldText,
           'newText': newText,
         });
 
-    test('pocketcoder:diff event appends a ToolDiff to the matching tool call',
+    test('episutra:diff event appends a ToolDiff to the matching tool call',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'edit_file'))
         ..apply(diffEvent('t1', 'lib/foo.dart', oldText: 'a', newText: 'b'));
@@ -331,7 +331,7 @@ void main() {
     test(
         'a second diff event for the same tool call appends rather than replaces',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'multi_edit'))
         ..apply(diffEvent('t1', 'lib/a.dart', newText: 'a2'))
@@ -346,7 +346,7 @@ void main() {
     test(
         'diff event for an unknown toolCallId creates an orphan entry, same as args/result would',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(diffEvent('unknown', 'lib/c.dart', newText: 'c'));
 
       expect(r.current.timeline, hasLength(1));
@@ -359,7 +359,7 @@ void main() {
     test(
         'new-file diff (no oldText in the event) defaults oldText to empty string',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'write_file'))
         ..apply(diffEvent('t1', 'lib/new.dart', newText: 'content'));
@@ -370,11 +370,11 @@ void main() {
 
     test('a malformed diff event (missing newText) is ignored, not crashed on',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'edit_file'))
         ..apply(const CustomEvent(
-            name: 'pocketcoder:diff',
+            name: 'episutra:diff',
             value: {'toolCallId': 't1', 'path': 'lib/x.dart'}));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
@@ -384,7 +384,7 @@ void main() {
 
   group('tool call kind', () {
     CustomEvent toolEvent(String toolCallId, {String? title, String? kind, String status = 'in_progress'}) =>
-        CustomEvent(name: 'pocketcoder:tool', value: {
+        CustomEvent(name: 'episutra:tool', value: {
           'toolCallId': toolCallId,
           if (title != null) 'title': title,
           if (kind != null) 'kind': kind,
@@ -392,8 +392,8 @@ void main() {
           'locations': <Map<String, dynamic>>[],
         });
 
-    test('pocketcoder:tool event sets toolKind on the matching tool call', () {
-      final r = ConversationReducer()
+    test('episutra:tool event sets toolKind on the matching tool call', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute'));
 
@@ -402,8 +402,8 @@ void main() {
       expect(item.name, 'shell', reason: 'a non-empty existing name is not overwritten');
     });
 
-    test('pocketcoder:tool event backfills an empty name from title', () {
-      final r = ConversationReducer()
+    test('episutra:tool event backfills an empty name from title', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: ''))
         ..apply(toolEvent('t1', title: 'Run shell command', kind: 'execute'));
 
@@ -413,9 +413,9 @@ void main() {
     });
 
     test(
-        'pocketcoder:tool event arriving before TOOL_CALL_START still lands on the '
+        'episutra:tool event arriving before TOOL_CALL_START still lands on the '
         'eventual tool call', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(toolEvent('t1', title: 'Run shell command', kind: 'execute'))
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: ''));
 
@@ -425,18 +425,18 @@ void main() {
       expect(item.name, 'Run shell command');
     });
 
-    test('a pocketcoder:tool event with a non-Map value or missing toolCallId is a no-op', () {
-      final r = ConversationReducer()
+    test('a episutra:tool event with a non-Map value or missing toolCallId is a no-op', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
-        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: 'not a map'))
-        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {'kind': 'execute'}));
+        ..apply(const CustomEvent(name: 'episutra:tool', value: 'not a map'))
+        ..apply(const CustomEvent(name: 'episutra:tool', value: {'kind': 'execute'}));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
       expect(item.toolKind, isNull);
     });
 
-    test('pocketcoder:tool event with status "failed" marks the tool call failed', () {
-      final r = ConversationReducer()
+    test('episutra:tool event with status "failed" marks the tool call failed', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute', status: 'failed'));
 
@@ -445,8 +445,8 @@ void main() {
       expect(item.isFailed, isTrue);
     });
 
-    test('pocketcoder:tool event with status "completed" is not failed', () {
-      final r = ConversationReducer()
+    test('episutra:tool event with status "completed" is not failed', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute', status: 'completed'));
 
@@ -456,7 +456,7 @@ void main() {
     });
 
     test('a later in_progress status does not erase an earlier failed status', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute', status: 'failed'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'));
@@ -468,13 +468,13 @@ void main() {
   });
 
   group('permission/elicitation via state delta', () {
-    group('elicitation (Adapter A: pocketcoder StateDelta)', () {
+    group('elicitation (Adapter A: episutra StateDelta)', () {
       test(
-          'StateSnapshot with /pocketcoder/elicitation produces a full-payload item',
+          'StateSnapshot with /episutra/elicitation produces a full-payload item',
           () {
-        final r = ConversationReducer();
+        final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'elicitation': {
               'elicitationId': 'e1',
               'message': 'Pick a color',
@@ -504,9 +504,9 @@ void main() {
       });
 
       test('url-mode elicitation carries url, no schema', () {
-        final r = ConversationReducer();
+        final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'elicitation': {
               'elicitationId': 'e2',
               'message': 'Open this link',
@@ -523,13 +523,13 @@ void main() {
       });
     });
 
-    group('permission (Adapter A: pocketcoder StateDelta)', () {
+    group('permission (Adapter A: episutra StateDelta)', () {
       test(
-          'StateSnapshot with /pocketcoder/permission produces a full-payload item (toolTitle null today)',
+          'StateSnapshot with /episutra/permission produces a full-payload item (toolTitle null today)',
           () {
-        final r = ConversationReducer();
+        final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'permission': {
               'requestId': 'p1',
               'status': 'pending',
@@ -544,7 +544,7 @@ void main() {
         final item = r.current.timeline.single as PermissionRequestTimelineItem;
         expect(item.requestId, 'p1');
         expect(item.toolTitle,
-            isNull); // pocketcoder doesn't send this yet (Phase 2, Task 9)
+            isNull); // episutra doesn't send this yet (Phase 2, Task 9)
         expect(item.description, isNull); // never an ACP wire field
         expect(item.options, hasLength(2));
         expect(item.options[0].optionId, 'allow');
@@ -553,11 +553,11 @@ void main() {
       });
 
       test(
-          'once pocketcoder forwards title/kind (Phase 2), the adapter reads them',
+          'once episutra forwards title/kind (Phase 2), the adapter reads them',
           () {
-        final r = ConversationReducer();
+        final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'permission': {
               'requestId': 'p2',
               'status': 'pending',
@@ -577,13 +577,13 @@ void main() {
       test(
           'correlates toolCallId to the matching tool call\'s own args, '
           'since the permission payload never carries them directly', () {
-        final r = ConversationReducer()
+        final r = ConversationReducer(namespace: 'episutra')
           ..apply(const ToolCallStartEvent(
               toolCallId: 't1', toolCallName: 'shell'))
           ..apply(const ToolCallArgsEvent(
               toolCallId: 't1', delta: '{"command":"echo hi"}'));
         r.apply(const StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'permission': {
               'requestId': 'p3',
               'status': 'pending',
@@ -604,9 +604,9 @@ void main() {
 
       test('toolArgs is null when toolCallId has no correlated tool call',
           () {
-        final r = ConversationReducer();
+        final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'permission': {
               'requestId': 'p4',
               'status': 'pending',
@@ -623,10 +623,10 @@ void main() {
     test(
         'permission sub-path add inserts a full-payload item after its correlated tool call',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'write_file'))
-        ..apply(_delta('/pocketcoder/permission',
+        ..apply(_delta('/episutra/permission',
             value: {'requestId': 'p1', 'toolCallId': 't1'}));
 
       expect(r.current.timeline, hasLength(2));
@@ -636,9 +636,9 @@ void main() {
     });
 
     test('elicitation sub-path add appends a marker at the end', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
-            _delta('/pocketcoder/elicitation', value: {'elicitationId': 'e1'}));
+            _delta('/episutra/elicitation', value: {'elicitationId': 'e1'}));
 
       expect(r.current.timeline, hasLength(1));
       expect(
@@ -652,9 +652,9 @@ void main() {
     test(
         'resolving a permission removes it and a later replay of the same state does not resurrect it',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       const snapshot = StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'permission': {
             'requestId': 'p1',
             'status': 'pending',
@@ -670,16 +670,16 @@ void main() {
       r.resolveRequest('p1');
       expect(r.current.timeline, isEmpty);
 
-      // Simulate pocketcoder replaying the exact same StateSnapshot (backend
+      // Simulate episutra replaying the exact same StateSnapshot (backend
       // never clears its own namespace) — the resolved item must not come back.
       r.apply(snapshot);
       expect(r.current.timeline, isEmpty);
     });
 
     test('resolved-id set survives the cold-replay reset marker', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       const snapshot = StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'elicitation': {'elicitationId': 'e1', 'message': 'm', 'mode': 'form'}
         }
       });
@@ -689,7 +689,7 @@ void main() {
 
       // Reconnect replay: cold-replay marker, then the same snapshot again.
       r.apply(const CustomEvent(
-          name: 'pocketcoder:sync', value: {'mode': 'replace'}));
+          name: 'episutra:sync', value: {'mode': 'replace'}));
       r.apply(snapshot);
       expect(r.current.timeline, isEmpty,
           reason:
@@ -702,7 +702,7 @@ void main() {
       () {
     test('acp.permission_request decodes optionsJson and remaps id->optionId',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(name: 'acp.permission_request', value: {
         'callId': 'p1',
         'toolName': 'bash',
@@ -722,7 +722,7 @@ void main() {
         'acp.permission_request correlates callId to the tool call sharing '
         'that same id (protocol-level, not a coincidence) for toolCallId/'
         'toolArgs', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(toolCallId: 'p2', toolCallName: 'bash'))
         ..apply(const ToolCallArgsEvent(
             toolCallId: 'p2', delta: '{"command":"ls -la"}'));
@@ -739,7 +739,7 @@ void main() {
     });
 
     test('client_execute_request args sent as a JSON object are re-encoded', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
         'callId': 't1',
         'toolName': 'propose_edit',
@@ -750,7 +750,7 @@ void main() {
     });
 
     test('client_execute_request with missing or null args defaults to {}', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
         'callId': 't1',
         'toolName': 'a',
@@ -765,7 +765,7 @@ void main() {
     });
 
     test('the retired acp.tool_request name no longer produces an item', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(name: 'acp.tool_request', value: {
         'callId': 't1',
         'toolName': 'propose_edit',
@@ -775,7 +775,7 @@ void main() {
     });
 
     test('acp.client_execute_request produces a ToolRequestTimelineItem', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
         'callId': 't1',
         'toolName': 'propose_edit',
@@ -792,6 +792,7 @@ void main() {
       'for tools it returns true for — no insert-then-remove churn',
       () {
         final r = ConversationReducer(
+          namespace: 'episutra',
           autoResolveToolRequest: (toolName) => toolName != 'render_surface',
         );
         r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
@@ -819,6 +820,7 @@ void main() {
       'a later resolveRequest for it is a harmless no-op',
       () {
         final r = ConversationReducer(
+          namespace: 'episutra',
           autoResolveToolRequest: (toolName) => true,
         );
         r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
@@ -835,9 +837,9 @@ void main() {
     test(
         'Adapter B items are independent of Adapter A — resolving one A item does not touch a B item',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'permission': {
             'requestId': 'a1',
             'status': 'pending',
@@ -858,7 +860,7 @@ void main() {
       // A fresh StateSnapshot rebuild (Adapter A's normal behavior) must not
       // wipe Adapter B's b1 item.
       r.apply(const StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'permission': {
             'requestId': 'a1',
             'status': 'pending',
@@ -880,7 +882,7 @@ void main() {
     test(
         'sync replace marker resets the accumulator; only post-marker events survive',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const TextMessageStartEvent(
             messageId: 'stale', role: TextMessageRole.assistant))
         ..apply(const TextMessageEndEvent(messageId: 'stale'))
@@ -895,7 +897,7 @@ void main() {
   });
 
   group(
-      'run lifecycle (new — pocketcoder had no equivalent before this package)',
+      'run lifecycle (new — episutra had no equivalent before this package)',
       () {
     // NOTE: RunStartedEvent/RunFinishedEvent require threadId/runId (not
     // const-constructible with zero args) and ToolCallResultEvent requires
@@ -903,21 +905,21 @@ void main() {
     // during plan review. The values below are arbitrary test fixtures,
     // not meaningful IDs.
     test('RUN_STARTED sets isRunning true and clears any prior error', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(RunStartedEvent(threadId: 'th1', runId: 'run1'));
       expect(r.current.sessionState.isRunning, isTrue);
       expect(r.current.sessionState.runError, isNull);
     });
 
     test('RUN_FINISHED sets isRunning false', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(RunStartedEvent(threadId: 'th1', runId: 'run1'))
         ..apply(const RunFinishedEvent(threadId: 'th1', runId: 'run1'));
       expect(r.current.sessionState.isRunning, isFalse);
     });
 
     test('RUN_ERROR sets isRunning false and records the error message', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(RunStartedEvent(threadId: 'th1', runId: 'run1'))
         ..apply(const RunErrorEvent(message: 'boom'));
       expect(r.current.sessionState.isRunning, isFalse);
@@ -925,7 +927,7 @@ void main() {
     });
 
     test('cold replay resets isRunning/runError along with the timeline', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(RunStartedEvent(threadId: 'th1', runId: 'run1'))
         ..apply(const RunErrorEvent(message: 'boom'))
         ..apply(_sync());
@@ -934,7 +936,7 @@ void main() {
     });
 
     test('acp.session_phase starting sets isStarting true', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(
         name: 'acp.session_phase',
         value: {'phase': 'starting'},
@@ -943,7 +945,7 @@ void main() {
     });
 
     test('acp.session_phase ready clears isStarting', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(
         name: 'acp.session_phase',
         value: {'phase': 'starting'},
@@ -956,7 +958,7 @@ void main() {
     });
 
     test('RunFinishedEvent clears isStarting even without a prior ready', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(
         name: 'acp.session_phase',
         value: {'phase': 'starting'},
@@ -966,7 +968,7 @@ void main() {
     });
 
     test('RunErrorEvent clears isStarting even without a prior ready', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(
         name: 'acp.session_phase',
         value: {'phase': 'starting'},
@@ -976,7 +978,7 @@ void main() {
     });
 
     test('isStarting does not affect isRunning', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(
         name: 'acp.session_phase',
         value: {'phase': 'starting'},
@@ -992,7 +994,7 @@ void main() {
     test(
         'a repeated ToolCallStartEvent for the same id updates in place, not duplicates',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(
             const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'search'))
         ..apply(const ToolCallStartEvent(
@@ -1004,7 +1006,7 @@ void main() {
     test(
         'resolving a tool-request card does not remove its correlated ToolCallTimelineItem',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 'tc1', toolCallName: 'add_comment'))
         ..apply(const CustomEvent(
@@ -1020,9 +1022,9 @@ void main() {
     test(
         'a re-synced permission whose requestId changed removes the stale card, not just adds the new one',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(const StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'permission': {'requestId': 'p1', 'status': 'pending', 'options': []}
         }
       }));
@@ -1033,7 +1035,7 @@ void main() {
         ['p1'],
       );
       r.apply(const StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'permission': {'requestId': 'p2', 'status': 'pending', 'options': []}
         }
       }));
@@ -1048,7 +1050,7 @@ void main() {
     test(
         'a reasoning stream and a text stream with the same messageId do not collide',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ReasoningMessageStartEvent(messageId: 'm1'))
         ..apply(const TextMessageStartEvent(
             messageId: 'm1', role: TextMessageRole.assistant))
@@ -1064,7 +1066,7 @@ void main() {
       'a bug — see acp-core stdio.rs) — resolving the permission must not destroy the '
       "correlated ToolCallTimelineItem's data (regression, 2026-08-01)",
       () {
-        final r = ConversationReducer()
+        final r = ConversationReducer(namespace: 'episutra')
           ..apply(const ToolCallStartEvent(
               toolCallId: 'tc1', toolCallName: 'add_comment'))
           ..apply(const CustomEvent(
@@ -1108,7 +1110,7 @@ void main() {
     test(
         'a tool call and its correlated tool-request survive together in the same timeline',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 'tc1', toolCallName: 'add_comment'))
         ..apply(const CustomEvent(
@@ -1128,7 +1130,7 @@ void main() {
   group('deterministic ordering: text, tool, text', () {
     test('two distinct message ids around a tool call keep their arrival order',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const TextMessageStartEvent(
             messageId: 'm1', role: TextMessageRole.assistant))
         ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
@@ -1154,7 +1156,7 @@ void main() {
         "call in between does not relocate it after the tool -- content "
         "updates in place at the id's original (pre-tool) position",
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const TextMessageStartEvent(
             messageId: 'm1', role: TextMessageRole.assistant))
         ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
@@ -1190,8 +1192,8 @@ void main() {
         const TextMessageContentEvent(messageId: 'm1', delta: 'hi'),
         const TextMessageEndEvent(messageId: 'm1'),
       ];
-      final viaReduce = reduce(events);
-      final r = ConversationReducer();
+      final viaReduce = reduce(events, namespace: 'episutra');
+      final r = ConversationReducer(namespace: 'episutra');
       for (final e in events) {
         r.apply(e);
       }

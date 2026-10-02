@@ -4,7 +4,7 @@ import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation_reducer.dart';
 
 StateSnapshotEvent snap(Map<String, dynamic> ns) =>
-    StateSnapshotEvent(snapshot: {'pocketcoder': ns});
+    StateSnapshotEvent(snapshot: {'episutra': ns});
 
 StateDeltaEvent delta(List<Map<String, dynamic>> ops) =>
     StateDeltaEvent(delta: ops);
@@ -13,7 +13,7 @@ void main() {
   group('I1 wrong-typed wire fields never throw', () {
     test('permission with non-string title/kind applies and later replaces work',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(snap({
                 'permission': {
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('elicitation with non-string message/mode/url applies', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(snap({
                 'elicitation': {
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('RUN_FINISHED with a non-string stopReason does not throw', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(const RunFinishedEvent(
               threadId: 't', runId: 'r', result: {'stopReason': 5})),
@@ -70,7 +70,7 @@ void main() {
     });
 
     test('session_info with a non-string title does not throw', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(() => r.apply(snap({'session_info': {'title': 5}})),
           returnsNormally);
       expect(() => r.current, returnsNormally);
@@ -78,7 +78,7 @@ void main() {
     });
 
     test('direct permission event with non-string fields applies', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(const CustomEvent(name: 'acp.permission_request', value: {
                 'callId': 'c1',
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('malformed optionsJson is diagnosed, not thrown', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(const CustomEvent(name: 'acp.permission_request', value: {
                 'callId': 'c1',
@@ -114,7 +114,7 @@ void main() {
 
     test('direct elicitation / execute events with wrong-typed fields apply',
         () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(const CustomEvent(name: 'acp.elicitation_request', value: {
                 'requestId': 'e1',
@@ -134,34 +134,34 @@ void main() {
   group('I2-I4 state patch / snapshot hardening', () {
     test('I2: replace of the namespace with a non-map is rejected untouched',
         () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'agent': {'protocolVersion': 1},
         }));
       r.apply(delta([
-        {'op': 'replace', 'path': '/pocketcoder', 'value': 5},
+        {'op': 'replace', 'path': '/episutra', 'value': 5},
       ]));
       expect(r.current.sessionState.agent?.protocolVersion, 1);
       final d = r.current.diagnostics
           .where((d) => d.kind == DiagnosticKind.malformedPayload)
           .single;
-      expect(d.name, 'pocketcoder/patch');
+      expect(d.name, 'episutra/patch');
     });
 
     test('I2: remove of the namespace clears, add of a map replaces', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'agent': {'protocolVersion': 1},
         }));
       r.apply(delta([
-        {'op': 'remove', 'path': '/pocketcoder'},
+        {'op': 'remove', 'path': '/episutra'},
       ]));
       expect(r.current.sessionState.agent, isNull);
       expect(r.current.diagnostics, isEmpty);
       r.apply(delta([
         {
           'op': 'replace',
-          'path': '/pocketcoder',
+          'path': '/episutra',
           'value': {
             'agent': {'protocolVersion': 2}
           }
@@ -171,41 +171,41 @@ void main() {
     });
 
     test('I3: a snapshot whose namespace entry is not a map is diagnosed', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'agent': {'protocolVersion': 1},
         }));
-      r.apply(StateSnapshotEvent(snapshot: {'pocketcoder': 5}));
+      r.apply(StateSnapshotEvent(snapshot: {'episutra': 5}));
       expect(r.current.sessionState.agent, isNull);
       final d = r.current.diagnostics
           .where((d) => d.kind == DiagnosticKind.malformedPayload)
           .single;
-      expect(d.name, 'snapshot/pocketcoder');
+      expect(d.name, 'snapshot/episutra');
       expect(d.payload, 5);
     });
 
     test('I3: a snapshot with no namespace entry records nothing', () {
-      final r = ConversationReducer()
-        ..apply(StateSnapshotEvent(snapshot: {'pocketcoder': null}));
+      final r = ConversationReducer(namespace: 'episutra')
+        ..apply(StateSnapshotEvent(snapshot: {'episutra': null}));
       expect(r.current.diagnostics, isEmpty);
     });
 
     test('I4: remove through a missing parent creates no state', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       r.apply(delta([
-        {'op': 'remove', 'path': '/pocketcoder/usage/used'},
+        {'op': 'remove', 'path': '/episutra/usage/used'},
       ]));
       expect(r.current.sessionState.usage, isNull);
       expect(r.current.diagnostics, isEmpty);
     });
 
     test('I4: remove of an existing nested key still works', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'usage': {'used': 5, 'size': 10},
         }));
       r.apply(delta([
-        {'op': 'remove', 'path': '/pocketcoder/usage/used'},
+        {'op': 'remove', 'path': '/episutra/usage/used'},
       ]));
       expect(r.current.sessionState.usage?.used, isNull);
       expect(r.current.sessionState.usage?.size, 10);
@@ -214,7 +214,7 @@ void main() {
 
   group('I5 commands as a bare list', () {
     test('a bare list of commands parses, with no diagnostic', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'commands': [
             {'name': 'help', 'description': 'Show help'},
@@ -229,7 +229,7 @@ void main() {
     });
 
     test('the map shape still parses', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'commands': {
             'commands': [
@@ -248,7 +248,7 @@ void main() {
       'acp.client_execute_request',
     ]) {
       test('$name: non-map and missing id are malformedPayload, deduped', () {
-        final r = ConversationReducer();
+        final r = ConversationReducer(namespace: 'episutra');
         r.apply(CustomEvent(name: name, value: 'oops'));
         r.apply(CustomEvent(name: name, value: const {'x': 1}));
         r.apply(CustomEvent(name: name, value: const {'x': 1}));
@@ -262,7 +262,7 @@ void main() {
     }
 
     test('acp.session_phase: unknown phase and non-map are diagnosed', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const CustomEvent(
             name: 'acp.session_phase', value: {'phase': 'weird'}))
         ..apply(const CustomEvent(name: 'acp.session_phase', value: 'x'))
@@ -277,7 +277,7 @@ void main() {
 
   group('M2-M4', () {
     test('M2: unhandledEvent diagnostic carries the event payload', () {
-      final r = ConversationReducer()
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(const StepStartedEvent(stepName: 'plan'));
       final d = r.current.diagnostics.single;
       expect(d.kind, DiagnosticKind.unhandledEvent);
@@ -285,8 +285,8 @@ void main() {
     });
 
     test('M3: non-map location entries are diagnosed, valid ones kept', () {
-      final r = ConversationReducer()
-        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {
+      final r = ConversationReducer(namespace: 'episutra')
+        ..apply(const CustomEvent(name: 'episutra:tool', value: {
           'toolCallId': 't',
           'locations': [
             'junk',
@@ -297,28 +297,28 @@ void main() {
       expect(t.locations.single.path, 'a.dart');
       final d = r.current.diagnostics.single;
       expect(d.kind, DiagnosticKind.malformedPayload);
-      expect(d.name, 'pocketcoder:tool/locations');
+      expect(d.name, 'episutra:tool/locations');
     });
 
     test('M3: a non-list locations value is diagnosed and keeps earlier ones',
         () {
-      final r = ConversationReducer()
-        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {
+      final r = ConversationReducer(namespace: 'episutra')
+        ..apply(const CustomEvent(name: 'episutra:tool', value: {
           'toolCallId': 't',
           'locations': [
             {'path': 'a.dart'}
           ],
         }))
         ..apply(const CustomEvent(
-            name: 'pocketcoder:tool',
+            name: 'episutra:tool',
             value: {'toolCallId': 't', 'locations': 5}));
       final t = r.current.timeline.single as ToolCallTimelineItem;
       expect(t.locations.single.path, 'a.dart');
-      expect(r.current.diagnostics.single.name, 'pocketcoder:tool/locations');
+      expect(r.current.diagnostics.single.name, 'episutra:tool/locations');
     });
 
     test('M4: an unknown snapshot key is re-reported after it disappears', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       StateSnapshotEvent s(Map<String, dynamic> m) =>
           StateSnapshotEvent(snapshot: m);
       int count() => r.current.diagnostics
@@ -327,15 +327,15 @@ void main() {
       r.apply(s({'extra': 1}));
       r.apply(s({'extra': 2}));
       expect(count(), 1);
-      r.apply(s({'pocketcoder': <String, dynamic>{}}));
+      r.apply(s({'episutra': <String, dynamic>{}}));
       r.apply(s({'extra': 3}));
       expect(count(), 2);
     });
 
     test('M4: the permission-content dedupe set is bounded', () {
-      final r = ConversationReducer();
+      final r = ConversationReducer(namespace: 'episutra');
       StateSnapshotEvent s() => StateSnapshotEvent(snapshot: {
-            'pocketcoder': {
+            'episutra': {
               'permission': {
                 'requestId': 'p',
                 'content': [for (var i = 0; i < 501; i++) 'bad$i'],

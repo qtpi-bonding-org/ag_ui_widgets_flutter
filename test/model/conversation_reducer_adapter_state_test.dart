@@ -139,10 +139,10 @@ void main() {
       expect(kinds, hasLength(2));
     });
 
-    test('the single-slot `permission` shape still works (pocketcoder)', () {
-      final r = ConversationReducer()
+    test('the single-slot `permission` shape still works (episutra)', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(StateSnapshotEvent(snapshot: {
-          'pocketcoder': {'permission': _permission('tc1')},
+          'episutra': {'permission': _permission('tc1')},
         }));
       expect(_permissions(r).single.requestId, 'req-1');
     });
@@ -195,10 +195,10 @@ void main() {
       expect(_elicitations(r), isEmpty);
     });
 
-    test('the legacy string `mode` shape still works (pocketcoder)', () {
-      final r = ConversationReducer()
+    test('the legacy string `mode` shape still works (episutra)', () {
+      final r = ConversationReducer(namespace: 'episutra')
         ..apply(StateSnapshotEvent(snapshot: {
-          'pocketcoder': {
+          'episutra': {
             'elicitation': {
               'elicitationId': 'e9',
               'message': 'hi',

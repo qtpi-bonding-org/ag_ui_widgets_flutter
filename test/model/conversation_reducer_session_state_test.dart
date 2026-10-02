@@ -127,10 +127,10 @@ void main() {
     expect(r.current.sessionState.usage!.used, 3);
   });
 
-  test('the legacy single-slot shape (pocketcoder) is unaffected', () {
-    final r = ConversationReducer()
+  test('the legacy single-slot shape (episutra) is unaffected', () {
+    final r = ConversationReducer(namespace: 'episutra')
       ..apply(StateSnapshotEvent(snapshot: {
-        'pocketcoder': {
+        'episutra': {
           'session_info': {'title': 'PC'},
           'modes': {'x': 1}
         },

@@ -139,7 +139,7 @@ void main() {
     'tree (including the reducer key-collision fix — see '
     'conversation_reducer_test.dart).',
     (tester) async {
-      final reducer = ConversationReducer();
+      final reducer = ConversationReducer(namespace: 'episutra');
       Future<void> pumpEvent(ag_ui.BaseEvent event) async {
         reducer.apply(event);
         await tester.pumpWidget(host(reducer.current));

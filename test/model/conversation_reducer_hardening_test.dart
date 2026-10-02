@@ -130,4 +130,85 @@ void main() {
           returnsNormally);
     });
   });
+
+  group('I2-I4 state patch / snapshot hardening', () {
+    test('I2: replace of the namespace with a non-map is rejected untouched',
+        () {
+      final r = ConversationReducer()
+        ..apply(snap({
+          'agent': {'protocolVersion': 1},
+        }));
+      r.apply(delta([
+        {'op': 'replace', 'path': '/pocketcoder', 'value': 5},
+      ]));
+      expect(r.current.sessionState.agent?.protocolVersion, 1);
+      final d = r.current.diagnostics
+          .where((d) => d.kind == DiagnosticKind.malformedPayload)
+          .single;
+      expect(d.name, 'pocketcoder/patch');
+    });
+
+    test('I2: remove of the namespace clears, add of a map replaces', () {
+      final r = ConversationReducer()
+        ..apply(snap({
+          'agent': {'protocolVersion': 1},
+        }));
+      r.apply(delta([
+        {'op': 'remove', 'path': '/pocketcoder'},
+      ]));
+      expect(r.current.sessionState.agent, isNull);
+      expect(r.current.diagnostics, isEmpty);
+      r.apply(delta([
+        {
+          'op': 'replace',
+          'path': '/pocketcoder',
+          'value': {
+            'agent': {'protocolVersion': 2}
+          }
+        },
+      ]));
+      expect(r.current.sessionState.agent?.protocolVersion, 2);
+    });
+
+    test('I3: a snapshot whose namespace entry is not a map is diagnosed', () {
+      final r = ConversationReducer()
+        ..apply(snap({
+          'agent': {'protocolVersion': 1},
+        }));
+      r.apply(StateSnapshotEvent(snapshot: {'pocketcoder': 5}));
+      expect(r.current.sessionState.agent, isNull);
+      final d = r.current.diagnostics
+          .where((d) => d.kind == DiagnosticKind.malformedPayload)
+          .single;
+      expect(d.name, 'snapshot/pocketcoder');
+      expect(d.payload, 5);
+    });
+
+    test('I3: a snapshot with no namespace entry records nothing', () {
+      final r = ConversationReducer()
+        ..apply(StateSnapshotEvent(snapshot: {'pocketcoder': null}));
+      expect(r.current.diagnostics, isEmpty);
+    });
+
+    test('I4: remove through a missing parent creates no state', () {
+      final r = ConversationReducer();
+      r.apply(delta([
+        {'op': 'remove', 'path': '/pocketcoder/usage/used'},
+      ]));
+      expect(r.current.sessionState.usage, isNull);
+      expect(r.current.diagnostics, isEmpty);
+    });
+
+    test('I4: remove of an existing nested key still works', () {
+      final r = ConversationReducer()
+        ..apply(snap({
+          'usage': {'used': 5, 'size': 10},
+        }));
+      r.apply(delta([
+        {'op': 'remove', 'path': '/pocketcoder/usage/used'},
+      ]));
+      expect(r.current.sessionState.usage?.used, isNull);
+      expect(r.current.sessionState.usage?.size, 10);
+    });
+  });
 }

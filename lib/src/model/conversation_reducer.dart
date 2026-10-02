@@ -564,8 +564,14 @@ class ConversationReducer {
         _pocketcoder.clear();
         if (snapshot is Map) {
           final pocketcoder = snapshot[namespace];
-          _pocketcoder.addAll(
-              pocketcoder is Map ? Map<String, dynamic>.from(pocketcoder) : {});
+          if (pocketcoder is Map) {
+            _pocketcoder.addAll(Map<String, dynamic>.from(pocketcoder));
+          } else if (pocketcoder != null) {
+            // The snapshot stays authoritative (state is cleared), but a
+            // namespace entry that is not a map is a wire problem.
+            _diagnose(
+                DiagnosticKind.malformedPayload, 'snapshot/$namespace', pocketcoder);
+          }
         }
         _syncPermission();
         _syncElicitation();
@@ -914,10 +920,16 @@ class ConversationReducer {
     if (keys.isEmpty) {
       // The whole namespace at once — acp-agui-adapter sends every state
       // change as a `replace` of `/<namespace>` carrying the full state.
-      _pocketcoder.clear();
       final value = op['value'];
-      if (kind != 'remove' && value is Map) {
-        _pocketcoder.addAll(Map<String, dynamic>.from(value));
+      if (kind != 'remove' && value is! Map) {
+        // Not a state tree: leave the current state untouched and say so,
+        // rather than silently wiping everything.
+        _diagnose(DiagnosticKind.malformedPayload, '$namespace/patch', op);
+        return;
+      }
+      _pocketcoder.clear();
+      if (kind != 'remove') {
+        _pocketcoder.addAll(Map<String, dynamic>.from(value as Map));
       }
     } else if (!_setAt(_pocketcoder, keys, op['value'],
         remove: kind == 'remove')) {
@@ -947,7 +959,12 @@ class ConversationReducer {
     Object? probe = root;
     for (var i = 0; i < keys.length - 1; i++) {
       probe = (probe as Map)[keys[i]];
-      if (probe == null) break;
+      if (probe == null) {
+        // Removing through a parent that does not exist: nothing to remove,
+        // and the loop below must not create the missing parents.
+        if (remove) return true;
+        break;
+      }
       if (probe is! Map) return false;
     }
     var current = root;

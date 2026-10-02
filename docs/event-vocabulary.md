@@ -10,9 +10,9 @@ distinct payload (the dedupe set is bounded).
 `acp.*` and `acp:source` names are fixed protocol events and do not depend on
 configuration. `<namespace>:*` CUSTOM event names and the `/<namespace>` state
 tree (STATE_SNAPSHOT key, STATE_DELTA path prefix) belong to the backend and
-are selected with `ConversationReducer(namespace:)` (default `pocketcoder`;
-acp-agui-adapter backends such as episutra pass `episutra`). `isReplaceMarker`
-takes the same `namespace`.
+are selected with `ConversationReducer(namespace:)`, which is required (no
+default; acp-agui-adapter backends such as episutra pass `episutra`).
+`isReplaceMarker` and `reduce` take the same required `namespace`.
 
 The contract test (`test/model/adapter_contract_test.dart`) feeds the
 adapter's golden fixture through the reducer and fails on any new event name or
@@ -61,18 +61,14 @@ diagnostic (reported once until it parses again).
 |---|---|---|---|
 | `agent` | agent info | `SessionState.agent` (`AgentState`) | |
 | `mode` | current mode id and available modes | `SessionState.mode` (`ModeState`) | |
-| `commands` | available commands: a bare list of `{name, description}` (pocketcoder) or `{commands: [...]}` | `SessionState.commands` (`CommandsState`) | |
-| `config` | config options | `SessionState.configState` (`ConfigState`) | `SessionState.config` stays the legacy raw map of the same key. |
+| `commands` | available commands: `{commands: [...]}` (a bare list is `malformedPayload`) | `SessionState.commands` (`CommandsState`) | |
+| `config` | config options | `SessionState.configState` (`ConfigState`) | |
 | `usage` | token/context usage | `SessionState.usage` (`UsageState`) | |
 | `session_info` | title, `updated_at`, `meta` | `SessionState.sessionInfo` (`SessionInfo`); `title` also at `SessionState.title` | |
 | `plans` | `{by-id: {id: plan}, legacy?: plan}` | `SessionState.plans` (`PlansState`) | A list is `malformedPayload`. |
 | `permissions` | `{by-id: {toolCallId: {requestId, ...}}}` | `PermissionRequestTimelineItem` per entry (content, meta, sessionId, option extras, unknown keys in `extras`) | Cards no longer pending are removed; others updated in place. |
 | `elicitations` | `{by-id: {elicitationId: {...}}}` | `ElicitationRequestTimelineItem` per entry (`scope`, `meta`, tagged `mode` object kept as `rawMode`) | Same pending/removal rule. |
-| `permission` | single request map (legacy, pocketcoder) | same as one `permissions` entry; also `SessionState.permission` raw | |
-| `elicitation` | single request map (legacy) | same as one `elicitations` entry; also `SessionState.elicitation` raw | `mode` is a plain string with `requestedSchema`/`url` beside it. |
-| `modes` | raw map (legacy) | `SessionState.modes` raw | Not typed. |
-| `plan` | raw map (legacy) | `SessionState.plan` raw | Not typed. |
-| any other key | any | `Diagnostic(unknownStateKey)` `<namespace>/<key>`, once per key while present | |
+| any other key | any | `Diagnostic(unknownStateKey)` `<namespace>/<key>`, once per key while present | The former single-slot `permission`/`elicitation` and raw `modes`/`plan` keys are no longer read and land here. |
 
 Requests the app resolves via `resolveRequest(id)` stay suppressed across
 resets and replays.
@@ -82,6 +78,6 @@ resets and replays.
 - List-valued fields inside session models (modes, auth methods, commands,
   config options and their choices, plan entries, and `PlansState.byId`) are
   read with `asJsonMapList`, which silently drops entries that are not maps.
-- Elicitation `mode` defaults to `form` when absent or not a string.
+- Elicitation `mode` in `elicitations.by-id` is the tagged object `{kind, ...}`; absent or not an object it defaults to `form` with no schema/url. (The direct `acp.elicitation_request` event carries a plain string `mode`, defaulting to `form`.)
 - Typed fields read with `asString` are null when the wire value has the wrong
   type; the original value is not kept (only unknown keys are, in `extras`).

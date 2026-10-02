@@ -207,10 +207,6 @@ abstract class CommandsState with _$CommandsState {
       ];
 
   static CommandsState? parse(Object? raw) {
-    // pocketcoder sends the commands as a bare list of {name, description}.
-    if (raw is List) {
-      return CommandsState(commands: _commandsOf(raw));
-    }
     final m = asJsonMap(raw);
     if (m == null) return null;
     return CommandsState(

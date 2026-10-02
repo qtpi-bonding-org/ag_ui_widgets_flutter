@@ -81,8 +81,8 @@ void main() {
 
       r.apply(const TextMessageStartEvent(
           messageId: 'm1', role: TextMessageRole.user));
-      r.apply(const TextMessageContentEvent(
-          messageId: 'm1', delta: 'hello again'));
+      r.apply(
+          const TextMessageContentEvent(messageId: 'm1', delta: 'hello again'));
       r.apply(const TextMessageEndEvent(messageId: 'm1'));
 
       expect(r.current.timeline, hasLength(1));
@@ -292,7 +292,8 @@ void main() {
       expect(item.hasEnded, isFalse);
     });
 
-    test('a ToolCallEndEvent for an unknown toolCallId creates an orphan '
+    test(
+        'a ToolCallEndEvent for an unknown toolCallId creates an orphan '
         'entry already marked ended', () {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallEndEvent(toolCallId: 'unknown'));
@@ -383,7 +384,8 @@ void main() {
   });
 
   group('tool call kind', () {
-    CustomEvent toolEvent(String toolCallId, {String? title, String? kind, String status = 'in_progress'}) =>
+    CustomEvent toolEvent(String toolCallId,
+            {String? title, String? kind, String status = 'in_progress'}) =>
         CustomEvent(name: 'episutra:tool', value: {
           'toolCallId': toolCallId,
           if (title != null) 'title': title,
@@ -394,12 +396,14 @@ void main() {
 
     test('episutra:tool event sets toolKind on the matching tool call', () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute'));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
       expect(item.toolKind, 'execute');
-      expect(item.name, 'shell', reason: 'a non-empty existing name is not overwritten');
+      expect(item.name, 'shell',
+          reason: 'a non-empty existing name is not overwritten');
     });
 
     test('episutra:tool event backfills an empty name from title', () {
@@ -425,19 +429,25 @@ void main() {
       expect(item.name, 'Run shell command');
     });
 
-    test('a episutra:tool event with a non-Map value or missing toolCallId is a no-op', () {
+    test(
+        'a episutra:tool event with a non-Map value or missing toolCallId is a no-op',
+        () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(const CustomEvent(name: 'episutra:tool', value: 'not a map'))
-        ..apply(const CustomEvent(name: 'episutra:tool', value: {'kind': 'execute'}));
+        ..apply(const CustomEvent(
+            name: 'episutra:tool', value: {'kind': 'execute'}));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
       expect(item.toolKind, isNull);
     });
 
-    test('episutra:tool event with status "failed" marks the tool call failed', () {
+    test('episutra:tool event with status "failed" marks the tool call failed',
+        () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute', status: 'failed'));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
@@ -447,7 +457,8 @@ void main() {
 
     test('episutra:tool event with status "completed" is not failed', () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute', status: 'completed'));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
@@ -455,36 +466,45 @@ void main() {
       expect(item.isFailed, isFalse);
     });
 
-    test('a later in_progress status does not erase an earlier failed status', () {
+    test('a later in_progress status does not erase an earlier failed status',
+        () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
         ..apply(toolEvent('t1', kind: 'execute', status: 'failed'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'));
 
       final item = r.current.timeline.single as ToolCallTimelineItem;
       expect(item.status, 'failed');
-      expect(item.isFailed, isTrue, reason: 'TOOL_CALL_END must not clear a known failure status');
+      expect(item.isFailed, isTrue,
+          reason: 'TOOL_CALL_END must not clear a known failure status');
     });
   });
 
   group('permission/elicitation via state delta', () {
-    group('elicitation (Adapter A: episutra StateDelta)', () {
+    group('elicitation (state-sync: by-id map)', () {
       test(
-          'StateSnapshot with /episutra/elicitation produces a full-payload item',
+          'StateSnapshot with /episutra/elicitations/by-id produces a full-payload item',
           () {
         final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
           'episutra': {
-            'elicitation': {
-              'elicitationId': 'e1',
-              'message': 'Pick a color',
-              'mode': 'form',
-              'requestedSchema': {
-                'type': 'object',
-                'properties': {
-                  'color': {'type': 'string'}
+            'elicitations': {
+              'by-id': {
+                'e1': {
+                  'elicitationId': 'e1',
+                  'message': 'Pick a color',
+                  'mode': {
+                    'kind': 'form',
+                    'schema': {
+                      'type': 'object',
+                      'properties': {
+                        'color': {'type': 'string'}
+                      }
+                    },
+                  },
                 }
-              },
+              }
             }
           }
         }));
@@ -507,11 +527,14 @@ void main() {
         final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
           'episutra': {
-            'elicitation': {
-              'elicitationId': 'e2',
-              'message': 'Open this link',
-              'mode': 'url',
-              'url': 'https://example.com/auth',
+            'elicitations': {
+              'by-id': {
+                'e2': {
+                  'elicitationId': 'e2',
+                  'message': 'Open this link',
+                  'mode': {'kind': 'url', 'url': 'https://example.com/auth'},
+                }
+              }
             }
           }
         }));
@@ -523,20 +546,28 @@ void main() {
       });
     });
 
-    group('permission (Adapter A: episutra StateDelta)', () {
+    group('permission (state-sync: by-id map)', () {
       test(
-          'StateSnapshot with /episutra/permission produces a full-payload item (toolTitle null today)',
+          'StateSnapshot with /episutra/permissions/by-id produces a full-payload item (toolTitle null today)',
           () {
         final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
           'episutra': {
-            'permission': {
-              'requestId': 'p1',
-              'status': 'pending',
-              'options': [
-                {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
-                {'optionId': 'deny', 'name': 'Deny', 'kind': 'reject_once'},
-              ],
+            'permissions': {
+              'by-id': {
+                'p1': {
+                  'requestId': 'p1',
+                  'status': 'pending',
+                  'options': [
+                    {
+                      'optionId': 'allow',
+                      'name': 'Allow',
+                      'kind': 'allow_once'
+                    },
+                    {'optionId': 'deny', 'name': 'Deny', 'kind': 'reject_once'},
+                  ],
+                }
+              }
             }
           }
         }));
@@ -558,14 +589,22 @@ void main() {
         final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
           'episutra': {
-            'permission': {
-              'requestId': 'p2',
-              'status': 'pending',
-              'title': 'Run shell command',
-              'kind': 'execute',
-              'options': [
-                {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
-              ],
+            'permissions': {
+              'by-id': {
+                'p2': {
+                  'requestId': 'p2',
+                  'status': 'pending',
+                  'title': 'Run shell command',
+                  'kind': 'execute',
+                  'options': [
+                    {
+                      'optionId': 'allow',
+                      'name': 'Allow',
+                      'kind': 'allow_once'
+                    },
+                  ],
+                }
+              }
             }
           }
         }));
@@ -578,20 +617,28 @@ void main() {
           'correlates toolCallId to the matching tool call\'s own args, '
           'since the permission payload never carries them directly', () {
         final r = ConversationReducer(namespace: 'episutra')
-          ..apply(const ToolCallStartEvent(
-              toolCallId: 't1', toolCallName: 'shell'))
+          ..apply(
+              const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
           ..apply(const ToolCallArgsEvent(
               toolCallId: 't1', delta: '{"command":"echo hi"}'));
         r.apply(const StateSnapshotEvent(snapshot: {
           'episutra': {
-            'permission': {
-              'requestId': 'p3',
-              'status': 'pending',
-              'toolCallId': 't1',
-              'kind': 'execute',
-              'options': [
-                {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
-              ],
+            'permissions': {
+              'by-id': {
+                'p3': {
+                  'requestId': 'p3',
+                  'status': 'pending',
+                  'toolCallId': 't1',
+                  'kind': 'execute',
+                  'options': [
+                    {
+                      'optionId': 'allow',
+                      'name': 'Allow',
+                      'kind': 'allow_once'
+                    },
+                  ],
+                }
+              }
             }
           }
         }));
@@ -602,16 +649,19 @@ void main() {
         expect(item.toolArgs, '{"command":"echo hi"}');
       });
 
-      test('toolArgs is null when toolCallId has no correlated tool call',
-          () {
+      test('toolArgs is null when toolCallId has no correlated tool call', () {
         final r = ConversationReducer(namespace: 'episutra');
         r.apply(const StateSnapshotEvent(snapshot: {
           'episutra': {
-            'permission': {
-              'requestId': 'p4',
-              'status': 'pending',
-              'toolCallId': 'does-not-exist',
-              'options': [],
+            'permissions': {
+              'by-id': {
+                'p4': {
+                  'requestId': 'p4',
+                  'status': 'pending',
+                  'toolCallId': 'does-not-exist',
+                  'options': [],
+                }
+              }
             }
           }
         }));
@@ -626,7 +676,7 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'write_file'))
-        ..apply(_delta('/episutra/permission',
+        ..apply(_delta('/episutra/permissions/by-id/p1',
             value: {'requestId': 'p1', 'toolCallId': 't1'}));
 
       expect(r.current.timeline, hasLength(2));
@@ -637,8 +687,8 @@ void main() {
 
     test('elicitation sub-path add appends a marker at the end', () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(
-            _delta('/episutra/elicitation', value: {'elicitationId': 'e1'}));
+        ..apply(_delta('/episutra/elicitations/by-id/e1',
+            value: {'elicitationId': 'e1'}));
 
       expect(r.current.timeline, hasLength(1));
       expect(
@@ -655,12 +705,16 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       const snapshot = StateSnapshotEvent(snapshot: {
         'episutra': {
-          'permission': {
-            'requestId': 'p1',
-            'status': 'pending',
-            'options': [
-              {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}
-            ],
+          'permissions': {
+            'by-id': {
+              'p1': {
+                'requestId': 'p1',
+                'status': 'pending',
+                'options': [
+                  {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}
+                ],
+              }
+            }
           }
         }
       });
@@ -680,7 +734,15 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       const snapshot = StateSnapshotEvent(snapshot: {
         'episutra': {
-          'elicitation': {'elicitationId': 'e1', 'message': 'm', 'mode': 'form'}
+          'elicitations': {
+            'by-id': {
+              'e1': {
+                'elicitationId': 'e1',
+                'message': 'm',
+                'mode': {'kind': 'form'}
+              }
+            }
+          }
         }
       });
       r.apply(snapshot);
@@ -688,8 +750,8 @@ void main() {
       expect(r.current.timeline, isEmpty);
 
       // Reconnect replay: cold-replay marker, then the same snapshot again.
-      r.apply(const CustomEvent(
-          name: 'episutra:sync', value: {'mode': 'replace'}));
+      r.apply(
+          const CustomEvent(name: 'episutra:sync', value: {'mode': 'replace'}));
       r.apply(snapshot);
       expect(r.current.timeline, isEmpty,
           reason:
@@ -723,7 +785,8 @@ void main() {
         'that same id (protocol-level, not a coincidence) for toolCallId/'
         'toolArgs', () {
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(const ToolCallStartEvent(toolCallId: 'p2', toolCallName: 'bash'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 'p2', toolCallName: 'bash'))
         ..apply(const ToolCallArgsEvent(
             toolCallId: 'p2', delta: '{"command":"ls -la"}'));
       r.apply(const CustomEvent(name: 'acp.permission_request', value: {
@@ -731,14 +794,14 @@ void main() {
         'toolName': 'bash',
         'optionsJson': '[]',
       }));
-      final item = r.current.timeline
-          .whereType<PermissionRequestTimelineItem>()
-          .single;
+      final item =
+          r.current.timeline.whereType<PermissionRequestTimelineItem>().single;
       expect(item.toolCallId, 'p2');
       expect(item.toolArgs, '{"command":"ls -la"}');
     });
 
-    test('client_execute_request args sent as a JSON object are re-encoded', () {
+    test('client_execute_request args sent as a JSON object are re-encoded',
+        () {
       final r = ConversationReducer(namespace: 'episutra');
       r.apply(const CustomEvent(name: 'acp.client_execute_request', value: {
         'callId': 't1',
@@ -840,12 +903,16 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       r.apply(const StateSnapshotEvent(snapshot: {
         'episutra': {
-          'permission': {
-            'requestId': 'a1',
-            'status': 'pending',
-            'options': [
-              {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}
-            ],
+          'permissions': {
+            'by-id': {
+              'a1': {
+                'requestId': 'a1',
+                'status': 'pending',
+                'options': [
+                  {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}
+                ],
+              }
+            }
           }
         }
       }));
@@ -861,12 +928,16 @@ void main() {
       // wipe Adapter B's b1 item.
       r.apply(const StateSnapshotEvent(snapshot: {
         'episutra': {
-          'permission': {
-            'requestId': 'a1',
-            'status': 'pending',
-            'options': [
-              {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}
-            ],
+          'permissions': {
+            'by-id': {
+              'a1': {
+                'requestId': 'a1',
+                'status': 'pending',
+                'options': [
+                  {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'}
+                ],
+              }
+            }
           }
         }
       }));
@@ -896,8 +967,7 @@ void main() {
     });
   });
 
-  group(
-      'run lifecycle (new — episutra had no equivalent before this package)',
+  group('run lifecycle (new — episutra had no equivalent before this package)',
       () {
     // NOTE: RunStartedEvent/RunFinishedEvent require threadId/runId (not
     // const-constructible with zero args) and ToolCallResultEvent requires
@@ -1025,7 +1095,11 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       r.apply(const StateSnapshotEvent(snapshot: {
         'episutra': {
-          'permission': {'requestId': 'p1', 'status': 'pending', 'options': []}
+          'permissions': {
+            'by-id': {
+              'p1': {'requestId': 'p1', 'status': 'pending', 'options': []}
+            }
+          }
         }
       }));
       expect(
@@ -1036,7 +1110,11 @@ void main() {
       );
       r.apply(const StateSnapshotEvent(snapshot: {
         'episutra': {
-          'permission': {'requestId': 'p2', 'status': 'pending', 'options': []}
+          'permissions': {
+            'by-id': {
+              'p2': {'requestId': 'p2', 'status': 'pending', 'options': []}
+            }
+          }
         }
       }));
       expect(
@@ -1133,14 +1211,18 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(const TextMessageStartEvent(
             messageId: 'm1', role: TextMessageRole.assistant))
-        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
+        ..apply(
+            const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
         ..apply(const TextMessageEndEvent(messageId: 'm1'))
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
-        ..apply(const ToolCallResultEvent(messageId: 'm1', toolCallId: 't1', content: 'ok'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(const ToolCallResultEvent(
+            messageId: 'm1', toolCallId: 't1', content: 'ok'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'))
         ..apply(const TextMessageStartEvent(
             messageId: 'm2', role: TextMessageRole.assistant))
-        ..apply(const TextMessageContentEvent(messageId: 'm2', delta: 'summary'))
+        ..apply(
+            const TextMessageContentEvent(messageId: 'm2', delta: 'summary'))
         ..apply(const TextMessageEndEvent(messageId: 'm2'));
 
       final ids = r.current.timeline.map((i) => switch (i) {
@@ -1154,19 +1236,22 @@ void main() {
     test(
         "a second text message REUSING the first message's id after a tool "
         "call in between does not relocate it after the tool -- content "
-        "updates in place at the id's original (pre-tool) position",
-        () {
+        "updates in place at the id's original (pre-tool) position", () {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(const TextMessageStartEvent(
             messageId: 'm1', role: TextMessageRole.assistant))
-        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
+        ..apply(
+            const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
         ..apply(const TextMessageEndEvent(messageId: 'm1'))
-        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
-        ..apply(const ToolCallResultEvent(messageId: 'm1', toolCallId: 't1', content: 'ok'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(const ToolCallResultEvent(
+            messageId: 'm1', toolCallId: 't1', content: 'ok'))
         ..apply(const ToolCallEndEvent(toolCallId: 't1'))
         ..apply(const TextMessageStartEvent(
             messageId: 'm1', role: TextMessageRole.assistant))
-        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'summary'))
+        ..apply(
+            const TextMessageContentEvent(messageId: 'm1', delta: 'summary'))
         ..apply(const TextMessageEndEvent(messageId: 'm1'));
 
       final ids = r.current.timeline.map((i) => switch (i) {

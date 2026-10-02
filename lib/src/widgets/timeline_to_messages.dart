@@ -18,7 +18,7 @@ List<chat_core.Message> timelineToMessages(List<TimelineItem> timeline) {
     // (see conversation_reducer.dart's case for that event — the ACP
     // protocol sets callId = the tool call's own id), so it must be
     // collected unconditionally, not only via the separate toolCallId field
-    // below (which only Adapter A/pocketcoder's state-sync path sets). Both
+    // below (which only the state-sync path sets). Both
     // items now legitimately coexist in ConversationReducer's timeline
     // (they no longer overwrite each other — see that reducer case's doc
     // comment), so without this, converting both to Messages would produce

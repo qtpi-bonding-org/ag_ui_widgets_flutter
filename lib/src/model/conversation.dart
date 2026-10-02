@@ -83,7 +83,7 @@ sealed class TimelineItem with _$TimelineItem {
   /// that ends with no result at all (e.g. rejected by a sandbox) still
   /// resolves out of "running" instead of spinning forever.
   /// [status] mirrors ACP's `ToolCallStatus` string ("pending"/"in_progress"/
-  /// "completed"/"failed") as forwarded by the `pocketcoder:tool` CUSTOM
+  /// "completed"/"failed") as forwarded by the `<namespace>:tool` CUSTOM
   /// event; null until that event's first arrival. [isFailed] is the
   /// UI-facing check on it.
   const factory TimelineItem.toolCall({
@@ -185,17 +185,10 @@ sealed class TimelineItem with _$TimelineItem {
 }
 
 /// Ambient session-wide state, sourced from `StateSnapshotEvent`/
-/// `StateDeltaEvent` plus run-lifecycle events. `modes`/`config`/`plan` are
-/// intentionally untyped maps — their shape is backend-specific and not
-/// this package's concern (see design spec's transport-boundary section).
+/// `StateDeltaEvent` plus run-lifecycle events.
 @freezed
 sealed class SessionState with _$SessionState {
   const factory SessionState({
-    Map<String, dynamic>? permission,
-    Map<String, dynamic>? elicitation,
-    Map<String, dynamic>? modes,
-    Map<String, dynamic>? config,
-    Map<String, dynamic>? plan,
     String? title,
     @Default(false) bool isRunning,
 

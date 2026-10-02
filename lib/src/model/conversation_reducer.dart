@@ -52,7 +52,7 @@ class ConversationReducer {
   final Map<String, dynamic> _state = {};
 
   /// Ids of permission/elicitation cards currently shown *because* the
-  /// pocketcoder state-sync path (`_syncPermission`/`_syncElicitation`)
+  /// state-sync path (`_syncPermission`/`_syncElicitation`)
   /// put them there — as opposed to a direct `acp.permission_request`/
   /// `acp.elicitation_request` CustomEvent, which is a different source
   /// entirely. `_syncPermission`/`_syncElicitation` only ever remove/replace
@@ -315,7 +315,7 @@ class ConversationReducer {
 
       case ag_ui.ToolCallStartEvent():
         // Merges into any entry already synthesized by an earlier
-        // pocketcoder:tool/diff/etc. event instead of overwriting it — a
+        // <namespace>:tool/diff/etc. event instead of overwriting it — a
         // fresh construction here would clobber toolKind/diffs/result that
         // arrived before this event (see the reducer test covering that
         // ordering).
@@ -639,7 +639,7 @@ class ConversationReducer {
   void _reset() {
     // _resolvedIds is deliberately NOT cleared here — see resolveRequest's
     // doc comment. Clearing it would resurrect already-resolved
-    // permission/elicitation/tool-request cards on every pocketcoder
+    // permission/elicitation/tool-request cards on every
     // reconnect replay, since the backend never clears its own state.
     // _adapterAIds is likewise left untouched, matching the pre-rewrite
     // reducer's _reset (it never cleared _adapterAIds either).
@@ -776,16 +776,11 @@ class ConversationReducer {
   static const _knownStateKeys = {
     'agent', 'mode', 'commands', 'config', 'usage', 'session_info', 'plans',
     'permissions', 'elicitations',
-    // legacy single-slot shape
-    'permission', 'elicitation', 'modes', 'plan',
   };
 
-  /// Pending state entries of one kind, from both wire shapes: the legacy
-  /// single slot (`<legacyKey>`, one entry — pocketcoder) and the keyed map
+  /// Pending state entries of one kind, from the keyed map
   /// (`<byIdKey>.by-id`, any number pending at once — acp-agui-adapter).
-  Iterable<Map> _stateEntries(String legacyKey, String byIdKey) sync* {
-    final legacy = _state[legacyKey];
-    if (legacy is Map) yield legacy;
+  Iterable<Map> _stateEntries(String byIdKey) sync* {
     final keyed = _state[byIdKey];
     final byId = keyed is Map ? keyed['by-id'] : null;
     if (byId is Map) {
@@ -800,7 +795,7 @@ class ConversationReducer {
   // (a usage tick, a mode change), so removing and re-adding every card would
   // hand each a fresh order key and move it to the end of the timeline.
   void _syncPermission() {
-    final entries = _stateEntries('permission', 'permissions').toList();
+    final entries = _stateEntries('permissions').toList();
     final pending = {
       for (final e in entries)
         if (e['requestId'] is String) e['requestId'] as String,
@@ -869,7 +864,7 @@ class ConversationReducer {
   }
 
   void _syncElicitation() {
-    final entries = _stateEntries('elicitation', 'elicitations').toList();
+    final entries = _stateEntries('elicitations').toList();
     final pending = {
       for (final e in entries)
         if (e['elicitationId'] is String) e['elicitationId'] as String,
@@ -885,9 +880,7 @@ class ConversationReducer {
     if (requestId is! String) return;
     if (_resolvedIds.contains(requestId)) return;
     final message = asString(elicitation['message']) ?? '';
-    // `mode` is a plain string with `requestedSchema`/`url` beside it
-    // (pocketcoder), or a tagged object — `{kind: form, schema}` /
-    // `{kind: url, url}` (acp-agui-adapter).
+    // `mode` is a tagged object — `{kind: form, schema}` / `{kind: url, url}`.
     final rawMode = elicitation['mode'];
     final String mode;
     final Object? schema;
@@ -897,9 +890,9 @@ class ConversationReducer {
       schema = rawMode['schema'];
       url = asString(rawMode['url']);
     } else {
-      mode = asString(rawMode) ?? 'form';
-      schema = elicitation['requestedSchema'];
-      url = asString(elicitation['url']);
+      mode = 'form';
+      schema = null;
+      url = null;
     }
     _adapterAIds.add(requestId);
     _upsert(
@@ -914,23 +907,23 @@ class ConversationReducer {
         scope: ElicitationScope.parse(elicitation['scope']),
         meta: asJsonMap(elicitation['meta']),
         rawMode: rawMode is Map ? Map<String, dynamic>.from(rawMode) : null,
-        extras: extrasOf(Map<String, dynamic>.from(elicitation), const {'elicitationId', 'message', 'mode', 'scope', 'meta', 'requestedSchema', 'url'}),
+        extras: extrasOf(Map<String, dynamic>.from(elicitation), const {'elicitationId', 'message', 'mode', 'scope', 'meta'}),
       ),
     );
   }
 
   /// Resolves a pending permission/elicitation/tool-request: removes it from
   /// the timeline immediately, and remembers it as resolved so a later
-  /// replay of the same backend state (pocketcoder's backend never clears
-  /// its own /pocketcoder/<ns> namespace server-side — see the design spec's
+  /// replay of the same backend state (a backend that never clears
+  /// its own state namespace server-side — see the design spec's
   /// "Resolution" section) does not resurrect it. Survives `_reset()`
   /// deliberately — see that method.
   void resolveRequest(String requestId) {
     _resolvedIds.add(requestId);
-    // The bare `requestId` key may belong to an Adapter A (pocketcoder
-    // state-sync) permission/elicitation card, which still use bare keys —
-    // pocketcoder's own `requestId` is a distinct id from its `toolCallId`
-    // field, so no collision risk there, unlike Adapter B below. But for a
+    // The bare `requestId` key may belong to a state-sync
+    // permission/elicitation card, which uses bare keys — its `requestId`
+    // is a distinct id from its `toolCallId` field, so no collision risk
+    // there, unlike the direct-event path below. But for a
     // resolved tool-request, `requestId` is the same value as its tool
     // call's own key (`callId`), and that ToolCallTimelineItem must NOT be
     // removed. Only remove the bare key when it actually holds a
@@ -941,10 +934,10 @@ class ConversationReducer {
       _removeKey(requestId);
     }
     _removeKey('req:$requestId');
-    // Adapter B's direct `acp.permission_request` CustomEvent path (unlike
-    // Adapter A above) stores at 'perm:$requestId', not the bare key — see
+    // The direct `acp.permission_request` CustomEvent path (unlike the
+    // state-sync path above) stores at 'perm:$requestId', not the bare key — see
     // that case in apply()'s doc comment for why. Harmless no-op if this
-    // requestId was never an Adapter B permission (or already resolved).
+    // requestId was never a direct-event permission (or already resolved).
     _removeKey('perm:$requestId');
     _adapterAIds.remove(requestId);
   }
@@ -1044,14 +1037,7 @@ class ConversationReducer {
   }
 
   SessionState _sessionState() {
-    Map<String, dynamic>? asMap(dynamic v) =>
-        v is Map ? Map<String, dynamic>.from(v) : null;
     return SessionState(
-      permission: asMap(_state['permission']),
-      elicitation: asMap(_state['elicitation']),
-      modes: asMap(_state['modes']),
-      config: asMap(_state['config']),
-      plan: asMap(_state['plan']),
       title: _sessionInfo?.title,
       isRunning: _isRunning,
       isStarting: _isStarting,
@@ -1074,7 +1060,7 @@ class ConversationReducer {
 }
 
 /// Convenience wrapper for callers holding a full event list (e.g.
-/// pocketcoder's cache-replay `AgentChatRepository.watch()` — see Task 8).
+/// a cache-replay `AgentChatRepository.watch()` — see Task 8).
 /// Equivalent to constructing a fresh [ConversationReducer] and applying
 /// every event in order.
 Conversation reduce(

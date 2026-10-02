@@ -64,7 +64,8 @@ void main() {
       expect(card.toolCallId, 'tc1');
       expect(card.toolTitle, 'Run ls');
       expect(card.toolKind, 'execute');
-      expect(card.options.map((o) => o.optionId), ['allow_once', 'reject_once']);
+      expect(
+          card.options.map((o) => o.optionId), ['allow_once', 'reject_once']);
       expect(card.options.map((o) => o.label), ['Allow', 'Deny']);
     });
 
@@ -88,7 +89,8 @@ void main() {
           'tc1': _permission('tc1', requestId: 'req-1'),
           'tc2': _permission('tc2', requestId: 'req-2', title: 'Write file'),
         })));
-      expect(_permissions(r).map((p) => p.requestId).toSet(), {'req-1', 'req-2'});
+      expect(
+          _permissions(r).map((p) => p.requestId).toSet(), {'req-1', 'req-2'});
     });
 
     test('resolving one of several leaves the others', () {
@@ -115,8 +117,10 @@ void main() {
 
     test('toolArgs are correlated from the matching tool call', () {
       final r = ConversationReducer(namespace: _ns)
-        ..apply(const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'bash'))
-        ..apply(const ToolCallArgsEvent(toolCallId: 'tc1', delta: '{"cmd":"ls"}'))
+        ..apply(
+            const ToolCallStartEvent(toolCallId: 'tc1', toolCallName: 'bash'))
+        ..apply(
+            const ToolCallArgsEvent(toolCallId: 'tc1', delta: '{"cmd":"ls"}'))
         ..apply(_snapshot(_state(permissions: {'tc1': _permission('tc1')})));
       expect(_permissions(r).single.toolArgs, '{"cmd":"ls"}');
     });
@@ -139,12 +143,19 @@ void main() {
       expect(kinds, hasLength(2));
     });
 
-    test('the single-slot `permission` shape still works (episutra)', () {
+    test(
+        'the legacy single-slot `permission` key is reported once and '
+        'renders nothing', () {
+      final slot = {
+        'episutra': {'permission': _permission('tc1')}
+      };
       final r = ConversationReducer(namespace: 'episutra')
-        ..apply(StateSnapshotEvent(snapshot: {
-          'episutra': {'permission': _permission('tc1')},
-        }));
-      expect(_permissions(r).single.requestId, 'req-1');
+        ..apply(StateSnapshotEvent(snapshot: slot))
+        ..apply(StateSnapshotEvent(snapshot: slot));
+      expect(_permissions(r), isEmpty);
+      final d = r.current.diagnostics.single;
+      expect(d.kind, DiagnosticKind.unknownStateKey);
+      expect(d.name, 'episutra/permission');
     });
   });
 
@@ -195,21 +206,43 @@ void main() {
       expect(_elicitations(r), isEmpty);
     });
 
-    test('the legacy string `mode` shape still works (episutra)', () {
-      final r = ConversationReducer(namespace: 'episutra')
-        ..apply(StateSnapshotEvent(snapshot: {
-          'episutra': {
-            'elicitation': {
-              'elicitationId': 'e9',
-              'message': 'hi',
-              'mode': 'form',
-              'requestedSchema': {'type': 'object'},
-            },
+    test(
+        'the legacy single-slot `elicitation` key is reported once and '
+        'renders nothing', () {
+      final slot = {
+        'episutra': {
+          'elicitation': {
+            'elicitationId': 'e9',
+            'message': 'hi',
+            'mode': 'form',
+            'requestedSchema': {'type': 'object'},
           },
-        }));
+        },
+      };
+      final r = ConversationReducer(namespace: 'episutra')
+        ..apply(StateSnapshotEvent(snapshot: slot))
+        ..apply(StateSnapshotEvent(snapshot: slot));
+      expect(_elicitations(r), isEmpty);
+      final d = r.current.diagnostics.single;
+      expect(d.kind, DiagnosticKind.unknownStateKey);
+      expect(d.name, 'episutra/elicitation');
+    });
+
+    test('a string `mode` (legacy shape) is not read: no schema, no url', () {
+      final r = ConversationReducer(namespace: _ns)
+        ..apply(_snapshot(_state(elicitations: {
+          'e9': {
+            'elicitationId': 'e9',
+            'message': 'hi',
+            'mode': 'url',
+            'requestedSchema': {'type': 'object'},
+            'url': 'https://example.com/x',
+          },
+        })));
       final e = _elicitations(r).single;
       expect(e.mode, 'form');
-      expect(e.schema, {'type': 'object'});
+      expect(e.schema, isNull);
+      expect(e.url, isNull);
     });
   });
 

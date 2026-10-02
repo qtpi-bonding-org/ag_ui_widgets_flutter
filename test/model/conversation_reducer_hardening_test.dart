@@ -11,16 +11,21 @@ StateDeltaEvent delta(List<Map<String, dynamic>> ops) =>
 
 void main() {
   group('I1 wrong-typed wire fields never throw', () {
-    test('permission with non-string title/kind applies and later replaces work',
+    test(
+        'permission with non-string title/kind applies and later replaces work',
         () {
       final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(snap({
-                'permission': {
-                  'requestId': 'p1',
-                  'title': 5,
-                  'kind': 6,
-                  'options': [],
+                'permissions': {
+                  'by-id': {
+                    'p1': {
+                      'requestId': 'p1',
+                      'title': 5,
+                      'kind': 6,
+                      'options': [],
+                    },
+                  },
                 },
               })),
           returnsNormally);
@@ -28,7 +33,11 @@ void main() {
       expect(item.toolTitle, isNull);
       expect(item.toolKind, isNull);
       r.apply(snap({
-        'permission': {'requestId': 'p1', 'title': 'ok', 'options': []},
+        'permissions': {
+          'by-id': {
+            'p1': {'requestId': 'p1', 'title': 'ok', 'options': []},
+          },
+        },
       }));
       item = r.current.timeline.single as PermissionRequestTimelineItem;
       expect(item.toolTitle, 'ok');
@@ -38,11 +47,14 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       expect(
           () => r.apply(snap({
-                'elicitation': {
-                  'elicitationId': 'e1',
-                  'message': 5,
-                  'mode': 7,
-                  'url': 8,
+                'elicitations': {
+                  'by-id': {
+                    'e1': {
+                      'elicitationId': 'e1',
+                      'message': 5,
+                      'mode': 7,
+                    },
+                  },
                 },
               })),
           returnsNormally);
@@ -52,9 +64,13 @@ void main() {
       expect(e.url, isNull);
       expect(
           () => r.apply(snap({
-                'elicitation': {
-                  'elicitationId': 'e1',
-                  'mode': {'kind': 5, 'url': 6, 'schema': {}},
+                'elicitations': {
+                  'by-id': {
+                    'e1': {
+                      'elicitationId': 'e1',
+                      'mode': {'kind': 5, 'url': 6, 'schema': {}},
+                    },
+                  },
                 },
               })),
           returnsNormally);
@@ -71,7 +87,10 @@ void main() {
 
     test('session_info with a non-string title does not throw', () {
       final r = ConversationReducer(namespace: 'episutra');
-      expect(() => r.apply(snap({'session_info': {'title': 5}})),
+      expect(
+          () => r.apply(snap({
+                'session_info': {'title': 5}
+              })),
           returnsNormally);
       expect(() => r.current, returnsNormally);
       expect(r.current.sessionState.title, isNull);
@@ -80,7 +99,8 @@ void main() {
     test('direct permission event with non-string fields applies', () {
       final r = ConversationReducer(namespace: 'episutra');
       expect(
-          () => r.apply(const CustomEvent(name: 'acp.permission_request', value: {
+          () =>
+              r.apply(const CustomEvent(name: 'acp.permission_request', value: {
                 'callId': 'c1',
                 'optionsJson': '[{"id":5,"label":6,"kind":7}]',
                 'toolName': 5,
@@ -95,13 +115,15 @@ void main() {
     test('malformed optionsJson is diagnosed, not thrown', () {
       final r = ConversationReducer(namespace: 'episutra');
       expect(
-          () => r.apply(const CustomEvent(name: 'acp.permission_request', value: {
+          () =>
+              r.apply(const CustomEvent(name: 'acp.permission_request', value: {
                 'callId': 'c1',
                 'optionsJson': '{not json',
               })),
           returnsNormally);
       expect(
-          () => r.apply(const CustomEvent(name: 'acp.permission_request', value: {
+          () =>
+              r.apply(const CustomEvent(name: 'acp.permission_request', value: {
                 'callId': 'c2',
                 'optionsJson': 5,
               })),
@@ -116,7 +138,8 @@ void main() {
         () {
       final r = ConversationReducer(namespace: 'episutra');
       expect(
-          () => r.apply(const CustomEvent(name: 'acp.elicitation_request', value: {
+          () => r.apply(
+                  const CustomEvent(name: 'acp.elicitation_request', value: {
                 'requestId': 'e1',
                 'message': 5,
                 'mode': 5,
@@ -212,20 +235,23 @@ void main() {
     });
   });
 
-  group('I5 commands as a bare list', () {
-    test('a bare list of commands parses, with no diagnostic', () {
+  group('I5 commands shape', () {
+    test('a bare list of commands is malformedPayload, reported once', () {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(snap({
           'commands': [
             {'name': 'help', 'description': 'Show help'},
-            'junk',
-            {'name': 'x'},
+          ],
+        }))
+        ..apply(snap({
+          'commands': [
+            {'name': 'help', 'description': 'Show help'},
           ],
         }));
-      final c = r.current.sessionState.commands!;
-      expect(c.commands.map((e) => e.name), ['help', 'x']);
-      expect(c.commands.first.description, 'Show help');
-      expect(r.current.diagnostics, isEmpty);
+      expect(r.current.sessionState.commands, isNull);
+      final d = r.current.diagnostics.single;
+      expect(d.kind, DiagnosticKind.malformedPayload);
+      expect(d.name, 'episutra/commands');
     });
 
     test('the map shape still parses', () {
@@ -254,8 +280,8 @@ void main() {
         r.apply(CustomEvent(name: name, value: const {'x': 1}));
         final ds = r.current.diagnostics;
         expect(ds, hasLength(2));
-        expect(ds.every((d) => d.kind == DiagnosticKind.malformedPayload),
-            isTrue);
+        expect(
+            ds.every((d) => d.kind == DiagnosticKind.malformedPayload), isTrue);
         expect(ds.every((d) => d.name == name), isTrue);
         expect(r.current.timeline, isEmpty);
       });
@@ -310,8 +336,7 @@ void main() {
           ],
         }))
         ..apply(const CustomEvent(
-            name: 'episutra:tool',
-            value: {'toolCallId': 't', 'locations': 5}));
+            name: 'episutra:tool', value: {'toolCallId': 't', 'locations': 5}));
       final t = r.current.timeline.single as ToolCallTimelineItem;
       expect(t.locations.single.path, 'a.dart');
       expect(r.current.diagnostics.single.name, 'episutra:tool/locations');
@@ -321,9 +346,8 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       StateSnapshotEvent s(Map<String, dynamic> m) =>
           StateSnapshotEvent(snapshot: m);
-      int count() => r.current.diagnostics
-          .where((d) => d.name == 'snapshot/extra')
-          .length;
+      int count() =>
+          r.current.diagnostics.where((d) => d.name == 'snapshot/extra').length;
       r.apply(s({'extra': 1}));
       r.apply(s({'extra': 2}));
       expect(count(), 1);
@@ -336,9 +360,13 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra');
       StateSnapshotEvent s() => StateSnapshotEvent(snapshot: {
             'episutra': {
-              'permission': {
-                'requestId': 'p',
-                'content': [for (var i = 0; i < 501; i++) 'bad$i'],
+              'permissions': {
+                'by-id': {
+                  'p': {
+                    'requestId': 'p',
+                    'content': [for (var i = 0; i < 501; i++) 'bad$i'],
+                  },
+                },
               },
             },
           });

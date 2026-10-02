@@ -2539,11 +2539,6 @@ class _$ToolRequestTimelineItemCopyWithImpl<$Res>
 
 /// @nodoc
 mixin _$SessionState {
-  Map<String, dynamic>? get permission;
-  Map<String, dynamic>? get elicitation;
-  Map<String, dynamic>? get modes;
-  Map<String, dynamic>? get config;
-  Map<String, dynamic>? get plan;
   String? get title;
   bool get isRunning;
 
@@ -2581,13 +2576,6 @@ mixin _$SessionState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is SessionState &&
-            const DeepCollectionEquality()
-                .equals(other.permission, permission) &&
-            const DeepCollectionEquality()
-                .equals(other.elicitation, elicitation) &&
-            const DeepCollectionEquality().equals(other.modes, modes) &&
-            const DeepCollectionEquality().equals(other.config, config) &&
-            const DeepCollectionEquality().equals(other.plan, plan) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.isRunning, isRunning) ||
                 other.isRunning == isRunning) &&
@@ -2619,35 +2607,29 @@ mixin _$SessionState {
   }
 
   @override
-  int get hashCode => Object.hashAll([
-        runtimeType,
-        const DeepCollectionEquality().hash(permission),
-        const DeepCollectionEquality().hash(elicitation),
-        const DeepCollectionEquality().hash(modes),
-        const DeepCollectionEquality().hash(config),
-        const DeepCollectionEquality().hash(plan),
-        title,
-        isRunning,
-        isStarting,
-        runError,
-        runOutcome,
-        threadId,
-        runId,
-        stopReason,
-        runErrorCode,
-        agent,
-        mode,
-        commands,
-        configState,
-        usage,
-        sessionInfo,
-        plans,
-        const DeepCollectionEquality().hash(responseMeta)
-      ]);
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      isRunning,
+      isStarting,
+      runError,
+      runOutcome,
+      threadId,
+      runId,
+      stopReason,
+      runErrorCode,
+      agent,
+      mode,
+      commands,
+      configState,
+      usage,
+      sessionInfo,
+      plans,
+      const DeepCollectionEquality().hash(responseMeta));
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
   }
 }
 
@@ -2658,12 +2640,7 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       _$SessionStateCopyWithImpl;
   @useResult
   $Res call(
-      {Map<String, dynamic>? permission,
-      Map<String, dynamic>? elicitation,
-      Map<String, dynamic>? modes,
-      Map<String, dynamic>? config,
-      Map<String, dynamic>? plan,
-      String? title,
+      {String? title,
       bool isRunning,
       bool isStarting,
       String? runError,
@@ -2702,11 +2679,6 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? permission = freezed,
-    Object? elicitation = freezed,
-    Object? modes = freezed,
-    Object? config = freezed,
-    Object? plan = freezed,
     Object? title = freezed,
     Object? isRunning = null,
     Object? isStarting = null,
@@ -2726,26 +2698,6 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? responseMeta = null,
   }) {
     return _then(_self.copyWith(
-      permission: freezed == permission
-          ? _self.permission
-          : permission // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      elicitation: freezed == elicitation
-          ? _self.elicitation
-          : elicitation // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      modes: freezed == modes
-          ? _self.modes
-          : modes // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      config: freezed == config
-          ? _self.config
-          : config // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      plan: freezed == plan
-          ? _self.plan
-          : plan // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
       title: freezed == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -3004,11 +2956,6 @@ extension SessionStatePatterns on SessionState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            Map<String, dynamic>? permission,
-            Map<String, dynamic>? elicitation,
-            Map<String, dynamic>? modes,
-            Map<String, dynamic>? config,
-            Map<String, dynamic>? plan,
             String? title,
             bool isRunning,
             bool isStarting,
@@ -3033,11 +2980,6 @@ extension SessionStatePatterns on SessionState {
     switch (_that) {
       case _SessionState() when $default != null:
         return $default(
-            _that.permission,
-            _that.elicitation,
-            _that.modes,
-            _that.config,
-            _that.plan,
             _that.title,
             _that.isRunning,
             _that.isStarting,
@@ -3076,11 +3018,6 @@ extension SessionStatePatterns on SessionState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            Map<String, dynamic>? permission,
-            Map<String, dynamic>? elicitation,
-            Map<String, dynamic>? modes,
-            Map<String, dynamic>? config,
-            Map<String, dynamic>? plan,
             String? title,
             bool isRunning,
             bool isStarting,
@@ -3104,11 +3041,6 @@ extension SessionStatePatterns on SessionState {
     switch (_that) {
       case _SessionState():
         return $default(
-            _that.permission,
-            _that.elicitation,
-            _that.modes,
-            _that.config,
-            _that.plan,
             _that.title,
             _that.isRunning,
             _that.isStarting,
@@ -3144,11 +3076,6 @@ extension SessionStatePatterns on SessionState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            Map<String, dynamic>? permission,
-            Map<String, dynamic>? elicitation,
-            Map<String, dynamic>? modes,
-            Map<String, dynamic>? config,
-            Map<String, dynamic>? plan,
             String? title,
             bool isRunning,
             bool isStarting,
@@ -3172,11 +3099,6 @@ extension SessionStatePatterns on SessionState {
     switch (_that) {
       case _SessionState() when $default != null:
         return $default(
-            _that.permission,
-            _that.elicitation,
-            _that.modes,
-            _that.config,
-            _that.plan,
             _that.title,
             _that.isRunning,
             _that.isStarting,
@@ -3204,12 +3126,7 @@ extension SessionStatePatterns on SessionState {
 
 class _SessionState extends SessionState {
   const _SessionState(
-      {final Map<String, dynamic>? permission,
-      final Map<String, dynamic>? elicitation,
-      final Map<String, dynamic>? modes,
-      final Map<String, dynamic>? config,
-      final Map<String, dynamic>? plan,
-      this.title,
+      {this.title,
       this.isRunning = false,
       this.isStarting = false,
       this.runError,
@@ -3226,63 +3143,8 @@ class _SessionState extends SessionState {
       this.sessionInfo,
       this.plans = const PlansState(),
       final Map<String, dynamic> responseMeta = const <String, dynamic>{}})
-      : _permission = permission,
-        _elicitation = elicitation,
-        _modes = modes,
-        _config = config,
-        _plan = plan,
-        _responseMeta = responseMeta,
+      : _responseMeta = responseMeta,
         super._();
-
-  final Map<String, dynamic>? _permission;
-  @override
-  Map<String, dynamic>? get permission {
-    final value = _permission;
-    if (value == null) return null;
-    if (_permission is EqualUnmodifiableMapView) return _permission;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
-
-  final Map<String, dynamic>? _elicitation;
-  @override
-  Map<String, dynamic>? get elicitation {
-    final value = _elicitation;
-    if (value == null) return null;
-    if (_elicitation is EqualUnmodifiableMapView) return _elicitation;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
-
-  final Map<String, dynamic>? _modes;
-  @override
-  Map<String, dynamic>? get modes {
-    final value = _modes;
-    if (value == null) return null;
-    if (_modes is EqualUnmodifiableMapView) return _modes;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
-
-  final Map<String, dynamic>? _config;
-  @override
-  Map<String, dynamic>? get config {
-    final value = _config;
-    if (value == null) return null;
-    if (_config is EqualUnmodifiableMapView) return _config;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
-
-  final Map<String, dynamic>? _plan;
-  @override
-  Map<String, dynamic>? get plan {
-    final value = _plan;
-    if (value == null) return null;
-    if (_plan is EqualUnmodifiableMapView) return _plan;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
 
   @override
   final String? title;
@@ -3347,13 +3209,6 @@ class _SessionState extends SessionState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _SessionState &&
-            const DeepCollectionEquality()
-                .equals(other._permission, _permission) &&
-            const DeepCollectionEquality()
-                .equals(other._elicitation, _elicitation) &&
-            const DeepCollectionEquality().equals(other._modes, _modes) &&
-            const DeepCollectionEquality().equals(other._config, _config) &&
-            const DeepCollectionEquality().equals(other._plan, _plan) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.isRunning, isRunning) ||
                 other.isRunning == isRunning) &&
@@ -3385,35 +3240,29 @@ class _SessionState extends SessionState {
   }
 
   @override
-  int get hashCode => Object.hashAll([
-        runtimeType,
-        const DeepCollectionEquality().hash(_permission),
-        const DeepCollectionEquality().hash(_elicitation),
-        const DeepCollectionEquality().hash(_modes),
-        const DeepCollectionEquality().hash(_config),
-        const DeepCollectionEquality().hash(_plan),
-        title,
-        isRunning,
-        isStarting,
-        runError,
-        runOutcome,
-        threadId,
-        runId,
-        stopReason,
-        runErrorCode,
-        agent,
-        mode,
-        commands,
-        configState,
-        usage,
-        sessionInfo,
-        plans,
-        const DeepCollectionEquality().hash(_responseMeta)
-      ]);
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      isRunning,
+      isStarting,
+      runError,
+      runOutcome,
+      threadId,
+      runId,
+      stopReason,
+      runErrorCode,
+      agent,
+      mode,
+      commands,
+      configState,
+      usage,
+      sessionInfo,
+      plans,
+      const DeepCollectionEquality().hash(_responseMeta));
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
   }
 }
 
@@ -3426,12 +3275,7 @@ abstract mixin class _$SessionStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {Map<String, dynamic>? permission,
-      Map<String, dynamic>? elicitation,
-      Map<String, dynamic>? modes,
-      Map<String, dynamic>? config,
-      Map<String, dynamic>? plan,
-      String? title,
+      {String? title,
       bool isRunning,
       bool isStarting,
       String? runError,
@@ -3478,11 +3322,6 @@ class __$SessionStateCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? permission = freezed,
-    Object? elicitation = freezed,
-    Object? modes = freezed,
-    Object? config = freezed,
-    Object? plan = freezed,
     Object? title = freezed,
     Object? isRunning = null,
     Object? isStarting = null,
@@ -3502,26 +3341,6 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? responseMeta = null,
   }) {
     return _then(_SessionState(
-      permission: freezed == permission
-          ? _self._permission
-          : permission // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      elicitation: freezed == elicitation
-          ? _self._elicitation
-          : elicitation // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      modes: freezed == modes
-          ? _self._modes
-          : modes // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      config: freezed == config
-          ? _self._config
-          : config // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      plan: freezed == plan
-          ? _self._plan
-          : plan // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
       title: freezed == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable

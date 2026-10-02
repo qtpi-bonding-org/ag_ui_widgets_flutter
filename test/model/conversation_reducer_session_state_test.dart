@@ -127,16 +127,23 @@ void main() {
     expect(r.current.sessionState.usage!.used, 3);
   });
 
-  test('the legacy single-slot shape (episutra) is unaffected', () {
+  test(
+      'the legacy raw `modes`/`plan` keys are reported once each and not '
+      'exposed', () {
+    final snap = StateSnapshotEvent(snapshot: {
+      'episutra': {
+        'session_info': {'title': 'PC'},
+        'modes': {'x': 1},
+        'plan': {'y': 2},
+      },
+    });
     final r = ConversationReducer(namespace: 'episutra')
-      ..apply(StateSnapshotEvent(snapshot: {
-        'episutra': {
-          'session_info': {'title': 'PC'},
-          'modes': {'x': 1}
-        },
-      }));
+      ..apply(snap)
+      ..apply(snap);
     expect(r.current.sessionState.title, 'PC');
-    expect(r.current.sessionState.modes, {'x': 1});
-    expect(r.current.diagnostics, isEmpty);
+    expect(r.current.diagnostics.map((d) => (d.kind, d.name)).toList(), [
+      (DiagnosticKind.unknownStateKey, 'episutra/modes'),
+      (DiagnosticKind.unknownStateKey, 'episutra/plan'),
+    ]);
   });
 }

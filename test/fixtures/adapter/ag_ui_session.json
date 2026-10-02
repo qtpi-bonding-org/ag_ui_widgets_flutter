@@ -1,0 +1,1894 @@
+[
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-1",
+      "sourceSequence": "1",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-1"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:sync",
+    "value": {
+      "mode": "replace"
+    },
+    "sourceEventId": "src-1"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-2",
+      "sourceSequence": "2",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-2"
+  },
+  {
+    "type": "TEXT_MESSAGE_START",
+    "messageId": "m1",
+    "role": "assistant",
+    "sourceEventId": "src-2"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-3",
+      "sourceSequence": "3",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-3"
+  },
+  {
+    "type": "TEXT_MESSAGE_CONTENT",
+    "messageId": "m1",
+    "delta": "hello",
+    "sourceEventId": "src-3"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-4",
+      "sourceSequence": "4",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-4"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:content",
+    "value": {
+      "kind": "audio",
+      "mimeType": "audio/wav",
+      "messageId": "m1"
+    },
+    "sourceEventId": "src-4"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-5",
+      "sourceSequence": "5",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-5"
+  },
+  {
+    "type": "TEXT_MESSAGE_END",
+    "messageId": "m1",
+    "sourceEventId": "src-5"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-6",
+      "sourceSequence": "6",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-6"
+  },
+  {
+    "type": "TOOL_CALL_START",
+    "toolCallId": "tc1",
+    "toolCallName": "Edit a.txt",
+    "sourceEventId": "src-6"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-7",
+      "sourceSequence": "7",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:diff",
+    "value": {
+      "toolCallId": "tc1",
+      "path": "a.txt",
+      "oldText": null,
+      "newText": "x"
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:diff",
+    "value": {
+      "toolCallId": "tc1",
+      "format": "unified",
+      "patch": "@@ -1 +1 @@"
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:terminal",
+    "value": {
+      "toolCallId": "tc1",
+      "terminalId": "t1",
+      "meta": {
+        "cwd": "/"
+      }
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:content",
+    "value": {
+      "kind": "image",
+      "mimeType": "image/png",
+      "toolCallId": "tc1"
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "RAW",
+    "event": {
+      "unmapped": "tool_call_content",
+      "raw": {
+        "type": "future"
+      }
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:tool",
+    "value": {
+      "toolCallId": "tc1",
+      "title": "Edit a.txt",
+      "kind": "edit",
+      "status": "in_progress",
+      "locations": [
+        {
+          "path": "a.txt",
+          "line": 3
+        }
+      ],
+      "meta": {
+        "k": 1
+      }
+    },
+    "sourceEventId": "src-7"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-8",
+      "sourceSequence": "8",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-8"
+  },
+  {
+    "type": "TOOL_CALL_RESULT",
+    "messageId": "tool-result-tc1-0",
+    "toolCallId": "tc1",
+    "content": "Edited a.txt",
+    "sourceEventId": "src-8"
+  },
+  {
+    "type": "TOOL_CALL_END",
+    "toolCallId": "tc1",
+    "sourceEventId": "src-8"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-9",
+      "sourceSequence": "9",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-9"
+  },
+  {
+    "type": "RAW",
+    "event": {
+      "unmapped": "tool_call_empty_id",
+      "title": "orphan",
+      "kind": null,
+      "status": null,
+      "content": [],
+      "rawInput": null,
+      "rawOutput": null,
+      "locations": [],
+      "meta": null
+    },
+    "sourceEventId": "src-9"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-10",
+      "sourceSequence": "10",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-10"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "episutra:response_meta",
+    "value": {
+      "method": "session/new",
+      "meta": {
+        "a": 1
+      }
+    },
+    "sourceEventId": "src-10"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-11",
+      "sourceSequence": "11",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-11"
+  },
+  {
+    "type": "STATE_SNAPSHOT",
+    "snapshot": {
+      "episutra": {
+        "plans": {
+          "by-id": {}
+        },
+        "permissions": {
+          "by-id": {}
+        },
+        "elicitations": {
+          "by-id": {}
+        }
+      }
+    },
+    "sourceEventId": "src-11"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {}
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {}
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-11"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-12",
+      "sourceSequence": "12",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-12"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {}
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-12"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-13",
+      "sourceSequence": "13",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-13"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-13"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-14",
+      "sourceSequence": "14",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-14"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-14"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-15",
+      "sourceSequence": "15",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-15"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-15"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-16",
+      "sourceSequence": "16",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-16"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-16"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-17",
+      "sourceSequence": "17",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-17"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          },
+          "agent": {
+            "protocolVersion": 1,
+            "agentInfo": {
+              "name": "claude",
+              "title": "Claude",
+              "version": "2"
+            },
+            "agentCapabilities": {
+              "loadSession": true
+            },
+            "authMethods": [
+              {
+                "id": "oauth",
+                "name": "OAuth"
+              }
+            ],
+            "meta": null
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-17"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-18",
+      "sourceSequence": "18",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-18"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          },
+          "agent": {
+            "protocolVersion": 1,
+            "agentInfo": {
+              "name": "claude",
+              "title": "Claude",
+              "version": "2"
+            },
+            "agentCapabilities": {
+              "loadSession": true
+            },
+            "authMethods": [
+              {
+                "id": "oauth",
+                "name": "OAuth"
+              }
+            ],
+            "meta": null
+          },
+          "mode": {
+            "currentModeId": "ask",
+            "availableModes": [
+              {
+                "id": "ask",
+                "name": "Ask"
+              },
+              {
+                "id": "code",
+                "name": "Code"
+              }
+            ],
+            "meta": null
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-18"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-19",
+      "sourceSequence": "19",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-19"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          },
+          "agent": {
+            "protocolVersion": 1,
+            "agentInfo": {
+              "name": "claude",
+              "title": "Claude",
+              "version": "2"
+            },
+            "agentCapabilities": {
+              "loadSession": true
+            },
+            "authMethods": [
+              {
+                "id": "oauth",
+                "name": "OAuth"
+              }
+            ],
+            "meta": null
+          },
+          "mode": {
+            "currentModeId": "code",
+            "availableModes": [
+              {
+                "id": "ask",
+                "name": "Ask"
+              },
+              {
+                "id": "code",
+                "name": "Code"
+              }
+            ],
+            "meta": null
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-19"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-20",
+      "sourceSequence": "20",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-20"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          },
+          "agent": {
+            "protocolVersion": 1,
+            "agentInfo": {
+              "name": "claude",
+              "title": "Claude",
+              "version": "2"
+            },
+            "agentCapabilities": {
+              "loadSession": true
+            },
+            "authMethods": [
+              {
+                "id": "oauth",
+                "name": "OAuth"
+              }
+            ],
+            "meta": null
+          },
+          "mode": {
+            "currentModeId": "code",
+            "availableModes": [
+              {
+                "id": "ask",
+                "name": "Ask"
+              },
+              {
+                "id": "code",
+                "name": "Code"
+              }
+            ],
+            "meta": null
+          },
+          "config": {
+            "options": [
+              {
+                "id": "model",
+                "name": "Model",
+                "type": "select",
+                "currentValue": "a",
+                "options": [
+                  {
+                    "value": "a",
+                    "name": "A"
+                  }
+                ]
+              }
+            ],
+            "meta": null
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-20"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-21",
+      "sourceSequence": "21",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-21"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          },
+          "agent": {
+            "protocolVersion": 1,
+            "agentInfo": {
+              "name": "claude",
+              "title": "Claude",
+              "version": "2"
+            },
+            "agentCapabilities": {
+              "loadSession": true
+            },
+            "authMethods": [
+              {
+                "id": "oauth",
+                "name": "OAuth"
+              }
+            ],
+            "meta": null
+          },
+          "mode": {
+            "currentModeId": "code",
+            "availableModes": [
+              {
+                "id": "ask",
+                "name": "Ask"
+              },
+              {
+                "id": "code",
+                "name": "Code"
+              }
+            ],
+            "meta": null
+          },
+          "config": {
+            "options": [
+              {
+                "id": "model",
+                "name": "Model",
+                "type": "select",
+                "currentValue": "a",
+                "options": [
+                  {
+                    "value": "a",
+                    "name": "A"
+                  }
+                ]
+              }
+            ],
+            "meta": null
+          },
+          "session_info": {
+            "meta": null,
+            "title": "Hello",
+            "updated_at": "2026-10-01T00:00:00Z"
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-21"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-22",
+      "sourceSequence": "22",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-22"
+  },
+  {
+    "type": "STATE_DELTA",
+    "delta": [
+      {
+        "op": "replace",
+        "path": "/episutra",
+        "value": {
+          "plans": {
+            "by-id": {
+              "p1": {
+                "entries": [
+                  {
+                    "content": "do it",
+                    "priority": "high",
+                    "status": "pending"
+                  }
+                ],
+                "meta": null
+              },
+              "p2": {
+                "uri": "file:///plan.md",
+                "meta": null
+              },
+              "p3": {
+                "markdown": "# plan",
+                "meta": null
+              }
+            }
+          },
+          "permissions": {
+            "by-id": {
+              "tc2": {
+                "requestId": "req-1",
+                "sessionId": "s1",
+                "toolCallId": "tc2",
+                "status": "pending",
+                "title": "Run ls",
+                "options": [
+                  {
+                    "optionId": "allow_once",
+                    "name": "Allow",
+                    "kind": "allow_once"
+                  }
+                ],
+                "content": [
+                  {
+                    "toolCallId": "tc2",
+                    "terminalId": "t2"
+                  }
+                ],
+                "kind": "execute",
+                "meta": {
+                  "m": 1
+                }
+              }
+            }
+          },
+          "elicitations": {
+            "by-id": {
+              "e1": {
+                "elicitationId": "e1",
+                "message": "Need input",
+                "mode": {
+                  "kind": "form",
+                  "schema": {
+                    "type": "object"
+                  }
+                },
+                "scope": {
+                  "kind": "request",
+                  "request_id": "req-2"
+                },
+                "meta": null
+              }
+            }
+          },
+          "commands": {
+            "commands": [
+              {
+                "name": "plan",
+                "description": "make a plan"
+              }
+            ],
+            "meta": null
+          },
+          "agent": {
+            "protocolVersion": 1,
+            "agentInfo": {
+              "name": "claude",
+              "title": "Claude",
+              "version": "2"
+            },
+            "agentCapabilities": {
+              "loadSession": true
+            },
+            "authMethods": [
+              {
+                "id": "oauth",
+                "name": "OAuth"
+              }
+            ],
+            "meta": null
+          },
+          "mode": {
+            "currentModeId": "code",
+            "availableModes": [
+              {
+                "id": "ask",
+                "name": "Ask"
+              },
+              {
+                "id": "code",
+                "name": "Code"
+              }
+            ],
+            "meta": null
+          },
+          "config": {
+            "options": [
+              {
+                "id": "model",
+                "name": "Model",
+                "type": "select",
+                "currentValue": "a",
+                "options": [
+                  {
+                    "value": "a",
+                    "name": "A"
+                  }
+                ]
+              }
+            ],
+            "meta": null
+          },
+          "session_info": {
+            "meta": null,
+            "title": "Hello",
+            "updated_at": "2026-10-01T00:00:00Z"
+          },
+          "usage": {
+            "used": 10,
+            "size": 100,
+            "cost": {
+              "amount": 0.5,
+              "currency": "USD"
+            },
+            "meta": null
+          }
+        }
+      }
+    ],
+    "sourceEventId": "src-22"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-23",
+      "sourceSequence": "23",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-23"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp.client_execute_request",
+    "value": {
+      "callId": "c1",
+      "toolName": "create_note",
+      "args": {
+        "title": "x"
+      }
+    },
+    "sourceEventId": "src-23"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-24",
+      "sourceSequence": "24",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-24"
+  },
+  {
+    "type": "RAW",
+    "event": {
+      "unmapped": "future_update",
+      "payload": {
+        "a": 1
+      }
+    },
+    "sourceEventId": "src-24"
+  },
+  {
+    "type": "CUSTOM",
+    "name": "acp:source",
+    "value": {
+      "sourceEventId": "src-25",
+      "sourceSequence": "25",
+      "origin": "local",
+      "direction": "inbound",
+      "kind": "notification",
+      "protocolVersion": "",
+      "sessionId": null,
+      "method": "session/request_permission",
+      "requestIdJson": null,
+      "messageJson": "{}",
+      "decodeError": null,
+      "unknownPayload": null
+    },
+    "sourceEventId": "src-25"
+  },
+  {
+    "type": "RUN_FINISHED",
+    "threadId": "session-1",
+    "runId": "turn-1",
+    "result": {
+      "stopReason": "end_turn"
+    },
+    "sourceEventId": "src-25"
+  }
+]

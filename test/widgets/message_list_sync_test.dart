@@ -138,5 +138,43 @@ void main() {
         expect(actions.whereType<UpdateAction>(), isEmpty);
       },
     );
+
+    test(
+      "a mid-list id's content update, applied through a real "
+      'InMemoryChatController, never moves it relative to a tool call after '
+      "it -- rules out the widget layer as the source of a reported "
+      '"message appears after the tool instead of before it" bug (the '
+      'reducer already keeps the id at its original slot; this proves the '
+      'controller/animated-list layer honors that order too)',
+      () async {
+        final oldList = [_text('m1', 'announcing'), _text('t1', 'tool card')];
+        final newList = [_text('m1', 'summary'), _text('t1', 'tool card')];
+        final controller = chat_core.InMemoryChatController(messages: oldList);
+        addTearDown(controller.dispose);
+
+        final actions = computeMessageListSyncActions(oldList, newList);
+        expect(actions, hasLength(1),
+            reason: 'only m1 changed content; t1 must not be touched at all');
+        expect(actions.single, isA<UpdateAction>());
+
+        for (final action in actions) {
+          switch (action) {
+            case RemoveAction(:final message):
+              await controller.removeMessage(message);
+            case UpdateAction(:final oldMessage, :final newMessage):
+              await controller.updateMessage(oldMessage, newMessage);
+            case InsertAction(:final message, :final index):
+              await controller.insertMessage(message, index: index);
+            case ResetAction(:final messages):
+              await controller.setMessages(messages);
+          }
+        }
+
+        expect(controller.messages.map((m) => m.id), ['m1', 't1'],
+            reason: 'm1 must still render before t1, not after');
+        expect((controller.messages.first as chat_core.TextMessage).text,
+            'summary');
+      },
+    );
   });
 }

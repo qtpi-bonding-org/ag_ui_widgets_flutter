@@ -1087,6 +1087,63 @@ void main() {
     });
   });
 
+  group('deterministic ordering: text, tool, text', () {
+    test('two distinct message ids around a tool call keep their arrival order',
+        () {
+      final r = ConversationReducer()
+        ..apply(const TextMessageStartEvent(
+            messageId: 'm1', role: TextMessageRole.assistant))
+        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
+        ..apply(const TextMessageEndEvent(messageId: 'm1'))
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(const ToolCallResultEvent(messageId: 'm1', toolCallId: 't1', content: 'ok'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'))
+        ..apply(const TextMessageStartEvent(
+            messageId: 'm2', role: TextMessageRole.assistant))
+        ..apply(const TextMessageContentEvent(messageId: 'm2', delta: 'summary'))
+        ..apply(const TextMessageEndEvent(messageId: 'm2'));
+
+      final ids = r.current.timeline.map((i) => switch (i) {
+            TextTimelineItem(:final id) => id,
+            ToolCallTimelineItem(:final id) => id,
+            _ => '?',
+          });
+      expect(ids, ['m1', 't1', 'm2']);
+    });
+
+    test(
+        "a second text message REUSING the first message's id after a tool "
+        "call in between does not relocate it after the tool -- content "
+        "updates in place at the id's original (pre-tool) position",
+        () {
+      final r = ConversationReducer()
+        ..apply(const TextMessageStartEvent(
+            messageId: 'm1', role: TextMessageRole.assistant))
+        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'announcing'))
+        ..apply(const TextMessageEndEvent(messageId: 'm1'))
+        ..apply(const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
+        ..apply(const ToolCallResultEvent(messageId: 'm1', toolCallId: 't1', content: 'ok'))
+        ..apply(const ToolCallEndEvent(toolCallId: 't1'))
+        ..apply(const TextMessageStartEvent(
+            messageId: 'm1', role: TextMessageRole.assistant))
+        ..apply(const TextMessageContentEvent(messageId: 'm1', delta: 'summary'))
+        ..apply(const TextMessageEndEvent(messageId: 'm1'));
+
+      final ids = r.current.timeline.map((i) => switch (i) {
+            TextTimelineItem(:final id) => id,
+            ToolCallTimelineItem(:final id) => id,
+            _ => '?',
+          });
+      expect(ids, ['m1', 't1'],
+          reason: 'm1 is reused, not duplicated, and keeps its original slot');
+      final text = r.current.timeline.first as TextTimelineItem;
+      expect(text.text, 'summary',
+          reason: 'content is the reused id\'s latest value, still at the '
+              'original (pre-tool) position -- if the UI shows this text '
+              'AFTER the tool, that is a widget-layer bug, not a reducer one');
+    });
+  });
+
   group('reduce() convenience wrapper', () {
     test('folds a full event list identically to sequential apply() calls', () {
       final events = [

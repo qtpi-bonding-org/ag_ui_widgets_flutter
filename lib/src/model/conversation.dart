@@ -95,7 +95,21 @@ sealed class TimelineItem with _$TimelineItem {
     String? toolKind,
     @Default(false) bool hasEnded,
     String? status,
+    @Default(<ToolLocation>[]) List<ToolLocation> locations,
+    @Default(<ToolTerminal>[]) List<ToolTerminal> terminals,
+    @Default(<ToolPatch>[]) List<ToolPatch> patches,
+    @Default(<MediaDescriptor>[]) List<MediaDescriptor> media,
+    @Default(<ToolResultPart>[]) List<ToolResultPart> resultParts,
+    Map<String, dynamic>? meta,
   }) = ToolCallTimelineItem;
+
+  /// A non-text content block that belongs to a message (not to a tool call).
+  const factory TimelineItem.media({
+    required String id,
+    String? messageId,
+    required MediaDescriptor media,
+    required OrderKey order,
+  }) = MediaTimelineItem;
 
   /// A pending permission request — full payload, not a marker. `toolTitle`/
   /// `toolKind` are ACP's `ToolCallUpdate.Title`/`Kind`, both optional on the
@@ -149,6 +163,7 @@ sealed class TimelineItem with _$TimelineItem {
         PermissionRequestTimelineItem(:final requestId) => requestId,
         ElicitationRequestTimelineItem(:final requestId) => requestId,
         ToolRequestTimelineItem(:final requestId) => requestId,
+        MediaTimelineItem(:final id) => id,
       };
 
   /// Storage/merge identity — unique per distinct entity. Namespaces

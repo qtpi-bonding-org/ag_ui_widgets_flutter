@@ -5,6 +5,17 @@ import 'wire_parse.dart';
 
 part 'tool_models.freezed.dart';
 
+/// One part of a tool call's result stream — a single message with its id and
+/// content. [ToolCallTimelineItem.resultParts] keeps every part; [result] is
+/// the latest content.
+@freezed
+abstract class ToolResultPart with _$ToolResultPart {
+  const factory ToolResultPart({
+    required String messageId,
+    required String content,
+  }) = _ToolResultPart;
+}
+
 /// One diff hunk from a tool call's result — the full before/after text for
 /// one file. [oldText] is empty for new-file diffs (the wire's `oldText` is
 /// absent or null for a new file).

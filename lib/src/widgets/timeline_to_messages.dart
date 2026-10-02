@@ -101,8 +101,33 @@ chat_core.Message _toMessage(TimelineItem item) {
         authorId: kAgentAuthorId,
         metadata: {'kind': 'toolRequest'},
       ),
+    MediaTimelineItem(:final id, :final messageId, :final media) =>
+      chat_core.Message.custom(
+        id: id,
+        authorId: kAgentAuthorId,
+        metadata: {
+          'kind': 'media',
+          'messageId': messageId,
+          'media': _mediaToMap(media),
+        },
+      ),
   };
 }
+
+Map<String, dynamic> _mediaToMap(MediaDescriptor d) => {
+      'kind': d.kind,
+      'mimeType': d.mimeType,
+      'uri': d.uri,
+      'name': d.name,
+      'title': d.title,
+      'description': d.description,
+      'data': d.data,
+      'blob': d.blob,
+      'size': d.size,
+      'messageId': d.messageId,
+      'toolCallId': d.toolCallId,
+      ...d.extras,
+    };
 
 /// Projects every currently-open streaming text item into the `StreamState`
 /// map `FlyerChatTextStreamMessage` needs.

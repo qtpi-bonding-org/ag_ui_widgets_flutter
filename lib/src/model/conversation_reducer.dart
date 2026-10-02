@@ -87,6 +87,9 @@ class ConversationReducer {
   SessionInfo? _sessionInfo;
   PlansState _plans = const PlansState();
 
+  int _mediaCount = 0;
+  Map<String, dynamic> _responseMeta = const {};
+
   /// Called with a tool's name for every incoming `acp.client_execute_request`; return
   /// `true` to skip creating a [ToolRequestTimelineItem] for it entirely.
   ///
@@ -321,29 +324,47 @@ class ConversationReducer {
         _updateTool(
             event.toolCallId, (t) => t.copyWith(args: t.args + event.delta));
       case ag_ui.ToolCallResultEvent():
-        _updateTool(event.toolCallId, (t) => t.copyWith(result: event.content));
+        _updateTool(
+          event.toolCallId,
+          (t) => t.copyWith(
+            result: event.content,
+            resultParts: [
+              ...t.resultParts,
+              ToolResultPart(messageId: event.messageId, content: event.content),
+            ],
+          ),
+        );
       case ag_ui.ToolCallEndEvent():
         _updateTool(event.toolCallId, (t) => t.copyWith(hasEnded: true));
 
       case ag_ui.CustomEvent(name: final name) when name == '$namespace:tool':
-        final value = event.value;
-        if (value is Map) {
-          final toolCallId = value['toolCallId'];
-          if (toolCallId is String) {
-            final title = value['title'];
-            final kind = value['kind'];
-            final status = value['status'];
-            _updateTool(
-              toolCallId,
-              (t) => t.copyWith(
-                name: t.name.isEmpty && title is String && title.isNotEmpty
-                    ? title
-                    : t.name,
-                toolKind: kind is String && kind.isNotEmpty ? kind : t.toolKind,
-                status: status is String && status.isNotEmpty ? status : t.status,
-              ),
-            );
-          }
+        final value = asJsonMap(event.value);
+        final toolCallId = asString(value?['toolCallId']);
+        if (value == null || toolCallId == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          final title = value['title'];
+          final kind = value['kind'];
+          final status = value['status'];
+          final locations = value.containsKey('locations')
+              ? [
+                  for (final l in asJsonMapList(value['locations']))
+                    ToolLocation.parse(l)!,
+                ]
+              : null;
+          final meta = asJsonMap(value['meta']);
+          _updateTool(
+            toolCallId,
+            (t) => t.copyWith(
+              name: t.name.isEmpty && title is String && title.isNotEmpty
+                  ? title
+                  : t.name,
+              toolKind: kind is String && kind.isNotEmpty ? kind : t.toolKind,
+              status: status is String && status.isNotEmpty ? status : t.status,
+              locations: locations ?? t.locations,
+              meta: meta ?? t.meta,
+            ),
+          );
         }
 
       case ag_ui.CustomEvent(name: 'acp.permission_request', :final value):
@@ -452,20 +473,57 @@ class ConversationReducer {
           }
         }
       case ag_ui.CustomEvent(name: final name) when name == '$namespace:diff':
-        final value = event.value;
-        if (value is Map) {
-          final toolCallId = value['toolCallId'];
-          final path = value['path'];
-          final newText = value['newText'];
-          if (toolCallId is String && path is String && newText is String) {
-            final diff = ToolDiff(
-              path: path,
-              oldText: (value['oldText'] as String?) ?? '',
-              newText: newText,
-            );
-            _updateTool(
-                toolCallId, (t) => t.copyWith(diffs: [...t.diffs, diff]));
-          }
+        final value = asJsonMap(event.value);
+        final toolCallId = asString(value?['toolCallId']);
+        final content = value == null ? null : ToolContent.parse(value);
+        if (toolCallId == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else if (content is ToolContentDiff) {
+          _updateTool(toolCallId,
+              (t) => t.copyWith(diffs: [...t.diffs, content.diff]));
+        } else if (content is ToolContentPatch) {
+          _updateTool(toolCallId,
+              (t) => t.copyWith(patches: [...t.patches, content.patch]));
+        } else {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        }
+      case ag_ui.CustomEvent(name: final name) when name == '$namespace:terminal':
+        final value = asJsonMap(event.value);
+        final toolCallId = asString(value?['toolCallId']);
+        final terminal = ToolTerminal.parse(value);
+        if (toolCallId == null || terminal == null || terminal.terminalId.isEmpty) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          _updateTool(toolCallId,
+              (t) => t.copyWith(terminals: [...t.terminals, terminal]));
+        }
+      case ag_ui.CustomEvent(name: final name) when name == '$namespace:content':
+        final media = MediaDescriptor.parse(event.value);
+        if (media == null || media.kind.isEmpty) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else if (media.toolCallId != null) {
+          _updateTool(media.toolCallId!,
+              (t) => t.copyWith(media: [...t.media, media]));
+        } else {
+          final id = 'media:${_mediaCount++}';
+          _upsert(
+            id,
+            (order) => TimelineItem.media(
+              id: id,
+              messageId: media.messageId,
+              media: media,
+              order: order,
+            ),
+          );
+        }
+      case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:response_meta':
+        final value = asJsonMap(event.value);
+        final method = asString(value?['method']);
+        if (method == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          _responseMeta = {..._responseMeta, method: value!['meta']};
         }
 
       case ag_ui.StateSnapshotEvent():
@@ -506,6 +564,8 @@ class ConversationReducer {
     _isStarting = false;
     _runError = null;
     _runOutcome = null;
+    _mediaCount = 0;
+    _responseMeta = const {};
     // Reset typed state fields only. Do NOT clear _diagnostics,
     // _sourceRecords, _diagnosticCount or the _reported* sets — they
     // describe what the reducer has seen, and a replay re-sends the same state.
@@ -827,6 +887,7 @@ class ConversationReducer {
       usage: _usage,
       sessionInfo: _sessionInfo,
       plans: _plans,
+      responseMeta: _responseMeta,
     );
   }
 }

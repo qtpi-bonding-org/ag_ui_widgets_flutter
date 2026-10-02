@@ -722,6 +722,7 @@ extension TimelineItemPatterns on TimelineItem {
     TResult Function(TextTimelineItem value)? text,
     TResult Function(TextStreamTimelineItem value)? textStream,
     TResult Function(ToolCallTimelineItem value)? toolCall,
+    TResult Function(MediaTimelineItem value)? media,
     TResult Function(PermissionRequestTimelineItem value)? permissionRequest,
     TResult Function(ElicitationRequestTimelineItem value)? elicitationRequest,
     TResult Function(ToolRequestTimelineItem value)? toolRequest,
@@ -735,6 +736,8 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(_that);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(_that);
+      case MediaTimelineItem() when media != null:
+        return media(_that);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(_that);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
@@ -764,6 +767,7 @@ extension TimelineItemPatterns on TimelineItem {
     required TResult Function(TextTimelineItem value) text,
     required TResult Function(TextStreamTimelineItem value) textStream,
     required TResult Function(ToolCallTimelineItem value) toolCall,
+    required TResult Function(MediaTimelineItem value) media,
     required TResult Function(PermissionRequestTimelineItem value)
         permissionRequest,
     required TResult Function(ElicitationRequestTimelineItem value)
@@ -778,6 +782,8 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(_that);
       case ToolCallTimelineItem():
         return toolCall(_that);
+      case MediaTimelineItem():
+        return media(_that);
       case PermissionRequestTimelineItem():
         return permissionRequest(_that);
       case ElicitationRequestTimelineItem():
@@ -804,6 +810,7 @@ extension TimelineItemPatterns on TimelineItem {
     TResult? Function(TextTimelineItem value)? text,
     TResult? Function(TextStreamTimelineItem value)? textStream,
     TResult? Function(ToolCallTimelineItem value)? toolCall,
+    TResult? Function(MediaTimelineItem value)? media,
     TResult? Function(PermissionRequestTimelineItem value)? permissionRequest,
     TResult? Function(ElicitationRequestTimelineItem value)? elicitationRequest,
     TResult? Function(ToolRequestTimelineItem value)? toolRequest,
@@ -816,6 +823,8 @@ extension TimelineItemPatterns on TimelineItem {
         return textStream(_that);
       case ToolCallTimelineItem() when toolCall != null:
         return toolCall(_that);
+      case MediaTimelineItem() when media != null:
+        return media(_that);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(_that);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
@@ -856,8 +865,17 @@ extension TimelineItemPatterns on TimelineItem {
             List<ToolDiff> diffs,
             String? toolKind,
             bool hasEnded,
-            String? status)?
+            String? status,
+            List<ToolLocation> locations,
+            List<ToolTerminal> terminals,
+            List<ToolPatch> patches,
+            List<MediaDescriptor> media,
+            List<ToolResultPart> resultParts,
+            Map<String, dynamic>? meta)?
         toolCall,
+    TResult Function(String id, String? messageId, MediaDescriptor media,
+            OrderKey order)?
+        media,
     TResult Function(
             String requestId,
             String? toolTitle,
@@ -899,7 +917,15 @@ extension TimelineItemPatterns on TimelineItem {
             _that.diffs,
             _that.toolKind,
             _that.hasEnded,
-            _that.status);
+            _that.status,
+            _that.locations,
+            _that.terminals,
+            _that.patches,
+            _that.media,
+            _that.resultParts,
+            _that.meta);
+      case MediaTimelineItem() when media != null:
+        return media(_that.id, _that.messageId, _that.media, _that.order);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(
             _that.requestId,
@@ -951,8 +977,17 @@ extension TimelineItemPatterns on TimelineItem {
             List<ToolDiff> diffs,
             String? toolKind,
             bool hasEnded,
-            String? status)
+            String? status,
+            List<ToolLocation> locations,
+            List<ToolTerminal> terminals,
+            List<ToolPatch> patches,
+            List<MediaDescriptor> media,
+            List<ToolResultPart> resultParts,
+            Map<String, dynamic>? meta)
         toolCall,
+    required TResult Function(
+            String id, String? messageId, MediaDescriptor media, OrderKey order)
+        media,
     required TResult Function(
             String requestId,
             String? toolTitle,
@@ -993,7 +1028,15 @@ extension TimelineItemPatterns on TimelineItem {
             _that.diffs,
             _that.toolKind,
             _that.hasEnded,
-            _that.status);
+            _that.status,
+            _that.locations,
+            _that.terminals,
+            _that.patches,
+            _that.media,
+            _that.resultParts,
+            _that.meta);
+      case MediaTimelineItem():
+        return media(_that.id, _that.messageId, _that.media, _that.order);
       case PermissionRequestTimelineItem():
         return permissionRequest(
             _that.requestId,
@@ -1042,8 +1085,17 @@ extension TimelineItemPatterns on TimelineItem {
             List<ToolDiff> diffs,
             String? toolKind,
             bool hasEnded,
-            String? status)?
+            String? status,
+            List<ToolLocation> locations,
+            List<ToolTerminal> terminals,
+            List<ToolPatch> patches,
+            List<MediaDescriptor> media,
+            List<ToolResultPart> resultParts,
+            Map<String, dynamic>? meta)?
         toolCall,
+    TResult? Function(String id, String? messageId, MediaDescriptor media,
+            OrderKey order)?
+        media,
     TResult? Function(
             String requestId,
             String? toolTitle,
@@ -1084,7 +1136,15 @@ extension TimelineItemPatterns on TimelineItem {
             _that.diffs,
             _that.toolKind,
             _that.hasEnded,
-            _that.status);
+            _that.status,
+            _that.locations,
+            _that.terminals,
+            _that.patches,
+            _that.media,
+            _that.resultParts,
+            _that.meta);
+      case MediaTimelineItem() when media != null:
+        return media(_that.id, _that.messageId, _that.media, _that.order);
       case PermissionRequestTimelineItem() when permissionRequest != null:
         return permissionRequest(
             _that.requestId,
@@ -1361,8 +1421,20 @@ class ToolCallTimelineItem extends TimelineItem {
       final List<ToolDiff> diffs = const <ToolDiff>[],
       this.toolKind,
       this.hasEnded = false,
-      this.status})
+      this.status,
+      final List<ToolLocation> locations = const <ToolLocation>[],
+      final List<ToolTerminal> terminals = const <ToolTerminal>[],
+      final List<ToolPatch> patches = const <ToolPatch>[],
+      final List<MediaDescriptor> media = const <MediaDescriptor>[],
+      final List<ToolResultPart> resultParts = const <ToolResultPart>[],
+      final Map<String, dynamic>? meta})
       : _diffs = diffs,
+        _locations = locations,
+        _terminals = terminals,
+        _patches = patches,
+        _media = media,
+        _resultParts = resultParts,
+        _meta = meta,
         super._();
 
   final String id;
@@ -1384,6 +1456,54 @@ class ToolCallTimelineItem extends TimelineItem {
   @JsonKey()
   final bool hasEnded;
   final String? status;
+  final List<ToolLocation> _locations;
+  @JsonKey()
+  List<ToolLocation> get locations {
+    if (_locations is EqualUnmodifiableListView) return _locations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_locations);
+  }
+
+  final List<ToolTerminal> _terminals;
+  @JsonKey()
+  List<ToolTerminal> get terminals {
+    if (_terminals is EqualUnmodifiableListView) return _terminals;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_terminals);
+  }
+
+  final List<ToolPatch> _patches;
+  @JsonKey()
+  List<ToolPatch> get patches {
+    if (_patches is EqualUnmodifiableListView) return _patches;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_patches);
+  }
+
+  final List<MediaDescriptor> _media;
+  @JsonKey()
+  List<MediaDescriptor> get media {
+    if (_media is EqualUnmodifiableListView) return _media;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_media);
+  }
+
+  final List<ToolResultPart> _resultParts;
+  @JsonKey()
+  List<ToolResultPart> get resultParts {
+    if (_resultParts is EqualUnmodifiableListView) return _resultParts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_resultParts);
+  }
+
+  final Map<String, dynamic>? _meta;
+  Map<String, dynamic>? get meta {
+    final value = _meta;
+    if (value == null) return null;
+    if (_meta is EqualUnmodifiableMapView) return _meta;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
@@ -1409,16 +1529,40 @@ class ToolCallTimelineItem extends TimelineItem {
                 other.toolKind == toolKind) &&
             (identical(other.hasEnded, hasEnded) ||
                 other.hasEnded == hasEnded) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            const DeepCollectionEquality()
+                .equals(other._locations, _locations) &&
+            const DeepCollectionEquality()
+                .equals(other._terminals, _terminals) &&
+            const DeepCollectionEquality().equals(other._patches, _patches) &&
+            const DeepCollectionEquality().equals(other._media, _media) &&
+            const DeepCollectionEquality()
+                .equals(other._resultParts, _resultParts) &&
+            const DeepCollectionEquality().equals(other._meta, _meta));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, order, args, result,
-      const DeepCollectionEquality().hash(_diffs), toolKind, hasEnded, status);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      order,
+      args,
+      result,
+      const DeepCollectionEquality().hash(_diffs),
+      toolKind,
+      hasEnded,
+      status,
+      const DeepCollectionEquality().hash(_locations),
+      const DeepCollectionEquality().hash(_terminals),
+      const DeepCollectionEquality().hash(_patches),
+      const DeepCollectionEquality().hash(_media),
+      const DeepCollectionEquality().hash(_resultParts),
+      const DeepCollectionEquality().hash(_meta));
 
   @override
   String toString() {
-    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind, hasEnded: $hasEnded, status: $status)';
+    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind, hasEnded: $hasEnded, status: $status, locations: $locations, terminals: $terminals, patches: $patches, media: $media, resultParts: $resultParts, meta: $meta)';
   }
 }
 
@@ -1439,7 +1583,13 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
       List<ToolDiff> diffs,
       String? toolKind,
       bool hasEnded,
-      String? status});
+      String? status,
+      List<ToolLocation> locations,
+      List<ToolTerminal> terminals,
+      List<ToolPatch> patches,
+      List<MediaDescriptor> media,
+      List<ToolResultPart> resultParts,
+      Map<String, dynamic>? meta});
 
   @override
   $OrderKeyCopyWith<$Res> get order;
@@ -1467,6 +1617,12 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
     Object? toolKind = freezed,
     Object? hasEnded = null,
     Object? status = freezed,
+    Object? locations = null,
+    Object? terminals = null,
+    Object? patches = null,
+    Object? media = null,
+    Object? resultParts = null,
+    Object? meta = freezed,
   }) {
     return _then(ToolCallTimelineItem(
       id: null == id
@@ -1505,7 +1661,151 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
+      locations: null == locations
+          ? _self._locations
+          : locations // ignore: cast_nullable_to_non_nullable
+              as List<ToolLocation>,
+      terminals: null == terminals
+          ? _self._terminals
+          : terminals // ignore: cast_nullable_to_non_nullable
+              as List<ToolTerminal>,
+      patches: null == patches
+          ? _self._patches
+          : patches // ignore: cast_nullable_to_non_nullable
+              as List<ToolPatch>,
+      media: null == media
+          ? _self._media
+          : media // ignore: cast_nullable_to_non_nullable
+              as List<MediaDescriptor>,
+      resultParts: null == resultParts
+          ? _self._resultParts
+          : resultParts // ignore: cast_nullable_to_non_nullable
+              as List<ToolResultPart>,
+      meta: freezed == meta
+          ? _self._meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class MediaTimelineItem extends TimelineItem {
+  const MediaTimelineItem(
+      {required this.id,
+      this.messageId,
+      required this.media,
+      required this.order})
+      : super._();
+
+  final String id;
+  final String? messageId;
+  final MediaDescriptor media;
+  @override
+  final OrderKey order;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $MediaTimelineItemCopyWith<MediaTimelineItem> get copyWith =>
+      _$MediaTimelineItemCopyWithImpl<MediaTimelineItem>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is MediaTimelineItem &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.messageId, messageId) ||
+                other.messageId == messageId) &&
+            (identical(other.media, media) || other.media == media) &&
+            (identical(other.order, order) || other.order == order));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, messageId, media, order);
+
+  @override
+  String toString() {
+    return 'TimelineItem.media(id: $id, messageId: $messageId, media: $media, order: $order)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $MediaTimelineItemCopyWith<$Res>
+    implements $TimelineItemCopyWith<$Res> {
+  factory $MediaTimelineItemCopyWith(
+          MediaTimelineItem value, $Res Function(MediaTimelineItem) _then) =
+      _$MediaTimelineItemCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id, String? messageId, MediaDescriptor media, OrderKey order});
+
+  $MediaDescriptorCopyWith<$Res> get media;
+  @override
+  $OrderKeyCopyWith<$Res> get order;
+}
+
+/// @nodoc
+class _$MediaTimelineItemCopyWithImpl<$Res>
+    implements $MediaTimelineItemCopyWith<$Res> {
+  _$MediaTimelineItemCopyWithImpl(this._self, this._then);
+
+  final MediaTimelineItem _self;
+  final $Res Function(MediaTimelineItem) _then;
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? messageId = freezed,
+    Object? media = null,
+    Object? order = null,
+  }) {
+    return _then(MediaTimelineItem(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      messageId: freezed == messageId
+          ? _self.messageId
+          : messageId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      media: null == media
+          ? _self.media
+          : media // ignore: cast_nullable_to_non_nullable
+              as MediaDescriptor,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as OrderKey,
+    ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $MediaDescriptorCopyWith<$Res> get media {
+    return $MediaDescriptorCopyWith<$Res>(_self.media, (value) {
+      return _then(_self.copyWith(media: value));
+    });
   }
 
   /// Create a copy of TimelineItem

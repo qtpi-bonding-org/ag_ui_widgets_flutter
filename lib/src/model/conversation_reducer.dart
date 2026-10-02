@@ -81,6 +81,11 @@ class ConversationReducer {
   final Set<String> _reportedContent = {};
   final Set<String> _reportedSnapshotKeys = {};
 
+  String? _threadId;
+  String? _runId;
+  String? _stopReason;
+  String? _runErrorCode;
+
   AgentState? _agent;
   ModeState? _mode;
   CommandsState? _commands;
@@ -192,15 +197,20 @@ class ConversationReducer {
       return;
     }
     switch (event) {
-      case ag_ui.RunStartedEvent():
+      case ag_ui.RunStartedEvent(:final threadId, :final runId):
         _isRunning = true;
         _runError = null;
         _runOutcome = null;
+        _threadId = threadId;
+        _runId = runId;
+        _stopReason = null;
+        _runErrorCode = null;
       case ag_ui.RunFinishedEvent(:final result):
         _isRunning = false;
         _isStarting = false;
         final stopReason =
             result is Map ? result['stopReason'] as String? : null;
+        _stopReason = stopReason;
         _runOutcome = switch (stopReason) {
           'cancelled' => RunOutcome.cancelled,
           null => RunOutcome.success,
@@ -210,6 +220,7 @@ class ConversationReducer {
         _isRunning = false;
         _isStarting = false;
         _runError = message;
+        _runErrorCode = code;
         _runOutcome = code == 'connection_interrupted'
             ? RunOutcome.interrupted
             : RunOutcome.failed;
@@ -583,6 +594,10 @@ class ConversationReducer {
     _isStarting = false;
     _runError = null;
     _runOutcome = null;
+    _threadId = null;
+    _runId = null;
+    _stopReason = null;
+    _runErrorCode = null;
     _mediaCount = 0;
     _responseMeta = const {};
     // Reset typed state fields only. Do NOT clear _diagnostics,
@@ -953,6 +968,10 @@ class ConversationReducer {
       isStarting: _isStarting,
       runError: _runError,
       runOutcome: _runOutcome,
+      threadId: _threadId,
+      runId: _runId,
+      stopReason: _stopReason,
+      runErrorCode: _runErrorCode,
       agent: _agent,
       mode: _mode,
       commands: _commands,

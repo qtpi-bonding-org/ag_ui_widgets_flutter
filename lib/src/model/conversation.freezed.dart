@@ -2555,6 +2555,10 @@ mixin _$SessionState {
   bool get isStarting;
   String? get runError;
   RunOutcome? get runOutcome;
+  String? get threadId;
+  String? get runId;
+  String? get stopReason;
+  String? get runErrorCode;
   AgentState? get agent;
   ModeState? get mode;
   CommandsState? get commands;
@@ -2593,6 +2597,13 @@ mixin _$SessionState {
                 other.runError == runError) &&
             (identical(other.runOutcome, runOutcome) ||
                 other.runOutcome == runOutcome) &&
+            (identical(other.threadId, threadId) ||
+                other.threadId == threadId) &&
+            (identical(other.runId, runId) || other.runId == runId) &&
+            (identical(other.stopReason, stopReason) ||
+                other.stopReason == stopReason) &&
+            (identical(other.runErrorCode, runErrorCode) ||
+                other.runErrorCode == runErrorCode) &&
             (identical(other.agent, agent) || other.agent == agent) &&
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.commands, commands) ||
@@ -2608,30 +2619,35 @@ mixin _$SessionState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(permission),
-      const DeepCollectionEquality().hash(elicitation),
-      const DeepCollectionEquality().hash(modes),
-      const DeepCollectionEquality().hash(config),
-      const DeepCollectionEquality().hash(plan),
-      title,
-      isRunning,
-      isStarting,
-      runError,
-      runOutcome,
-      agent,
-      mode,
-      commands,
-      configState,
-      usage,
-      sessionInfo,
-      plans,
-      const DeepCollectionEquality().hash(responseMeta));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        const DeepCollectionEquality().hash(permission),
+        const DeepCollectionEquality().hash(elicitation),
+        const DeepCollectionEquality().hash(modes),
+        const DeepCollectionEquality().hash(config),
+        const DeepCollectionEquality().hash(plan),
+        title,
+        isRunning,
+        isStarting,
+        runError,
+        runOutcome,
+        threadId,
+        runId,
+        stopReason,
+        runErrorCode,
+        agent,
+        mode,
+        commands,
+        configState,
+        usage,
+        sessionInfo,
+        plans,
+        const DeepCollectionEquality().hash(responseMeta)
+      ]);
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
   }
 }
 
@@ -2652,6 +2668,10 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       bool isStarting,
       String? runError,
       RunOutcome? runOutcome,
+      String? threadId,
+      String? runId,
+      String? stopReason,
+      String? runErrorCode,
       AgentState? agent,
       ModeState? mode,
       CommandsState? commands,
@@ -2692,6 +2712,10 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? isStarting = null,
     Object? runError = freezed,
     Object? runOutcome = freezed,
+    Object? threadId = freezed,
+    Object? runId = freezed,
+    Object? stopReason = freezed,
+    Object? runErrorCode = freezed,
     Object? agent = freezed,
     Object? mode = freezed,
     Object? commands = freezed,
@@ -2742,6 +2766,22 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
           ? _self.runOutcome
           : runOutcome // ignore: cast_nullable_to_non_nullable
               as RunOutcome?,
+      threadId: freezed == threadId
+          ? _self.threadId
+          : threadId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      runId: freezed == runId
+          ? _self.runId
+          : runId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stopReason: freezed == stopReason
+          ? _self.stopReason
+          : stopReason // ignore: cast_nullable_to_non_nullable
+              as String?,
+      runErrorCode: freezed == runErrorCode
+          ? _self.runErrorCode
+          : runErrorCode // ignore: cast_nullable_to_non_nullable
+              as String?,
       agent: freezed == agent
           ? _self.agent
           : agent // ignore: cast_nullable_to_non_nullable
@@ -2974,6 +3014,10 @@ extension SessionStatePatterns on SessionState {
             bool isStarting,
             String? runError,
             RunOutcome? runOutcome,
+            String? threadId,
+            String? runId,
+            String? stopReason,
+            String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
             CommandsState? commands,
@@ -2999,6 +3043,10 @@ extension SessionStatePatterns on SessionState {
             _that.isStarting,
             _that.runError,
             _that.runOutcome,
+            _that.threadId,
+            _that.runId,
+            _that.stopReason,
+            _that.runErrorCode,
             _that.agent,
             _that.mode,
             _that.commands,
@@ -3038,6 +3086,10 @@ extension SessionStatePatterns on SessionState {
             bool isStarting,
             String? runError,
             RunOutcome? runOutcome,
+            String? threadId,
+            String? runId,
+            String? stopReason,
+            String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
             CommandsState? commands,
@@ -3062,6 +3114,10 @@ extension SessionStatePatterns on SessionState {
             _that.isStarting,
             _that.runError,
             _that.runOutcome,
+            _that.threadId,
+            _that.runId,
+            _that.stopReason,
+            _that.runErrorCode,
             _that.agent,
             _that.mode,
             _that.commands,
@@ -3098,6 +3154,10 @@ extension SessionStatePatterns on SessionState {
             bool isStarting,
             String? runError,
             RunOutcome? runOutcome,
+            String? threadId,
+            String? runId,
+            String? stopReason,
+            String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
             CommandsState? commands,
@@ -3122,6 +3182,10 @@ extension SessionStatePatterns on SessionState {
             _that.isStarting,
             _that.runError,
             _that.runOutcome,
+            _that.threadId,
+            _that.runId,
+            _that.stopReason,
+            _that.runErrorCode,
             _that.agent,
             _that.mode,
             _that.commands,
@@ -3150,6 +3214,10 @@ class _SessionState extends SessionState {
       this.isStarting = false,
       this.runError,
       this.runOutcome,
+      this.threadId,
+      this.runId,
+      this.stopReason,
+      this.runErrorCode,
       this.agent,
       this.mode,
       this.commands,
@@ -3235,6 +3303,14 @@ class _SessionState extends SessionState {
   @override
   final RunOutcome? runOutcome;
   @override
+  final String? threadId;
+  @override
+  final String? runId;
+  @override
+  final String? stopReason;
+  @override
+  final String? runErrorCode;
+  @override
   final AgentState? agent;
   @override
   final ModeState? mode;
@@ -3287,6 +3363,13 @@ class _SessionState extends SessionState {
                 other.runError == runError) &&
             (identical(other.runOutcome, runOutcome) ||
                 other.runOutcome == runOutcome) &&
+            (identical(other.threadId, threadId) ||
+                other.threadId == threadId) &&
+            (identical(other.runId, runId) || other.runId == runId) &&
+            (identical(other.stopReason, stopReason) ||
+                other.stopReason == stopReason) &&
+            (identical(other.runErrorCode, runErrorCode) ||
+                other.runErrorCode == runErrorCode) &&
             (identical(other.agent, agent) || other.agent == agent) &&
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.commands, commands) ||
@@ -3302,30 +3385,35 @@ class _SessionState extends SessionState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_permission),
-      const DeepCollectionEquality().hash(_elicitation),
-      const DeepCollectionEquality().hash(_modes),
-      const DeepCollectionEquality().hash(_config),
-      const DeepCollectionEquality().hash(_plan),
-      title,
-      isRunning,
-      isStarting,
-      runError,
-      runOutcome,
-      agent,
-      mode,
-      commands,
-      configState,
-      usage,
-      sessionInfo,
-      plans,
-      const DeepCollectionEquality().hash(_responseMeta));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        const DeepCollectionEquality().hash(_permission),
+        const DeepCollectionEquality().hash(_elicitation),
+        const DeepCollectionEquality().hash(_modes),
+        const DeepCollectionEquality().hash(_config),
+        const DeepCollectionEquality().hash(_plan),
+        title,
+        isRunning,
+        isStarting,
+        runError,
+        runOutcome,
+        threadId,
+        runId,
+        stopReason,
+        runErrorCode,
+        agent,
+        mode,
+        commands,
+        configState,
+        usage,
+        sessionInfo,
+        plans,
+        const DeepCollectionEquality().hash(_responseMeta)
+      ]);
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
   }
 }
 
@@ -3348,6 +3436,10 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       bool isStarting,
       String? runError,
       RunOutcome? runOutcome,
+      String? threadId,
+      String? runId,
+      String? stopReason,
+      String? runErrorCode,
       AgentState? agent,
       ModeState? mode,
       CommandsState? commands,
@@ -3396,6 +3488,10 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? isStarting = null,
     Object? runError = freezed,
     Object? runOutcome = freezed,
+    Object? threadId = freezed,
+    Object? runId = freezed,
+    Object? stopReason = freezed,
+    Object? runErrorCode = freezed,
     Object? agent = freezed,
     Object? mode = freezed,
     Object? commands = freezed,
@@ -3446,6 +3542,22 @@ class __$SessionStateCopyWithImpl<$Res>
           ? _self.runOutcome
           : runOutcome // ignore: cast_nullable_to_non_nullable
               as RunOutcome?,
+      threadId: freezed == threadId
+          ? _self.threadId
+          : threadId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      runId: freezed == runId
+          ? _self.runId
+          : runId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stopReason: freezed == stopReason
+          ? _self.stopReason
+          : stopReason // ignore: cast_nullable_to_non_nullable
+              as String?,
+      runErrorCode: freezed == runErrorCode
+          ? _self.runErrorCode
+          : runErrorCode // ignore: cast_nullable_to_non_nullable
+              as String?,
       agent: freezed == agent
           ? _self.agent
           : agent // ignore: cast_nullable_to_non_nullable

@@ -360,12 +360,23 @@ class ConversationReducer {
           final title = value['title'];
           final kind = value['kind'];
           final status = value['status'];
-          final locations = value.containsKey('locations')
-              ? [
-                  for (final l in asJsonMapList(value['locations']))
-                    ToolLocation.parse(l)!,
-                ]
-              : null;
+          final rawLocations = value['locations'];
+          List<ToolLocation>? locations;
+          if (rawLocations is List) {
+            locations = [
+              for (final l in rawLocations)
+                if (ToolLocation.parse(l) case final loc?) loc,
+            ];
+            if (locations.length != rawLocations.length) {
+              _diagnoseOnce(
+                  DiagnosticKind.malformedPayload, '$name/locations', rawLocations);
+            }
+          } else if (value.containsKey('locations')) {
+            // Not a list: keep the locations already known rather than
+            // clearing them on junk.
+            _diagnoseOnce(
+                DiagnosticKind.malformedPayload, '$name/locations', rawLocations);
+          }
           final meta = asJsonMap(value['meta']);
           _updateTool(
             toolCallId,
@@ -602,14 +613,19 @@ class ConversationReducer {
         _syncElicitation();
         _onStateChanged();
         if (snapshot is Map) {
+          // Forget keys that are gone, so one that comes back is reported again.
+          _reportedSnapshotKeys.retainAll({for (final k in snapshot.keys) '$k'});
           for (final key in snapshot.keys) {
             if (key != namespace && _reportedSnapshotKeys.add('$key')) {
               _diagnose(
                   DiagnosticKind.unknownStateKey, 'snapshot/$key', snapshot[key]);
             }
           }
-        } else if (snapshot != null) {
-          _diagnose(DiagnosticKind.malformedPayload, 'snapshot', snapshot);
+        } else {
+          _reportedSnapshotKeys.clear();
+          if (snapshot != null) {
+            _diagnose(DiagnosticKind.malformedPayload, 'snapshot', snapshot);
+          }
         }
       case ag_ui.StateDeltaEvent():
         for (final op in event.delta) {
@@ -617,7 +633,8 @@ class ConversationReducer {
         }
 
       default:
-        _diagnose(DiagnosticKind.unhandledEvent, event.eventType.value);
+        _diagnose(DiagnosticKind.unhandledEvent, event.eventType.value,
+            event.toJson());
     }
   }
 
@@ -819,7 +836,7 @@ class ConversationReducer {
       for (final c in rawContent) {
         final parsed = ToolContent.parse(c);
         if (parsed == null) {
-          if (_reportedContent.add('$requestId|$c')) {
+          if (_firstTime(_reportedContent, '$requestId|$c')) {
             _diagnose(DiagnosticKind.malformedPayload,
                 '$namespace/permissions/content', c);
           }

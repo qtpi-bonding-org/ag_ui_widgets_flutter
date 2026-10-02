@@ -274,4 +274,80 @@ void main() {
       expect(r.current.sessionState.isStarting, isTrue);
     });
   });
+
+  group('M2-M4', () {
+    test('M2: unhandledEvent diagnostic carries the event payload', () {
+      final r = ConversationReducer()
+        ..apply(const StepStartedEvent(stepName: 'plan'));
+      final d = r.current.diagnostics.single;
+      expect(d.kind, DiagnosticKind.unhandledEvent);
+      expect((d.payload as Map)['stepName'], 'plan');
+    });
+
+    test('M3: non-map location entries are diagnosed, valid ones kept', () {
+      final r = ConversationReducer()
+        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {
+          'toolCallId': 't',
+          'locations': [
+            'junk',
+            {'path': 'a.dart', 'line': 2},
+          ],
+        }));
+      final t = r.current.timeline.single as ToolCallTimelineItem;
+      expect(t.locations.single.path, 'a.dart');
+      final d = r.current.diagnostics.single;
+      expect(d.kind, DiagnosticKind.malformedPayload);
+      expect(d.name, 'pocketcoder:tool/locations');
+    });
+
+    test('M3: a non-list locations value is diagnosed and keeps earlier ones',
+        () {
+      final r = ConversationReducer()
+        ..apply(const CustomEvent(name: 'pocketcoder:tool', value: {
+          'toolCallId': 't',
+          'locations': [
+            {'path': 'a.dart'}
+          ],
+        }))
+        ..apply(const CustomEvent(
+            name: 'pocketcoder:tool',
+            value: {'toolCallId': 't', 'locations': 5}));
+      final t = r.current.timeline.single as ToolCallTimelineItem;
+      expect(t.locations.single.path, 'a.dart');
+      expect(r.current.diagnostics.single.name, 'pocketcoder:tool/locations');
+    });
+
+    test('M4: an unknown snapshot key is re-reported after it disappears', () {
+      final r = ConversationReducer();
+      StateSnapshotEvent s(Map<String, dynamic> m) =>
+          StateSnapshotEvent(snapshot: m);
+      int count() => r.current.diagnostics
+          .where((d) => d.name == 'snapshot/extra')
+          .length;
+      r.apply(s({'extra': 1}));
+      r.apply(s({'extra': 2}));
+      expect(count(), 1);
+      r.apply(s({'pocketcoder': <String, dynamic>{}}));
+      r.apply(s({'extra': 3}));
+      expect(count(), 2);
+    });
+
+    test('M4: the permission-content dedupe set is bounded', () {
+      final r = ConversationReducer();
+      StateSnapshotEvent s() => StateSnapshotEvent(snapshot: {
+            'pocketcoder': {
+              'permission': {
+                'requestId': 'p',
+                'content': [for (var i = 0; i < 501; i++) 'bad$i'],
+              },
+            },
+          });
+      r.apply(s());
+      final first = r.current.diagnostics.last.index;
+      r.apply(s());
+      // Past the cap the set was cleared, so old entries are reported again
+      // instead of the set growing without limit.
+      expect(r.current.diagnostics.last.index, greaterThan(first));
+    });
+  });
 }

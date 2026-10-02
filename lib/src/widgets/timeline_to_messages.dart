@@ -146,6 +146,7 @@ chat_core.Message _toMessage(TimelineItem item) {
 }
 
 Map<String, dynamic> _mediaToMap(MediaDescriptor d) => {
+      ...d.extras,
       'kind': d.kind,
       'mimeType': d.mimeType,
       'uri': d.uri,
@@ -157,7 +158,6 @@ Map<String, dynamic> _mediaToMap(MediaDescriptor d) => {
       'size': d.size,
       'messageId': d.messageId,
       'toolCallId': d.toolCallId,
-      ...d.extras,
     };
 
 /// Projects every currently-open streaming text item into the `StreamState`

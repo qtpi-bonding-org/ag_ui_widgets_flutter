@@ -497,10 +497,38 @@ class ConversationReducer {
     });
   }
 
+  /// Pending state entries of one kind, from both wire shapes: the legacy
+  /// single slot (`<legacyKey>`, one entry — pocketcoder) and the keyed map
+  /// (`<byIdKey>.by-id`, any number pending at once — acp-agui-adapter).
+  Iterable<Map> _stateEntries(String legacyKey, String byIdKey) sync* {
+    final legacy = _pocketcoder[legacyKey];
+    if (legacy is Map) yield legacy;
+    final keyed = _pocketcoder[byIdKey];
+    final byId = keyed is Map ? keyed['by-id'] : null;
+    if (byId is Map) {
+      for (final entry in byId.values) {
+        if (entry is Map) yield entry;
+      }
+    }
+  }
+
+  // Both syncs drop only the cards that are no longer pending and update the
+  // rest in place. A whole-namespace replace arrives on EVERY state change
+  // (a usage tick, a mode change), so removing and re-adding every card would
+  // hand each a fresh order key and move it to the end of the timeline.
   void _syncPermission() {
-    _removeAdapterItemsWhere((item) => item is PermissionRequestTimelineItem);
-    final permission = _pocketcoder['permission'];
-    if (permission is! Map) return;
+    final entries = _stateEntries('permission', 'permissions').toList();
+    final pending = {
+      for (final e in entries)
+        if (e['requestId'] is String) e['requestId'] as String,
+    };
+    _removeAdapterItemsWhere((item) =>
+        item is PermissionRequestTimelineItem &&
+        !pending.contains(item.requestId));
+    entries.forEach(_upsertPermission);
+  }
+
+  void _upsertPermission(Map permission) {
     final requestId = permission['requestId'];
     if (requestId is! String) return;
     if (_resolvedIds.contains(requestId)) return;
@@ -534,16 +562,38 @@ class ConversationReducer {
   }
 
   void _syncElicitation() {
-    _removeAdapterItemsWhere((item) => item is ElicitationRequestTimelineItem);
-    final elicitation = _pocketcoder['elicitation'];
-    if (elicitation is! Map) return;
+    final entries = _stateEntries('elicitation', 'elicitations').toList();
+    final pending = {
+      for (final e in entries)
+        if (e['elicitationId'] is String) e['elicitationId'] as String,
+    };
+    _removeAdapterItemsWhere((item) =>
+        item is ElicitationRequestTimelineItem &&
+        !pending.contains(item.requestId));
+    entries.forEach(_upsertElicitation);
+  }
+
+  void _upsertElicitation(Map elicitation) {
     final requestId = elicitation['elicitationId'];
     if (requestId is! String) return;
     if (_resolvedIds.contains(requestId)) return;
     final message = elicitation['message'] as String? ?? '';
-    final mode = elicitation['mode'] as String? ?? 'form';
-    final schema = elicitation['requestedSchema'];
-    final url = elicitation['url'] as String?;
+    // `mode` is a plain string with `requestedSchema`/`url` beside it
+    // (pocketcoder), or a tagged object — `{kind: form, schema}` /
+    // `{kind: url, url}` (acp-agui-adapter).
+    final rawMode = elicitation['mode'];
+    final String mode;
+    final Object? schema;
+    final String? url;
+    if (rawMode is Map) {
+      mode = (rawMode['kind'] as String?) ?? 'form';
+      schema = rawMode['schema'];
+      url = rawMode['url'] as String?;
+    } else {
+      mode = rawMode as String? ?? 'form';
+      schema = elicitation['requestedSchema'];
+      url = elicitation['url'] as String?;
+    }
     _adapterAIds.add(requestId);
     _upsert(
       requestId,
@@ -604,7 +654,17 @@ class ConversationReducer {
     final segments =
         path.split('/').where((s) => s.isNotEmpty).toList(growable: false);
     if (segments.isEmpty || segments.first != namespace) return;
-    if (segments.length == 2) {
+    if (segments.length == 1) {
+      // The whole namespace at once — acp-agui-adapter sends every state
+      // change as a `replace` of `/<namespace>` carrying the full state.
+      _pocketcoder.clear();
+      final value = op['value'];
+      if (op['op'] != 'remove' && value is Map) {
+        _pocketcoder.addAll(Map<String, dynamic>.from(value));
+      }
+      _syncPermission();
+      _syncElicitation();
+    } else if (segments.length == 2) {
       final ns = segments[1];
       switch (op['op']) {
         case 'remove':

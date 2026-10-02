@@ -40,4 +40,28 @@ void main() {
     expect((m.metadata!['resultParts'] as List).single['content'], 'A');
     expect(m.metadata!['meta'], {'k': 1});
   });
+
+  test('tool call extras in locations, terminals, patches and diffs are preserved',
+      () {
+    final item = TimelineItem.toolCall(
+      id: 't',
+      name: 'edit',
+      order: const OrderKey(1),
+      locations: const [
+        ToolLocation(path: 'a.dart', line: 3, extras: {'xLoc': 'val1'})
+      ],
+      terminals: const [
+        ToolTerminal(terminalId: 'x', extras: {'xTerm': 'val2'})
+      ],
+      patches: const [
+        ToolPatch(format: 'unified', patch: 'p', extras: {'xPatch': 'val3'})
+      ],
+      diffs: const [ToolDiff(path: 'b.dart', newText: 'n', extras: {'xDiff': 'val4'})],
+    );
+    final m = timelineToMessages([item]).single as chat_core.CustomMessage;
+    expect((m.metadata!['locations'] as List).single['xLoc'], 'val1');
+    expect((m.metadata!['terminals'] as List).single['xTerm'], 'val2');
+    expect((m.metadata!['patches'] as List).single['xPatch'], 'val3');
+    expect((m.metadata!['diffs'] as List).single['xDiff'], 'val4');
+  });
 }

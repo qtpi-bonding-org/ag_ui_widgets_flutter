@@ -85,19 +85,31 @@ chat_core.Message _toMessage(TimelineItem item) {
           'args': args,
           'result': result,
           'diffs': diffs
-              .map((d) => {'path': d.path, 'oldText': d.oldText, 'newText': d.newText})
+              .map((d) => {
+                    ...d.extras,
+                    'path': d.path,
+                    'oldText': d.oldText,
+                    'newText': d.newText
+                  })
               .toList(),
           'toolKind': toolKind,
           'hasEnded': hasEnded,
           'status': status,
           'locations': [
-            for (final l in locations) {'path': l.path, 'line': l.line},
+            for (final l in locations)
+              {...l.extras, 'path': l.path, 'line': l.line},
           ],
           'terminals': [
-            for (final t in terminals) {'terminalId': t.terminalId, 'meta': t.meta},
+            for (final t in terminals)
+              {
+                ...t.extras,
+                'terminalId': t.terminalId,
+                'meta': t.meta,
+              },
           ],
           'patches': [
-            for (final p in patches) {'format': p.format, 'patch': p.patch},
+            for (final p in patches)
+              {...p.extras, 'format': p.format, 'patch': p.patch},
           ],
           'media': [for (final d in media) _mediaToMap(d)],
           'resultParts': [
@@ -121,8 +133,7 @@ chat_core.Message _toMessage(TimelineItem item) {
         authorId: kAgentAuthorId,
         metadata: {'kind': 'toolRequest'},
       ),
-    MediaTimelineItem(:final id, :final messageId, :final media) =>
-      chat_core.Message.custom(
+    MediaTimelineItem(:final id, :final messageId, :final media) => chat_core.Message.custom(
         id: id,
         authorId: kAgentAuthorId,
         metadata: {

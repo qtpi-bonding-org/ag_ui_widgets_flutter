@@ -209,7 +209,7 @@ class ConversationReducer {
         _isRunning = false;
         _isStarting = false;
         final stopReason =
-            result is Map ? result['stopReason'] as String? : null;
+            result is Map ? asString(result['stopReason']) : null;
         _stopReason = stopReason;
         _runOutcome = switch (stopReason) {
           'cancelled' => RunOutcome.cancelled,
@@ -384,14 +384,27 @@ class ConversationReducer {
         if (value is Map) {
           final callId = value['callId'];
           if (callId is String) {
-            final optionsJson = value['optionsJson'] as String? ?? '[]';
-            final rawOptions = jsonDecode(optionsJson);
+            final rawOptionsJson = value['optionsJson'];
+            Object? rawOptions;
+            if (rawOptionsJson == null) {
+              rawOptions = const [];
+            } else if (rawOptionsJson is String) {
+              try {
+                rawOptions = jsonDecode(rawOptionsJson);
+              } on FormatException {
+                _diagnose(DiagnosticKind.malformedPayload,
+                    'acp.permission_request/optionsJson', rawOptionsJson);
+              }
+            } else {
+              _diagnose(DiagnosticKind.malformedPayload,
+                  'acp.permission_request/optionsJson', rawOptionsJson);
+            }
             final options = (rawOptions is List ? rawOptions : const [])
                 .whereType<Map>()
                 .map((o) => PermissionOption(
-                      optionId: (o['id'] as String?) ?? '',
-                      label: (o['label'] as String?) ?? '',
-                      kind: (o['kind'] as String?) ?? '',
+                      optionId: asString(o['id']) ?? '',
+                      label: asString(o['label']) ?? '',
+                      kind: asString(o['kind']) ?? '',
                     ))
                 .toList();
             // Namespaced ('perm:$callId', not bare $callId) — an ACP
@@ -419,8 +432,8 @@ class ConversationReducer {
               'perm:$callId',
               (order) => TimelineItem.permissionRequest(
                 requestId: callId,
-                toolTitle: value['toolName'] as String?,
-                description: value['description'] as String?,
+                toolTitle: asString(value['toolName']),
+                description: asString(value['description']),
                 toolCallId: callId,
                 toolArgs: correlatedTool is ToolCallTimelineItem
                     ? correlatedTool.args
@@ -439,12 +452,12 @@ class ConversationReducer {
               requestId,
               (order) => TimelineItem.elicitationRequest(
                 requestId: requestId,
-                message: (value['message'] as String?) ?? '',
-                mode: (value['mode'] as String?) ?? 'form',
+                message: asString(value['message']) ?? '',
+                mode: asString(value['mode']) ?? 'form',
                 schema: value['schema'] is Map
                     ? Map<String, dynamic>.from(value['schema'] as Map)
                     : null,
-                url: value['url'] as String?,
+                url: asString(value['url']),
                 order: order,
               ),
             );
@@ -454,7 +467,7 @@ class ConversationReducer {
         if (value is Map) {
           final callId = value['callId'];
           if (callId is String) {
-            final toolName = (value['toolName'] as String?) ?? '';
+            final toolName = asString(value['toolName']) ?? '';
             if (autoResolveToolRequest?.call(toolName) ?? false) {
               _resolvedIds.add(callId);
             } else {
@@ -773,8 +786,8 @@ class ConversationReducer {
       requestId,
       (order) => TimelineItem.permissionRequest(
         requestId: requestId,
-        toolTitle: permission['title'] as String?,
-        toolKind: permission['kind'] as String?,
+        toolTitle: asString(permission['title']),
+        toolKind: asString(permission['kind']),
         toolCallId: toolCallId is String ? toolCallId : null,
         toolArgs: correlatedTool is ToolCallTimelineItem
             ? correlatedTool.args
@@ -805,7 +818,7 @@ class ConversationReducer {
     final requestId = elicitation['elicitationId'];
     if (requestId is! String) return;
     if (_resolvedIds.contains(requestId)) return;
-    final message = elicitation['message'] as String? ?? '';
+    final message = asString(elicitation['message']) ?? '';
     // `mode` is a plain string with `requestedSchema`/`url` beside it
     // (pocketcoder), or a tagged object — `{kind: form, schema}` /
     // `{kind: url, url}` (acp-agui-adapter).
@@ -814,13 +827,13 @@ class ConversationReducer {
     final Object? schema;
     final String? url;
     if (rawMode is Map) {
-      mode = (rawMode['kind'] as String?) ?? 'form';
+      mode = asString(rawMode['kind']) ?? 'form';
       schema = rawMode['schema'];
-      url = rawMode['url'] as String?;
+      url = asString(rawMode['url']);
     } else {
-      mode = rawMode as String? ?? 'form';
+      mode = asString(rawMode) ?? 'form';
       schema = elicitation['requestedSchema'];
-      url = elicitation['url'] as String?;
+      url = asString(elicitation['url']);
     }
     _adapterAIds.add(requestId);
     _upsert(
@@ -956,14 +969,13 @@ class ConversationReducer {
   SessionState _sessionState() {
     Map<String, dynamic>? asMap(dynamic v) =>
         v is Map ? Map<String, dynamic>.from(v) : null;
-    final sessionInfo = asMap(_pocketcoder['session_info']);
     return SessionState(
       permission: asMap(_pocketcoder['permission']),
       elicitation: asMap(_pocketcoder['elicitation']),
       modes: asMap(_pocketcoder['modes']),
       config: asMap(_pocketcoder['config']),
       plan: asMap(_pocketcoder['plan']),
-      title: sessionInfo?['title'] as String?,
+      title: _sessionInfo?.title,
       isRunning: _isRunning,
       isStarting: _isStarting,
       runError: _runError,

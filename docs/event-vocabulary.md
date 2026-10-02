@@ -1,7 +1,9 @@
 # Event vocabulary
 
 What `ConversationReducer` folds, and where each piece ends up. Anything not
-listed here is recorded as a `Diagnostic` (never silently dropped).
+listed here is recorded as a `Diagnostic` (never silently dropped). Malformed
+`acp.*` payloads and unknown `acp.session_phase` phases are diagnosed once per
+distinct payload (the dedupe set is bounded).
 
 ## Namespace rule
 
@@ -20,16 +22,16 @@ state key; update this file when it does.
 
 | Wire name | Payload | Folded into | Notes |
 |---|---|---|---|
-| `<ns>:tool` | `{toolCallId, title?, kind?, status?, locations?, meta?}` | `ToolCallTimelineItem` `name` (only if still empty), `toolKind`, `status`, `locations`, `meta` | Missing `toolCallId` is a `malformedPayload`. Creates the tool item if the call has not started yet. |
+| `<ns>:tool` | `{toolCallId, title?, kind?, status?, locations?, meta?}` | `ToolCallTimelineItem` `name` (only if still empty), `toolKind`, `status`, `locations`, `meta` | Missing `toolCallId` is a `malformedPayload`. Creates the tool item if the call has not started yet. By design: a `title` arriving after the item already has a name is lost (the name is never overwritten). An update carrying a `locations` key replaces the earlier locations (an empty list clears them); an update without the key leaves them alone. Non-map `locations` entries are diagnosed (`malformedPayload`, `<ns>/locations`). |
 | `<ns>:diff` | `{toolCallId, ...}` as a tool-content object | `ToolCallTimelineItem.diffs` (`ToolDiff`) or `.patches` (`ToolPatch`, the `{format, patch}` shape) | Appends. Unknown keys kept in `extras`. Anything else is `malformedPayload`. |
 | `<ns>:terminal` | `{toolCallId, terminalId, ...}` | `ToolCallTimelineItem.terminals` | Appends. Missing/empty `terminalId` is `malformedPayload`. |
 | `<ns>:content` | media descriptor `{kind, toolCallId?, messageId?, ...}` | `ToolCallTimelineItem.media` when `toolCallId` is set, otherwise a standalone `MediaTimelineItem` | Empty `kind` is `malformedPayload`. |
 | `<ns>:response_meta` | `{method, meta}` | `SessionState.responseMeta[method]` | Later value for the same method replaces the earlier. |
 | `<ns>:sync` | `{mode: replace}` | Reset: clears timeline, run state, typed state and open streams | Keeps diagnostics, source records and the resolved-request set. Any other `mode` is an `unknownCustom` diagnostic. |
-| `acp.permission_request` | `{callId, optionsJson, toolName?, description?}` | `PermissionRequestTimelineItem` (key `perm:<callId>`) | Direct-event path, anchored right after its tool call. |
-| `acp.elicitation_request` | `{requestId, message?, mode?, schema?, url?}` | `ElicitationRequestTimelineItem` | Direct-event path. |
-| `acp.client_execute_request` | `{callId, toolName, args}` | `ToolRequestTimelineItem` (key `req:<callId>`) | Skipped (marked resolved) when `autoResolveToolRequest(toolName)` is true. |
-| `acp.session_phase` | `{phase: starting\|ready}` | `SessionState.isStarting` | Other phases are ignored. |
+| `acp.permission_request` | `{callId, optionsJson, toolName?, description?}` | `PermissionRequestTimelineItem` (key `perm:<callId>`) | Direct-event path, anchored right after its tool call. A non-map payload or missing `callId` is `malformedPayload`; `optionsJson` that is not a string or not valid JSON is `malformedPayload` (`acp.permission_request/optionsJson`) and yields no options. |
+| `acp.elicitation_request` | `{requestId, message?, mode?, schema?, url?}` | `ElicitationRequestTimelineItem` | Direct-event path. `mode` defaults to `form`. A non-map payload or missing `requestId` is `malformedPayload`. |
+| `acp.client_execute_request` | `{callId, toolName, args}` | `ToolRequestTimelineItem` (key `req:<callId>`) | Skipped (marked resolved) when `autoResolveToolRequest(toolName)` is true. A non-map payload or missing `callId` is `malformedPayload`. |
+| `acp.session_phase` | `{phase: starting\|ready}` | `SessionState.isStarting` | An unknown phase is `unknownCustom`; a non-map payload is `malformedPayload`. |
 | `acp:source` | wire record map | `Conversation.sourceRecords` (bounded) | Not a diagnostic. Non-map payload is `malformedPayload`. |
 | any other CUSTOM | any | `Diagnostic(unknownCustom)` | |
 
@@ -59,12 +61,12 @@ diagnostic (reported once until it parses again).
 |---|---|---|---|
 | `agent` | agent info | `SessionState.agent` (`AgentState`) | |
 | `mode` | current mode id and available modes | `SessionState.mode` (`ModeState`) | |
-| `commands` | available commands | `SessionState.commands` (`CommandsState`) | |
+| `commands` | available commands: a bare list of `{name, description}` (pocketcoder) or `{commands: [...]}` | `SessionState.commands` (`CommandsState`) | |
 | `config` | config options | `SessionState.configState` (`ConfigState`) | `SessionState.config` stays the legacy raw map of the same key. |
 | `usage` | token/context usage | `SessionState.usage` (`UsageState`) | |
 | `session_info` | title, `updated_at`, `meta` | `SessionState.sessionInfo` (`SessionInfo`); `title` also at `SessionState.title` | |
-| `plans` | `{by-id, ...}` (or legacy list shape) | `SessionState.plans` (`PlansState`) | |
-| `permissions` | `{by-id: {requestId: {...}}}` | `PermissionRequestTimelineItem` per entry (content, meta, sessionId, option extras, unknown keys in `extras`) | Cards no longer pending are removed; others updated in place. |
+| `plans` | `{by-id: {id: plan}, legacy?: plan}` | `SessionState.plans` (`PlansState`) | A list is `malformedPayload`. |
+| `permissions` | `{by-id: {toolCallId: {requestId, ...}}}` | `PermissionRequestTimelineItem` per entry (content, meta, sessionId, option extras, unknown keys in `extras`) | Cards no longer pending are removed; others updated in place. |
 | `elicitations` | `{by-id: {elicitationId: {...}}}` | `ElicitationRequestTimelineItem` per entry (`scope`, `meta`, tagged `mode` object kept as `rawMode`) | Same pending/removal rule. |
 | `permission` | single request map (legacy, pocketcoder) | same as one `permissions` entry; also `SessionState.permission` raw | |
 | `elicitation` | single request map (legacy) | same as one `elicitations` entry; also `SessionState.elicitation` raw | `mode` is a plain string with `requestedSchema`/`url` beside it. |
@@ -74,3 +76,12 @@ diagnostic (reported once until it parses again).
 
 Requests the app resolves via `resolveRequest(id)` stay suppressed across
 resets and replays.
+
+## Lossy-by-design notes
+
+- List-valued fields inside session models (modes, auth methods, commands,
+  config options and their choices, plan entries, and `PlansState.byId`) are
+  read with `asJsonMapList`, which silently drops entries that are not maps.
+- Elicitation `mode` defaults to `form` when absent or not a string.
+- Typed fields read with `asString` are null when the wire value has the wrong
+  type; the original value is not kept (only unknown keys are, in `extras`).

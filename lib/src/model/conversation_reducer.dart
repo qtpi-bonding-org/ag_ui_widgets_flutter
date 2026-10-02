@@ -80,6 +80,7 @@ class ConversationReducer {
   final Set<String> _reportedUnknown = {};
   final Set<String> _reportedContent = {};
   final Set<String> _reportedSnapshotKeys = {};
+  final Set<String> _reportedOnce = {};
 
   String? _threadId;
   String? _runId;
@@ -442,7 +443,13 @@ class ConversationReducer {
                 order: anchor != null ? OrderKey(anchor.seq, 1) : order,
               ),
             );
+          } else {
+            _diagnoseOnce(DiagnosticKind.malformedPayload,
+                'acp.permission_request', value);
           }
+        } else {
+          _diagnoseOnce(
+              DiagnosticKind.malformedPayload, 'acp.permission_request', value);
         }
       case ag_ui.CustomEvent(name: 'acp.elicitation_request', :final value):
         if (value is Map) {
@@ -461,7 +468,13 @@ class ConversationReducer {
                 order: order,
               ),
             );
+          } else {
+            _diagnoseOnce(DiagnosticKind.malformedPayload,
+                'acp.elicitation_request', value);
           }
+        } else {
+          _diagnoseOnce(
+              DiagnosticKind.malformedPayload, 'acp.elicitation_request', value);
         }
       case ag_ui.CustomEvent(name: 'acp.client_execute_request', :final value):
         if (value is Map) {
@@ -487,7 +500,13 @@ class ConversationReducer {
                 ),
               );
             }
+          } else {
+            _diagnoseOnce(DiagnosticKind.malformedPayload,
+                'acp.client_execute_request', value);
           }
+        } else {
+          _diagnoseOnce(DiagnosticKind.malformedPayload,
+              'acp.client_execute_request', value);
         }
       case ag_ui.CustomEvent(name: 'acp.session_phase', :final value):
         if (value is Map) {
@@ -496,7 +515,13 @@ class ConversationReducer {
               _isStarting = true;
             case 'ready':
               _isStarting = false;
+            default:
+              _diagnoseOnce(
+                  DiagnosticKind.unknownCustom, 'acp.session_phase', value);
           }
+        } else {
+          _diagnoseOnce(
+              DiagnosticKind.malformedPayload, 'acp.session_phase', value);
         }
       case ag_ui.CustomEvent(name: final name) when name == '$namespace:diff':
         final value = asJsonMap(event.value);
@@ -643,6 +668,26 @@ class ConversationReducer {
               as ToolCallTimelineItem;
       return update(base);
     });
+  }
+
+  /// Upper bound on every `_reported*` dedupe set that is keyed by wire
+  /// content (not by a state key that is pruned when it goes away).
+  static const int _maxReportedKeys = 500;
+
+  /// Adds [key] to [set], first clearing the set if it is at the cap — a
+  /// bounded dedupe: worst case a very old problem is reported once more.
+  static bool _firstTime(Set<String> set, String key) {
+    if (set.length >= _maxReportedKeys) set.clear();
+    return set.add(key);
+  }
+
+  /// [_diagnose], but only the first time this exact (kind, name, payload)
+  /// is seen, so a producer repeating the same bad event cannot flood the
+  /// bounded diagnostics list.
+  void _diagnoseOnce(DiagnosticKind kind, String name, [Object? payload]) {
+    if (_firstTime(_reportedOnce, '${kind.name}|$name|$payload')) {
+      _diagnose(kind, name, payload);
+    }
   }
 
   void _diagnose(DiagnosticKind kind, String name, [Object? payload]) {

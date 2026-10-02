@@ -240,4 +240,38 @@ void main() {
       expect(r.current.sessionState.commands!.commands.single.name, 'a');
     });
   });
+
+  group('I6 malformed direct acp.* events are diagnosed', () {
+    for (final name in [
+      'acp.permission_request',
+      'acp.elicitation_request',
+      'acp.client_execute_request',
+    ]) {
+      test('$name: non-map and missing id are malformedPayload, deduped', () {
+        final r = ConversationReducer();
+        r.apply(CustomEvent(name: name, value: 'oops'));
+        r.apply(CustomEvent(name: name, value: const {'x': 1}));
+        r.apply(CustomEvent(name: name, value: const {'x': 1}));
+        final ds = r.current.diagnostics;
+        expect(ds, hasLength(2));
+        expect(ds.every((d) => d.kind == DiagnosticKind.malformedPayload),
+            isTrue);
+        expect(ds.every((d) => d.name == name), isTrue);
+        expect(r.current.timeline, isEmpty);
+      });
+    }
+
+    test('acp.session_phase: unknown phase and non-map are diagnosed', () {
+      final r = ConversationReducer()
+        ..apply(const CustomEvent(
+            name: 'acp.session_phase', value: {'phase': 'weird'}))
+        ..apply(const CustomEvent(name: 'acp.session_phase', value: 'x'))
+        ..apply(const CustomEvent(
+            name: 'acp.session_phase', value: {'phase': 'starting'}));
+      final ds = r.current.diagnostics;
+      expect(ds.map((d) => d.kind),
+          [DiagnosticKind.unknownCustom, DiagnosticKind.malformedPayload]);
+      expect(r.current.sessionState.isStarting, isTrue);
+    });
+  });
 }

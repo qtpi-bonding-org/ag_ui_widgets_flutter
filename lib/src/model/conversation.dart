@@ -36,21 +36,14 @@ abstract class PermissionOption with _$PermissionOption {
 /// event-arrival counter, bumped once per `apply()` call. `sub` orders
 /// items correlated to the same anchor (e.g. a permission card pinned
 /// just after its tool call) without needing a fractional key.
-class OrderKey implements Comparable<OrderKey> {
-  const OrderKey(this.seq, [this.sub = 0]);
-  final int seq;
-  final int sub;
+@freezed
+abstract class OrderKey with _$OrderKey implements Comparable<OrderKey> {
+  const OrderKey._();
+  const factory OrderKey(int seq, [@Default(0) int sub]) = _OrderKey;
 
   @override
   int compareTo(OrderKey other) =>
       seq != other.seq ? seq.compareTo(other.seq) : sub.compareTo(other.sub);
-
-  @override
-  bool operator ==(Object other) =>
-      other is OrderKey && other.seq == seq && other.sub == sub;
-
-  @override
-  int get hashCode => Object.hash(seq, sub);
 }
 
 /// One item in the ordered conversation timeline: text/reasoning prose, an

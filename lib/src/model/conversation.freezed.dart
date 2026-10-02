@@ -647,6 +647,304 @@ class __$PermissionOptionCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$OrderKey {
+  int get seq;
+  int get sub;
+
+  /// Create a copy of OrderKey
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<OrderKey> get copyWith =>
+      _$OrderKeyCopyWithImpl<OrderKey>(this as OrderKey, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is OrderKey &&
+            (identical(other.seq, seq) || other.seq == seq) &&
+            (identical(other.sub, sub) || other.sub == sub));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, seq, sub);
+
+  @override
+  String toString() {
+    return 'OrderKey(seq: $seq, sub: $sub)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $OrderKeyCopyWith<$Res> {
+  factory $OrderKeyCopyWith(OrderKey value, $Res Function(OrderKey) _then) =
+      _$OrderKeyCopyWithImpl;
+  @useResult
+  $Res call({int seq, int sub});
+}
+
+/// @nodoc
+class _$OrderKeyCopyWithImpl<$Res> implements $OrderKeyCopyWith<$Res> {
+  _$OrderKeyCopyWithImpl(this._self, this._then);
+
+  final OrderKey _self;
+  final $Res Function(OrderKey) _then;
+
+  /// Create a copy of OrderKey
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? seq = null,
+    Object? sub = null,
+  }) {
+    return _then(_self.copyWith(
+      seq: null == seq
+          ? _self.seq
+          : seq // ignore: cast_nullable_to_non_nullable
+              as int,
+      sub: null == sub
+          ? _self.sub
+          : sub // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [OrderKey].
+extension OrderKeyPatterns on OrderKey {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_OrderKey value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OrderKey() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_OrderKey value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderKey():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_OrderKey value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderKey() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int seq, int sub)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OrderKey() when $default != null:
+        return $default(_that.seq, _that.sub);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int seq, int sub) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderKey():
+        return $default(_that.seq, _that.sub);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int seq, int sub)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderKey() when $default != null:
+        return $default(_that.seq, _that.sub);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _OrderKey extends OrderKey {
+  const _OrderKey(this.seq, [this.sub = 0]) : super._();
+
+  @override
+  final int seq;
+  @override
+  @JsonKey()
+  final int sub;
+
+  /// Create a copy of OrderKey
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$OrderKeyCopyWith<_OrderKey> get copyWith =>
+      __$OrderKeyCopyWithImpl<_OrderKey>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _OrderKey &&
+            (identical(other.seq, seq) || other.seq == seq) &&
+            (identical(other.sub, sub) || other.sub == sub));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, seq, sub);
+
+  @override
+  String toString() {
+    return 'OrderKey(seq: $seq, sub: $sub)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$OrderKeyCopyWith<$Res>
+    implements $OrderKeyCopyWith<$Res> {
+  factory _$OrderKeyCopyWith(_OrderKey value, $Res Function(_OrderKey) _then) =
+      __$OrderKeyCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int seq, int sub});
+}
+
+/// @nodoc
+class __$OrderKeyCopyWithImpl<$Res> implements _$OrderKeyCopyWith<$Res> {
+  __$OrderKeyCopyWithImpl(this._self, this._then);
+
+  final _OrderKey _self;
+  final $Res Function(_OrderKey) _then;
+
+  /// Create a copy of OrderKey
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? seq = null,
+    Object? sub = null,
+  }) {
+    return _then(_OrderKey(
+      null == seq
+          ? _self.seq
+          : seq // ignore: cast_nullable_to_non_nullable
+              as int,
+      null == sub
+          ? _self.sub
+          : sub // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$TimelineItem {
   OrderKey get order;
 
@@ -682,6 +980,8 @@ abstract mixin class $TimelineItemCopyWith<$Res> {
       _$TimelineItemCopyWithImpl;
   @useResult
   $Res call({OrderKey order});
+
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -704,6 +1004,16 @@ class _$TimelineItemCopyWithImpl<$Res> implements $TimelineItemCopyWith<$Res> {
           : order // ignore: cast_nullable_to_non_nullable
               as OrderKey,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 
@@ -1172,6 +1482,9 @@ abstract mixin class $TextTimelineItemCopyWith<$Res>
       String role,
       String text,
       OrderKey order});
+
+  @override
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -1215,6 +1528,16 @@ class _$TextTimelineItemCopyWithImpl<$Res>
           : order // ignore: cast_nullable_to_non_nullable
               as OrderKey,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 
@@ -1281,6 +1604,9 @@ abstract mixin class $TextStreamTimelineItemCopyWith<$Res>
       String role,
       String text,
       OrderKey order});
+
+  @override
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -1324,6 +1650,16 @@ class _$TextStreamTimelineItemCopyWithImpl<$Res>
           : order // ignore: cast_nullable_to_non_nullable
               as OrderKey,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 
@@ -1418,6 +1754,9 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
       String? toolKind,
       bool hasEnded,
       String? status});
+
+  @override
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -1481,6 +1820,16 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 
@@ -1581,6 +1930,9 @@ abstract mixin class $PermissionRequestTimelineItemCopyWith<$Res>
       String? toolArgs,
       List<PermissionOption> options,
       OrderKey order});
+
+  @override
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -1639,6 +1991,16 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
           : order // ignore: cast_nullable_to_non_nullable
               as OrderKey,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 
@@ -1725,6 +2087,9 @@ abstract mixin class $ElicitationRequestTimelineItemCopyWith<$Res>
       OrderKey order,
       Map<String, dynamic>? schema,
       String? url});
+
+  @override
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -1778,6 +2143,16 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 
@@ -1853,6 +2228,9 @@ abstract mixin class $ToolRequestTimelineItemCopyWith<$Res>
       String? toolTitle,
       String? toolKind,
       String argsJson});
+
+  @override
+  $OrderKeyCopyWith<$Res> get order;
 }
 
 /// @nodoc
@@ -1901,6 +2279,16 @@ class _$ToolRequestTimelineItemCopyWithImpl<$Res>
           : argsJson // ignore: cast_nullable_to_non_nullable
               as String,
     ));
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrderKeyCopyWith<$Res> get order {
+    return $OrderKeyCopyWith<$Res>(_self.order, (value) {
+      return _then(_self.copyWith(order: value));
+    });
   }
 }
 

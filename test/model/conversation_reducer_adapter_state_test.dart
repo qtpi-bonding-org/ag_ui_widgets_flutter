@@ -228,21 +228,39 @@ void main() {
       expect(d.name, 'episutra/elicitation');
     });
 
-    test('a string `mode` (legacy shape) is not read: no schema, no url', () {
+    test(
+        'a string `mode` (legacy shape) is not read but is diagnosed once, '
+        'and its sibling keys survive in extras', () {
+      final state = _state(elicitations: {
+        'e9': {
+          'elicitationId': 'e9',
+          'message': 'hi',
+          'mode': 'url',
+          'requestedSchema': {'type': 'object'},
+          'url': 'https://example.com/x',
+        },
+      });
       final r = ConversationReducer(namespace: _ns)
-        ..apply(_snapshot(_state(elicitations: {
-          'e9': {
-            'elicitationId': 'e9',
-            'message': 'hi',
-            'mode': 'url',
-            'requestedSchema': {'type': 'object'},
-            'url': 'https://example.com/x',
-          },
-        })));
+        ..apply(_snapshot(state))
+        ..apply(_replaceAll(state));
       final e = _elicitations(r).single;
       expect(e.mode, 'form');
       expect(e.schema, isNull);
       expect(e.url, isNull);
+      expect(e.extras['requestedSchema'], {'type': 'object'});
+      expect(e.extras['url'], 'https://example.com/x');
+      final d = r.current.diagnostics.single;
+      expect(d.kind, DiagnosticKind.malformedPayload);
+      expect(d.name, 'episutra/elicitations/mode');
+    });
+
+    test('an absent `mode` is a form card with no diagnostic', () {
+      final r = ConversationReducer(namespace: _ns)
+        ..apply(_snapshot(_state(elicitations: {
+          'e8': {'elicitationId': 'e8', 'message': 'hi'},
+        })));
+      expect(_elicitations(r).single.mode, 'form');
+      expect(r.current.diagnostics, isEmpty);
     });
   });
 

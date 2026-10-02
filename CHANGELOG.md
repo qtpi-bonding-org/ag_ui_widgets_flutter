@@ -1,3 +1,30 @@
+## 0.8.0
+
+Breaking:
+
+- `ConversationReducer`, `reduce` and `isReplaceMarker` take a required
+  `namespace` (no default). Backends pick their own wire namespace.
+- The legacy (pocketcoder) wire shapes are no longer read; only the
+  acp-agui-adapter shape is. Removed: the single-slot `permission` /
+  `elicitation` state keys (use `permissions.by-id` / `elicitations.by-id`),
+  string-valued elicitation `mode` with `requestedSchema`/`url` beside it
+  (use the tagged `mode: {kind, ...}` object), and the bare-list `commands`
+  shape (use `{commands: [...]}`). Legacy keys are reported once as
+  `unknownStateKey`; a string `mode` is reported as `malformedPayload`.
+- `SessionState` loses the raw `permission`, `elicitation`, `modes`, `config`
+  and `plan` fields (the typed `mode`, `configState`, `plans` remain).
+- New `TimelineItem.media` variant: exhaustive `switch`es over the sealed
+  `TimelineItem` must handle it.
+
+Added:
+
+- Typed session state (`agent`, `mode`, `commands`, `config`, `usage`,
+  `session_info`, `plans`) on `SessionState`.
+- Reducer diagnostics (`Conversation.diagnostics`) for unknown, malformed and
+  unhandled input instead of silently dropping it.
+- Richer tool-call detail, and run-lifecycle fields on `SessionState`.
+- `docs/event-vocabulary.md` documenting every event and state key.
+
 ## 0.6.0
 
 - New: `StackedChatStyle`/`BubbleChatStyle` gain `markdownWhileStreaming`

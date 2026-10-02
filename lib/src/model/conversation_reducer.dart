@@ -329,7 +329,8 @@ class ConversationReducer {
                   order: order,
                 ) as ToolCallTimelineItem;
           return base.copyWith(
-            name: event.toolCallName.isNotEmpty ? event.toolCallName : base.name,
+            name:
+                event.toolCallName.isNotEmpty ? event.toolCallName : base.name,
           );
         });
       case ag_ui.ToolCallArgsEvent():
@@ -342,7 +343,8 @@ class ConversationReducer {
             result: event.content,
             resultParts: [
               ...t.resultParts,
-              ToolResultPart(messageId: event.messageId, content: event.content),
+              ToolResultPart(
+                  messageId: event.messageId, content: event.content),
             ],
           ),
         );
@@ -366,14 +368,14 @@ class ConversationReducer {
                 if (ToolLocation.parse(l) case final loc?) loc,
             ];
             if (locations.length != rawLocations.length) {
-              _diagnoseOnce(
-                  DiagnosticKind.malformedPayload, '$name/locations', rawLocations);
+              _diagnoseOnce(DiagnosticKind.malformedPayload, '$name/locations',
+                  rawLocations);
             }
           } else if (value.containsKey('locations')) {
             // Not a list: keep the locations already known rather than
             // clearing them on junk.
-            _diagnoseOnce(
-                DiagnosticKind.malformedPayload, '$name/locations', rawLocations);
+            _diagnoseOnce(DiagnosticKind.malformedPayload, '$name/locations',
+                rawLocations);
           }
           final meta = asJsonMap(value['meta']);
           _updateTool(
@@ -482,8 +484,8 @@ class ConversationReducer {
                 'acp.elicitation_request', value);
           }
         } else {
-          _diagnoseOnce(
-              DiagnosticKind.malformedPayload, 'acp.elicitation_request', value);
+          _diagnoseOnce(DiagnosticKind.malformedPayload,
+              'acp.elicitation_request', value);
         }
       case ag_ui.CustomEvent(name: 'acp.client_execute_request', :final value):
         if (value is Map) {
@@ -539,31 +541,35 @@ class ConversationReducer {
         if (toolCallId == null) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else if (content is ToolContentDiff) {
-          _updateTool(toolCallId,
-              (t) => t.copyWith(diffs: [...t.diffs, content.diff]));
+          _updateTool(
+              toolCallId, (t) => t.copyWith(diffs: [...t.diffs, content.diff]));
         } else if (content is ToolContentPatch) {
           _updateTool(toolCallId,
               (t) => t.copyWith(patches: [...t.patches, content.patch]));
         } else {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         }
-      case ag_ui.CustomEvent(name: final name) when name == '$namespace:terminal':
+      case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:terminal':
         final value = asJsonMap(event.value);
         final toolCallId = asString(value?['toolCallId']);
         final terminal = ToolTerminal.parse(value);
-        if (toolCallId == null || terminal == null || terminal.terminalId.isEmpty) {
+        if (toolCallId == null ||
+            terminal == null ||
+            terminal.terminalId.isEmpty) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else {
           _updateTool(toolCallId,
               (t) => t.copyWith(terminals: [...t.terminals, terminal]));
         }
-      case ag_ui.CustomEvent(name: final name) when name == '$namespace:content':
+      case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:content':
         final media = MediaDescriptor.parse(event.value);
         if (media == null || media.kind.isEmpty) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else if (media.toolCallId != null) {
-          _updateTool(media.toolCallId!,
-              (t) => t.copyWith(media: [...t.media, media]));
+          _updateTool(
+              media.toolCallId!, (t) => t.copyWith(media: [...t.media, media]));
         } else {
           final id = 'media:${_mediaCount++}';
           _upsert(
@@ -603,8 +609,8 @@ class ConversationReducer {
           } else if (nsState != null) {
             // The snapshot stays authoritative (state is cleared), but a
             // namespace entry that is not a map is a wire problem.
-            _diagnose(
-                DiagnosticKind.malformedPayload, 'snapshot/$namespace', nsState);
+            _diagnose(DiagnosticKind.malformedPayload, 'snapshot/$namespace',
+                nsState);
           }
         }
         _syncPermission();
@@ -612,11 +618,12 @@ class ConversationReducer {
         _onStateChanged();
         if (snapshot is Map) {
           // Forget keys that are gone, so one that comes back is reported again.
-          _reportedSnapshotKeys.retainAll({for (final k in snapshot.keys) '$k'});
+          _reportedSnapshotKeys
+              .retainAll({for (final k in snapshot.keys) '$k'});
           for (final key in snapshot.keys) {
             if (key != namespace && _reportedSnapshotKeys.add('$key')) {
-              _diagnose(
-                  DiagnosticKind.unknownStateKey, 'snapshot/$key', snapshot[key]);
+              _diagnose(DiagnosticKind.unknownStateKey, 'snapshot/$key',
+                  snapshot[key]);
             }
           }
         } else {
@@ -767,15 +774,22 @@ class ConversationReducer {
     _reportedUnknown.retainAll(unknownNow);
     for (final key in unknownNow) {
       if (_reportedUnknown.add(key)) {
-        _diagnose(DiagnosticKind.unknownStateKey, '$namespace/$key',
-            _state[key]);
+        _diagnose(
+            DiagnosticKind.unknownStateKey, '$namespace/$key', _state[key]);
       }
     }
   }
 
   static const _knownStateKeys = {
-    'agent', 'mode', 'commands', 'config', 'usage', 'session_info', 'plans',
-    'permissions', 'elicitations',
+    'agent',
+    'mode',
+    'commands',
+    'config',
+    'usage',
+    'session_info',
+    'plans',
+    'permissions',
+    'elicitations',
   };
 
   /// Pending state entries of one kind, from the keyed map
@@ -811,8 +825,14 @@ class ConversationReducer {
     if (requestId is! String) return;
     if (_resolvedIds.contains(requestId)) return;
     const permissionKnown = {
-      'requestId', 'sessionId', 'toolCallId', 'title', 'kind', 'options',
-      'content', 'meta',
+      'requestId',
+      'sessionId',
+      'toolCallId',
+      'title',
+      'kind',
+      'options',
+      'content',
+      'meta',
     };
     final options = [
       for (final o in asJsonMapList(permission['options']))
@@ -839,8 +859,7 @@ class ConversationReducer {
       }
     }
     final toolCallId = permission['toolCallId'];
-    final correlatedTool =
-        toolCallId is String ? _items[toolCallId] : null;
+    final correlatedTool = toolCallId is String ? _items[toolCallId] : null;
     final anchor = correlatedTool?.order;
     _adapterAIds.add(requestId);
     _upsert(
@@ -850,15 +869,15 @@ class ConversationReducer {
         toolTitle: asString(permission['title']),
         toolKind: asString(permission['kind']),
         toolCallId: toolCallId is String ? toolCallId : null,
-        toolArgs: correlatedTool is ToolCallTimelineItem
-            ? correlatedTool.args
-            : null,
+        toolArgs:
+            correlatedTool is ToolCallTimelineItem ? correlatedTool.args : null,
         options: options,
         order: anchor != null ? OrderKey(anchor.seq, 1) : order,
         content: content,
         meta: asJsonMap(permission['meta']),
         sessionId: asString(permission['sessionId']),
-        extras: extrasOf(Map<String, dynamic>.from(permission), permissionKnown),
+        extras:
+            extrasOf(Map<String, dynamic>.from(permission), permissionKnown),
       ),
     );
   }
@@ -893,6 +912,13 @@ class ConversationReducer {
       mode = 'form';
       schema = null;
       url = null;
+      // A string mode (the old `requestedSchema`/`url`-beside-it shape) is no
+      // longer read; say so once. Those sibling keys stay in `extras`.
+      if (rawMode != null &&
+          _firstTime(_reportedContent, 'mode|$requestId|$rawMode')) {
+        _diagnose(DiagnosticKind.malformedPayload,
+            '$namespace/elicitations/mode', rawMode);
+      }
     }
     _adapterAIds.add(requestId);
     _upsert(
@@ -907,7 +933,8 @@ class ConversationReducer {
         scope: ElicitationScope.parse(elicitation['scope']),
         meta: asJsonMap(elicitation['meta']),
         rawMode: rawMode is Map ? Map<String, dynamic>.from(rawMode) : null,
-        extras: extrasOf(Map<String, dynamic>.from(elicitation), const {'elicitationId', 'message', 'mode', 'scope', 'meta'}),
+        extras: extrasOf(Map<String, dynamic>.from(elicitation),
+            const {'elicitationId', 'message', 'mode', 'scope', 'meta'}),
       ),
     );
   }
@@ -984,8 +1011,7 @@ class ConversationReducer {
       if (kind != 'remove') {
         _state.addAll(Map<String, dynamic>.from(value as Map));
       }
-    } else if (!_setAt(_state, keys, op['value'],
-        remove: kind == 'remove')) {
+    } else if (!_setAt(_state, keys, op['value'], remove: kind == 'remove')) {
       // Descends through a value that exists but is not a map (e.g. a list
       // index). Leave the state untouched rather than corrupt it, and say so.
       _diagnose(DiagnosticKind.malformedPayload, '$namespace/patch', op);

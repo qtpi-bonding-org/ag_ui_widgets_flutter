@@ -1,24 +1,15 @@
 // lib/src/model/conversation.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'tool_models.dart';
+
+export 'tool_models.dart';
+
 part 'conversation.freezed.dart';
 
 enum ChatMessageKind { text, reasoning }
 
 enum RunOutcome { success, cancelled, interrupted, failed }
-
-/// One diff hunk from a tool call's result — the full before/after text for
-/// one file. [oldText] is empty for new-file diffs (the backend's ACP-facing
-/// `ToolDiff.OldText` uses `omitempty`, so a new-file event never carries an
-/// `oldText` key at all).
-@freezed
-abstract class ToolDiff with _$ToolDiff {
-  const factory ToolDiff({
-    required String path,
-    @Default('') String oldText,
-    required String newText,
-  }) = _ToolDiff;
-}
 
 /// One option in a pending permission request. ACP's `PermissionOption`
 /// (`option_id`/`name`/`kind` — always present on the wire in both SDKs) maps

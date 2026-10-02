@@ -1,8 +1,12 @@
 // lib/src/model/conversation.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'diagnostics.dart';
+import 'session_models.dart';
 import 'tool_models.dart';
 
+export 'diagnostics.dart';
+export 'session_models.dart';
 export 'tool_models.dart';
 
 part 'conversation.freezed.dart';
@@ -179,6 +183,14 @@ sealed class SessionState with _$SessionState {
     @Default(false) bool isStarting,
     String? runError,
     RunOutcome? runOutcome,
+    AgentState? agent,
+    ModeState? mode,
+    CommandsState? commands,
+    ConfigState? configState,
+    UsageState? usage,
+    SessionInfo? sessionInfo,
+    @Default(PlansState()) PlansState plans,
+    @Default(<String, dynamic>{}) Map<String, dynamic> responseMeta,
   }) = _SessionState;
 
   const SessionState._();
@@ -194,6 +206,8 @@ sealed class Conversation with _$Conversation {
   const factory Conversation({
     @Default(<TimelineItem>[]) List<TimelineItem> timeline,
     @Default(SessionState.empty) SessionState sessionState,
+    @Default(<Diagnostic>[]) List<Diagnostic> diagnostics,
+    @Default(<Map<String, dynamic>>[]) List<Map<String, dynamic>> sourceRecords,
   }) = _Conversation;
 
   const Conversation._();

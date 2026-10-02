@@ -1996,6 +1996,14 @@ mixin _$SessionState {
   bool get isStarting;
   String? get runError;
   RunOutcome? get runOutcome;
+  AgentState? get agent;
+  ModeState? get mode;
+  CommandsState? get commands;
+  ConfigState? get configState;
+  UsageState? get usage;
+  SessionInfo? get sessionInfo;
+  PlansState get plans;
+  Map<String, dynamic> get responseMeta;
 
   /// Create a copy of SessionState
   /// with the given fields replaced by the non-null parameter values.
@@ -2025,7 +2033,19 @@ mixin _$SessionState {
             (identical(other.runError, runError) ||
                 other.runError == runError) &&
             (identical(other.runOutcome, runOutcome) ||
-                other.runOutcome == runOutcome));
+                other.runOutcome == runOutcome) &&
+            (identical(other.agent, agent) || other.agent == agent) &&
+            (identical(other.mode, mode) || other.mode == mode) &&
+            (identical(other.commands, commands) ||
+                other.commands == commands) &&
+            (identical(other.configState, configState) ||
+                other.configState == configState) &&
+            (identical(other.usage, usage) || other.usage == usage) &&
+            (identical(other.sessionInfo, sessionInfo) ||
+                other.sessionInfo == sessionInfo) &&
+            (identical(other.plans, plans) || other.plans == plans) &&
+            const DeepCollectionEquality()
+                .equals(other.responseMeta, responseMeta));
   }
 
   @override
@@ -2040,11 +2060,19 @@ mixin _$SessionState {
       isRunning,
       isStarting,
       runError,
-      runOutcome);
+      runOutcome,
+      agent,
+      mode,
+      commands,
+      configState,
+      usage,
+      sessionInfo,
+      plans,
+      const DeepCollectionEquality().hash(responseMeta));
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
   }
 }
 
@@ -2064,7 +2092,23 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       bool isRunning,
       bool isStarting,
       String? runError,
-      RunOutcome? runOutcome});
+      RunOutcome? runOutcome,
+      AgentState? agent,
+      ModeState? mode,
+      CommandsState? commands,
+      ConfigState? configState,
+      UsageState? usage,
+      SessionInfo? sessionInfo,
+      PlansState plans,
+      Map<String, dynamic> responseMeta});
+
+  $AgentStateCopyWith<$Res>? get agent;
+  $ModeStateCopyWith<$Res>? get mode;
+  $CommandsStateCopyWith<$Res>? get commands;
+  $ConfigStateCopyWith<$Res>? get configState;
+  $UsageStateCopyWith<$Res>? get usage;
+  $SessionInfoCopyWith<$Res>? get sessionInfo;
+  $PlansStateCopyWith<$Res> get plans;
 }
 
 /// @nodoc
@@ -2089,6 +2133,14 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? isStarting = null,
     Object? runError = freezed,
     Object? runOutcome = freezed,
+    Object? agent = freezed,
+    Object? mode = freezed,
+    Object? commands = freezed,
+    Object? configState = freezed,
+    Object? usage = freezed,
+    Object? sessionInfo = freezed,
+    Object? plans = null,
+    Object? responseMeta = null,
   }) {
     return _then(_self.copyWith(
       permission: freezed == permission
@@ -2131,7 +2183,133 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
           ? _self.runOutcome
           : runOutcome // ignore: cast_nullable_to_non_nullable
               as RunOutcome?,
+      agent: freezed == agent
+          ? _self.agent
+          : agent // ignore: cast_nullable_to_non_nullable
+              as AgentState?,
+      mode: freezed == mode
+          ? _self.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as ModeState?,
+      commands: freezed == commands
+          ? _self.commands
+          : commands // ignore: cast_nullable_to_non_nullable
+              as CommandsState?,
+      configState: freezed == configState
+          ? _self.configState
+          : configState // ignore: cast_nullable_to_non_nullable
+              as ConfigState?,
+      usage: freezed == usage
+          ? _self.usage
+          : usage // ignore: cast_nullable_to_non_nullable
+              as UsageState?,
+      sessionInfo: freezed == sessionInfo
+          ? _self.sessionInfo
+          : sessionInfo // ignore: cast_nullable_to_non_nullable
+              as SessionInfo?,
+      plans: null == plans
+          ? _self.plans
+          : plans // ignore: cast_nullable_to_non_nullable
+              as PlansState,
+      responseMeta: null == responseMeta
+          ? _self.responseMeta
+          : responseMeta // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
     ));
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AgentStateCopyWith<$Res>? get agent {
+    if (_self.agent == null) {
+      return null;
+    }
+
+    return $AgentStateCopyWith<$Res>(_self.agent!, (value) {
+      return _then(_self.copyWith(agent: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ModeStateCopyWith<$Res>? get mode {
+    if (_self.mode == null) {
+      return null;
+    }
+
+    return $ModeStateCopyWith<$Res>(_self.mode!, (value) {
+      return _then(_self.copyWith(mode: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CommandsStateCopyWith<$Res>? get commands {
+    if (_self.commands == null) {
+      return null;
+    }
+
+    return $CommandsStateCopyWith<$Res>(_self.commands!, (value) {
+      return _then(_self.copyWith(commands: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ConfigStateCopyWith<$Res>? get configState {
+    if (_self.configState == null) {
+      return null;
+    }
+
+    return $ConfigStateCopyWith<$Res>(_self.configState!, (value) {
+      return _then(_self.copyWith(configState: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UsageStateCopyWith<$Res>? get usage {
+    if (_self.usage == null) {
+      return null;
+    }
+
+    return $UsageStateCopyWith<$Res>(_self.usage!, (value) {
+      return _then(_self.copyWith(usage: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionInfoCopyWith<$Res>? get sessionInfo {
+    if (_self.sessionInfo == null) {
+      return null;
+    }
+
+    return $SessionInfoCopyWith<$Res>(_self.sessionInfo!, (value) {
+      return _then(_self.copyWith(sessionInfo: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PlansStateCopyWith<$Res> get plans {
+    return $PlansStateCopyWith<$Res>(_self.plans, (value) {
+      return _then(_self.copyWith(plans: value));
+    });
   }
 }
 
@@ -2236,7 +2414,15 @@ extension SessionStatePatterns on SessionState {
             bool isRunning,
             bool isStarting,
             String? runError,
-            RunOutcome? runOutcome)?
+            RunOutcome? runOutcome,
+            AgentState? agent,
+            ModeState? mode,
+            CommandsState? commands,
+            ConfigState? configState,
+            UsageState? usage,
+            SessionInfo? sessionInfo,
+            PlansState plans,
+            Map<String, dynamic> responseMeta)?
         $default, {
     required TResult orElse(),
   }) {
@@ -2253,7 +2439,15 @@ extension SessionStatePatterns on SessionState {
             _that.isRunning,
             _that.isStarting,
             _that.runError,
-            _that.runOutcome);
+            _that.runOutcome,
+            _that.agent,
+            _that.mode,
+            _that.commands,
+            _that.configState,
+            _that.usage,
+            _that.sessionInfo,
+            _that.plans,
+            _that.responseMeta);
       case _:
         return orElse();
     }
@@ -2284,7 +2478,15 @@ extension SessionStatePatterns on SessionState {
             bool isRunning,
             bool isStarting,
             String? runError,
-            RunOutcome? runOutcome)
+            RunOutcome? runOutcome,
+            AgentState? agent,
+            ModeState? mode,
+            CommandsState? commands,
+            ConfigState? configState,
+            UsageState? usage,
+            SessionInfo? sessionInfo,
+            PlansState plans,
+            Map<String, dynamic> responseMeta)
         $default,
   ) {
     final _that = this;
@@ -2300,7 +2502,15 @@ extension SessionStatePatterns on SessionState {
             _that.isRunning,
             _that.isStarting,
             _that.runError,
-            _that.runOutcome);
+            _that.runOutcome,
+            _that.agent,
+            _that.mode,
+            _that.commands,
+            _that.configState,
+            _that.usage,
+            _that.sessionInfo,
+            _that.plans,
+            _that.responseMeta);
     }
   }
 
@@ -2328,7 +2538,15 @@ extension SessionStatePatterns on SessionState {
             bool isRunning,
             bool isStarting,
             String? runError,
-            RunOutcome? runOutcome)?
+            RunOutcome? runOutcome,
+            AgentState? agent,
+            ModeState? mode,
+            CommandsState? commands,
+            ConfigState? configState,
+            UsageState? usage,
+            SessionInfo? sessionInfo,
+            PlansState plans,
+            Map<String, dynamic> responseMeta)?
         $default,
   ) {
     final _that = this;
@@ -2344,7 +2562,15 @@ extension SessionStatePatterns on SessionState {
             _that.isRunning,
             _that.isStarting,
             _that.runError,
-            _that.runOutcome);
+            _that.runOutcome,
+            _that.agent,
+            _that.mode,
+            _that.commands,
+            _that.configState,
+            _that.usage,
+            _that.sessionInfo,
+            _that.plans,
+            _that.responseMeta);
       case _:
         return null;
     }
@@ -2364,12 +2590,21 @@ class _SessionState extends SessionState {
       this.isRunning = false,
       this.isStarting = false,
       this.runError,
-      this.runOutcome})
+      this.runOutcome,
+      this.agent,
+      this.mode,
+      this.commands,
+      this.configState,
+      this.usage,
+      this.sessionInfo,
+      this.plans = const PlansState(),
+      final Map<String, dynamic> responseMeta = const <String, dynamic>{}})
       : _permission = permission,
         _elicitation = elicitation,
         _modes = modes,
         _config = config,
         _plan = plan,
+        _responseMeta = responseMeta,
         super._();
 
   final Map<String, dynamic>? _permission;
@@ -2440,6 +2675,29 @@ class _SessionState extends SessionState {
   final String? runError;
   @override
   final RunOutcome? runOutcome;
+  @override
+  final AgentState? agent;
+  @override
+  final ModeState? mode;
+  @override
+  final CommandsState? commands;
+  @override
+  final ConfigState? configState;
+  @override
+  final UsageState? usage;
+  @override
+  final SessionInfo? sessionInfo;
+  @override
+  @JsonKey()
+  final PlansState plans;
+  final Map<String, dynamic> _responseMeta;
+  @override
+  @JsonKey()
+  Map<String, dynamic> get responseMeta {
+    if (_responseMeta is EqualUnmodifiableMapView) return _responseMeta;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_responseMeta);
+  }
 
   /// Create a copy of SessionState
   /// with the given fields replaced by the non-null parameter values.
@@ -2469,7 +2727,19 @@ class _SessionState extends SessionState {
             (identical(other.runError, runError) ||
                 other.runError == runError) &&
             (identical(other.runOutcome, runOutcome) ||
-                other.runOutcome == runOutcome));
+                other.runOutcome == runOutcome) &&
+            (identical(other.agent, agent) || other.agent == agent) &&
+            (identical(other.mode, mode) || other.mode == mode) &&
+            (identical(other.commands, commands) ||
+                other.commands == commands) &&
+            (identical(other.configState, configState) ||
+                other.configState == configState) &&
+            (identical(other.usage, usage) || other.usage == usage) &&
+            (identical(other.sessionInfo, sessionInfo) ||
+                other.sessionInfo == sessionInfo) &&
+            (identical(other.plans, plans) || other.plans == plans) &&
+            const DeepCollectionEquality()
+                .equals(other._responseMeta, _responseMeta));
   }
 
   @override
@@ -2484,11 +2754,19 @@ class _SessionState extends SessionState {
       isRunning,
       isStarting,
       runError,
-      runOutcome);
+      runOutcome,
+      agent,
+      mode,
+      commands,
+      configState,
+      usage,
+      sessionInfo,
+      plans,
+      const DeepCollectionEquality().hash(_responseMeta));
 
   @override
   String toString() {
-    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome)';
+    return 'SessionState(permission: $permission, elicitation: $elicitation, modes: $modes, config: $config, plan: $plan, title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
   }
 }
 
@@ -2510,7 +2788,30 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       bool isRunning,
       bool isStarting,
       String? runError,
-      RunOutcome? runOutcome});
+      RunOutcome? runOutcome,
+      AgentState? agent,
+      ModeState? mode,
+      CommandsState? commands,
+      ConfigState? configState,
+      UsageState? usage,
+      SessionInfo? sessionInfo,
+      PlansState plans,
+      Map<String, dynamic> responseMeta});
+
+  @override
+  $AgentStateCopyWith<$Res>? get agent;
+  @override
+  $ModeStateCopyWith<$Res>? get mode;
+  @override
+  $CommandsStateCopyWith<$Res>? get commands;
+  @override
+  $ConfigStateCopyWith<$Res>? get configState;
+  @override
+  $UsageStateCopyWith<$Res>? get usage;
+  @override
+  $SessionInfoCopyWith<$Res>? get sessionInfo;
+  @override
+  $PlansStateCopyWith<$Res> get plans;
 }
 
 /// @nodoc
@@ -2536,6 +2837,14 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? isStarting = null,
     Object? runError = freezed,
     Object? runOutcome = freezed,
+    Object? agent = freezed,
+    Object? mode = freezed,
+    Object? commands = freezed,
+    Object? configState = freezed,
+    Object? usage = freezed,
+    Object? sessionInfo = freezed,
+    Object? plans = null,
+    Object? responseMeta = null,
   }) {
     return _then(_SessionState(
       permission: freezed == permission
@@ -2578,7 +2887,133 @@ class __$SessionStateCopyWithImpl<$Res>
           ? _self.runOutcome
           : runOutcome // ignore: cast_nullable_to_non_nullable
               as RunOutcome?,
+      agent: freezed == agent
+          ? _self.agent
+          : agent // ignore: cast_nullable_to_non_nullable
+              as AgentState?,
+      mode: freezed == mode
+          ? _self.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as ModeState?,
+      commands: freezed == commands
+          ? _self.commands
+          : commands // ignore: cast_nullable_to_non_nullable
+              as CommandsState?,
+      configState: freezed == configState
+          ? _self.configState
+          : configState // ignore: cast_nullable_to_non_nullable
+              as ConfigState?,
+      usage: freezed == usage
+          ? _self.usage
+          : usage // ignore: cast_nullable_to_non_nullable
+              as UsageState?,
+      sessionInfo: freezed == sessionInfo
+          ? _self.sessionInfo
+          : sessionInfo // ignore: cast_nullable_to_non_nullable
+              as SessionInfo?,
+      plans: null == plans
+          ? _self.plans
+          : plans // ignore: cast_nullable_to_non_nullable
+              as PlansState,
+      responseMeta: null == responseMeta
+          ? _self._responseMeta
+          : responseMeta // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
     ));
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AgentStateCopyWith<$Res>? get agent {
+    if (_self.agent == null) {
+      return null;
+    }
+
+    return $AgentStateCopyWith<$Res>(_self.agent!, (value) {
+      return _then(_self.copyWith(agent: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ModeStateCopyWith<$Res>? get mode {
+    if (_self.mode == null) {
+      return null;
+    }
+
+    return $ModeStateCopyWith<$Res>(_self.mode!, (value) {
+      return _then(_self.copyWith(mode: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CommandsStateCopyWith<$Res>? get commands {
+    if (_self.commands == null) {
+      return null;
+    }
+
+    return $CommandsStateCopyWith<$Res>(_self.commands!, (value) {
+      return _then(_self.copyWith(commands: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ConfigStateCopyWith<$Res>? get configState {
+    if (_self.configState == null) {
+      return null;
+    }
+
+    return $ConfigStateCopyWith<$Res>(_self.configState!, (value) {
+      return _then(_self.copyWith(configState: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UsageStateCopyWith<$Res>? get usage {
+    if (_self.usage == null) {
+      return null;
+    }
+
+    return $UsageStateCopyWith<$Res>(_self.usage!, (value) {
+      return _then(_self.copyWith(usage: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionInfoCopyWith<$Res>? get sessionInfo {
+    if (_self.sessionInfo == null) {
+      return null;
+    }
+
+    return $SessionInfoCopyWith<$Res>(_self.sessionInfo!, (value) {
+      return _then(_self.copyWith(sessionInfo: value));
+    });
+  }
+
+  /// Create a copy of SessionState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PlansStateCopyWith<$Res> get plans {
+    return $PlansStateCopyWith<$Res>(_self.plans, (value) {
+      return _then(_self.copyWith(plans: value));
+    });
   }
 }
 
@@ -2586,6 +3021,8 @@ class __$SessionStateCopyWithImpl<$Res>
 mixin _$Conversation {
   List<TimelineItem> get timeline;
   SessionState get sessionState;
+  List<Diagnostic> get diagnostics;
+  List<Map<String, dynamic>> get sourceRecords;
 
   /// Create a copy of Conversation
   /// with the given fields replaced by the non-null parameter values.
@@ -2602,16 +3039,24 @@ mixin _$Conversation {
             other is Conversation &&
             const DeepCollectionEquality().equals(other.timeline, timeline) &&
             (identical(other.sessionState, sessionState) ||
-                other.sessionState == sessionState));
+                other.sessionState == sessionState) &&
+            const DeepCollectionEquality()
+                .equals(other.diagnostics, diagnostics) &&
+            const DeepCollectionEquality()
+                .equals(other.sourceRecords, sourceRecords));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(timeline), sessionState);
+      runtimeType,
+      const DeepCollectionEquality().hash(timeline),
+      sessionState,
+      const DeepCollectionEquality().hash(diagnostics),
+      const DeepCollectionEquality().hash(sourceRecords));
 
   @override
   String toString() {
-    return 'Conversation(timeline: $timeline, sessionState: $sessionState)';
+    return 'Conversation(timeline: $timeline, sessionState: $sessionState, diagnostics: $diagnostics, sourceRecords: $sourceRecords)';
   }
 }
 
@@ -2621,7 +3066,11 @@ abstract mixin class $ConversationCopyWith<$Res> {
           Conversation value, $Res Function(Conversation) _then) =
       _$ConversationCopyWithImpl;
   @useResult
-  $Res call({List<TimelineItem> timeline, SessionState sessionState});
+  $Res call(
+      {List<TimelineItem> timeline,
+      SessionState sessionState,
+      List<Diagnostic> diagnostics,
+      List<Map<String, dynamic>> sourceRecords});
 
   $SessionStateCopyWith<$Res> get sessionState;
 }
@@ -2640,6 +3089,8 @@ class _$ConversationCopyWithImpl<$Res> implements $ConversationCopyWith<$Res> {
   $Res call({
     Object? timeline = null,
     Object? sessionState = null,
+    Object? diagnostics = null,
+    Object? sourceRecords = null,
   }) {
     return _then(_self.copyWith(
       timeline: null == timeline
@@ -2650,6 +3101,14 @@ class _$ConversationCopyWithImpl<$Res> implements $ConversationCopyWith<$Res> {
           ? _self.sessionState
           : sessionState // ignore: cast_nullable_to_non_nullable
               as SessionState,
+      diagnostics: null == diagnostics
+          ? _self.diagnostics
+          : diagnostics // ignore: cast_nullable_to_non_nullable
+              as List<Diagnostic>,
+      sourceRecords: null == sourceRecords
+          ? _self.sourceRecords
+          : sourceRecords // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
     ));
   }
 
@@ -2755,14 +3214,19 @@ extension ConversationPatterns on Conversation {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(List<TimelineItem> timeline, SessionState sessionState)?
+    TResult Function(
+            List<TimelineItem> timeline,
+            SessionState sessionState,
+            List<Diagnostic> diagnostics,
+            List<Map<String, dynamic>> sourceRecords)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Conversation() when $default != null:
-        return $default(_that.timeline, _that.sessionState);
+        return $default(_that.timeline, _that.sessionState, _that.diagnostics,
+            _that.sourceRecords);
       case _:
         return orElse();
     }
@@ -2783,13 +3247,18 @@ extension ConversationPatterns on Conversation {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(List<TimelineItem> timeline, SessionState sessionState)
+    TResult Function(
+            List<TimelineItem> timeline,
+            SessionState sessionState,
+            List<Diagnostic> diagnostics,
+            List<Map<String, dynamic>> sourceRecords)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Conversation():
-        return $default(_that.timeline, _that.sessionState);
+        return $default(_that.timeline, _that.sessionState, _that.diagnostics,
+            _that.sourceRecords);
     }
   }
 
@@ -2807,13 +3276,18 @@ extension ConversationPatterns on Conversation {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(List<TimelineItem> timeline, SessionState sessionState)?
+    TResult? Function(
+            List<TimelineItem> timeline,
+            SessionState sessionState,
+            List<Diagnostic> diagnostics,
+            List<Map<String, dynamic>> sourceRecords)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Conversation() when $default != null:
-        return $default(_that.timeline, _that.sessionState);
+        return $default(_that.timeline, _that.sessionState, _that.diagnostics,
+            _that.sourceRecords);
       case _:
         return null;
     }
@@ -2825,8 +3299,13 @@ extension ConversationPatterns on Conversation {
 class _Conversation extends Conversation {
   const _Conversation(
       {final List<TimelineItem> timeline = const <TimelineItem>[],
-      this.sessionState = SessionState.empty})
+      this.sessionState = SessionState.empty,
+      final List<Diagnostic> diagnostics = const <Diagnostic>[],
+      final List<Map<String, dynamic>> sourceRecords =
+          const <Map<String, dynamic>>[]})
       : _timeline = timeline,
+        _diagnostics = diagnostics,
+        _sourceRecords = sourceRecords,
         super._();
 
   final List<TimelineItem> _timeline;
@@ -2841,6 +3320,23 @@ class _Conversation extends Conversation {
   @override
   @JsonKey()
   final SessionState sessionState;
+  final List<Diagnostic> _diagnostics;
+  @override
+  @JsonKey()
+  List<Diagnostic> get diagnostics {
+    if (_diagnostics is EqualUnmodifiableListView) return _diagnostics;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_diagnostics);
+  }
+
+  final List<Map<String, dynamic>> _sourceRecords;
+  @override
+  @JsonKey()
+  List<Map<String, dynamic>> get sourceRecords {
+    if (_sourceRecords is EqualUnmodifiableListView) return _sourceRecords;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sourceRecords);
+  }
 
   /// Create a copy of Conversation
   /// with the given fields replaced by the non-null parameter values.
@@ -2857,16 +3353,24 @@ class _Conversation extends Conversation {
             other is _Conversation &&
             const DeepCollectionEquality().equals(other._timeline, _timeline) &&
             (identical(other.sessionState, sessionState) ||
-                other.sessionState == sessionState));
+                other.sessionState == sessionState) &&
+            const DeepCollectionEquality()
+                .equals(other._diagnostics, _diagnostics) &&
+            const DeepCollectionEquality()
+                .equals(other._sourceRecords, _sourceRecords));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType,
-      const DeepCollectionEquality().hash(_timeline), sessionState);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_timeline),
+      sessionState,
+      const DeepCollectionEquality().hash(_diagnostics),
+      const DeepCollectionEquality().hash(_sourceRecords));
 
   @override
   String toString() {
-    return 'Conversation(timeline: $timeline, sessionState: $sessionState)';
+    return 'Conversation(timeline: $timeline, sessionState: $sessionState, diagnostics: $diagnostics, sourceRecords: $sourceRecords)';
   }
 }
 
@@ -2878,7 +3382,11 @@ abstract mixin class _$ConversationCopyWith<$Res>
       __$ConversationCopyWithImpl;
   @override
   @useResult
-  $Res call({List<TimelineItem> timeline, SessionState sessionState});
+  $Res call(
+      {List<TimelineItem> timeline,
+      SessionState sessionState,
+      List<Diagnostic> diagnostics,
+      List<Map<String, dynamic>> sourceRecords});
 
   @override
   $SessionStateCopyWith<$Res> get sessionState;
@@ -2899,6 +3407,8 @@ class __$ConversationCopyWithImpl<$Res>
   $Res call({
     Object? timeline = null,
     Object? sessionState = null,
+    Object? diagnostics = null,
+    Object? sourceRecords = null,
   }) {
     return _then(_Conversation(
       timeline: null == timeline
@@ -2909,6 +3419,14 @@ class __$ConversationCopyWithImpl<$Res>
           ? _self.sessionState
           : sessionState // ignore: cast_nullable_to_non_nullable
               as SessionState,
+      diagnostics: null == diagnostics
+          ? _self._diagnostics
+          : diagnostics // ignore: cast_nullable_to_non_nullable
+              as List<Diagnostic>,
+      sourceRecords: null == sourceRecords
+          ? _self._sourceRecords
+          : sourceRecords // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
     ));
   }
 

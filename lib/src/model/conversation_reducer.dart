@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:ag_ui/ag_ui.dart' as ag_ui;
 import 'conversation.dart';
+import 'wire_parse.dart';
 
 /// True for the cold-replay reset marker backends emit to signal "the client
 /// should discard history and rebuild from here": a `<namespace>:sync`
@@ -65,6 +66,27 @@ class ConversationReducer {
   String? _runError;
   RunOutcome? _runOutcome;
 
+  static const int _maxDiagnostics = 200;
+  static const int _maxSourceRecords = 200;
+  final List<Diagnostic> _diagnostics = [];
+  final List<Map<String, dynamic>> _sourceRecords = [];
+  int _diagnosticCount = 0; // never reset: Diagnostic.index stays monotonic
+
+  // What is currently reported. A whole-namespace replace arrives on every
+  // state change, so a re-sync must not re-report the same problem; an entry
+  // leaves its set when the problem goes away, so it is reported again if it
+  // comes back.
+  final Set<String> _reportedMalformed = {};
+  final Set<String> _reportedUnknown = {};
+
+  AgentState? _agent;
+  ModeState? _mode;
+  CommandsState? _commands;
+  ConfigState? _configState;
+  UsageState? _usage;
+  SessionInfo? _sessionInfo;
+  PlansState _plans = const PlansState();
+
   /// Called with a tool's name for every incoming `acp.client_execute_request`; return
   /// `true` to skip creating a [ToolRequestTimelineItem] for it entirely.
   ///
@@ -97,6 +119,8 @@ class ConversationReducer {
   Conversation get current => Conversation(
         timeline: List.unmodifiable(_sortedTimeline),
         sessionState: _sessionState(),
+        diagnostics: List.unmodifiable(_diagnostics),
+        sourceRecords: List.unmodifiable(_sourceRecords),
       );
 
   /// Inserts a message directly into the timeline, bypassing the AG-UI
@@ -454,6 +478,7 @@ class ConversationReducer {
         }
         _syncPermission();
         _syncElicitation();
+        _onStateChanged();
       case ag_ui.StateDeltaEvent():
         for (final op in event.delta) {
           _applyPatch(op);
@@ -481,6 +506,16 @@ class ConversationReducer {
     _isStarting = false;
     _runError = null;
     _runOutcome = null;
+    // Reset typed state fields only. Do NOT clear _diagnostics,
+    // _sourceRecords, _diagnosticCount or the _reported* sets — they
+    // describe what the reducer has seen, and a replay re-sends the same state.
+    _agent = null;
+    _mode = null;
+    _commands = null;
+    _configState = null;
+    _usage = null;
+    _sessionInfo = null;
+    _plans = const PlansState();
   }
 
   void _updateTool(
@@ -496,6 +531,82 @@ class ConversationReducer {
       return update(base);
     });
   }
+
+  void _diagnose(DiagnosticKind kind, String name, [Object? payload]) {
+    _diagnostics.add(Diagnostic(
+      kind: kind,
+      name: name,
+      payload: payload,
+      index: _diagnosticCount++,
+    ));
+    if (_diagnostics.length > _maxDiagnostics) {
+      _diagnostics.removeRange(0, _diagnostics.length - _maxDiagnostics);
+    }
+  }
+
+  /// Keeps an `acp:source` wire record. Kept apart from [_diagnostics]: there
+  /// is one per batch, so sharing a bounded list would let routine traffic
+  /// evict real diagnostics.
+  // ignore: unused_element
+  void _recordSource(Object? value) {
+    final record = asJsonMap(value);
+    if (record == null) {
+      _diagnose(DiagnosticKind.malformedPayload, 'acp:source', value);
+      return;
+    }
+    _sourceRecords.add(record);
+    if (_sourceRecords.length > _maxSourceRecords) {
+      _sourceRecords.removeRange(0, _sourceRecords.length - _maxSourceRecords);
+    }
+  }
+
+  /// Re-reads the typed models from the raw `/<namespace>` map. Called after
+  /// every state change. State is mirrored: a key that is gone becomes null.
+  void _onStateChanged() {
+    T? typed<T>(String key, T? Function(Object?) parse) {
+      final raw = _pocketcoder[key];
+      if (raw == null) {
+        _reportedMalformed.remove(key);
+        return null;
+      }
+      final value = parse(raw);
+      if (value == null) {
+        if (_reportedMalformed.add(key)) {
+          _diagnose(DiagnosticKind.malformedPayload, '$namespace/$key', raw);
+        }
+      } else {
+        _reportedMalformed.remove(key);
+      }
+      return value;
+    }
+
+    _agent = typed('agent', AgentState.parse);
+    _mode = typed('mode', ModeState.parse);
+    _commands = typed('commands', CommandsState.parse);
+    _configState = typed('config', ConfigState.parse);
+    _usage = typed('usage', UsageState.parse);
+    _sessionInfo = typed('session_info', SessionInfo.parse);
+    _plans = typed('plans', PlansState.parse) ?? const PlansState();
+
+    final unknownNow = {
+      for (final k in _pocketcoder.keys)
+        if (!_knownStateKeys.contains(k)) k,
+    };
+    _reportedUnknown.retainAll(unknownNow);
+    for (final key in unknownNow) {
+      if (_reportedUnknown.add(key)) {
+        _diagnose(DiagnosticKind.unknownStateKey, '$namespace/$key',
+            _pocketcoder[key]);
+      }
+    }
+  }
+
+  static const _knownStateKeys = {
+    'agent', 'mode', 'commands', 'config', 'usage', 'session_info', 'plans',
+    'permissions', 'elicitations',
+    // legacy single-slot shape
+    'permission', 'elicitation', 'modes', 'plan',
+  };
 
   /// Pending state entries of one kind, from both wire shapes: the legacy
   /// single slot (`<legacyKey>`, one entry — pocketcoder) and the keyed map
@@ -664,6 +775,7 @@ class ConversationReducer {
       }
       _syncPermission();
       _syncElicitation();
+      _onStateChanged();
     } else if (segments.length == 2) {
       final ns = segments[1];
       switch (op['op']) {
@@ -674,6 +786,7 @@ class ConversationReducer {
       }
       if (ns == 'permission') _syncPermission();
       if (ns == 'elicitation') _syncElicitation();
+      _onStateChanged();
     } else if (segments.length >= 3) {
       final ns = segments[1];
       final key = segments[2];
@@ -688,6 +801,7 @@ class ConversationReducer {
           sub[key] = op['value'];
       }
       _pocketcoder[ns] = sub;
+      _onStateChanged();
     }
   }
 
@@ -706,6 +820,13 @@ class ConversationReducer {
       isStarting: _isStarting,
       runError: _runError,
       runOutcome: _runOutcome,
+      agent: _agent,
+      mode: _mode,
+      commands: _commands,
+      configState: _configState,
+      usage: _usage,
+      sessionInfo: _sessionInfo,
+      plans: _plans,
     );
   }
 }

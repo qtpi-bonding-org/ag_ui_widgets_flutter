@@ -79,6 +79,7 @@ class ConversationReducer {
   final Set<String> _reportedMalformed = {};
   final Set<String> _reportedUnknown = {};
   final Set<String> _reportedContent = {};
+  final Set<String> _reportedSnapshotKeys = {};
 
   AgentState? _agent;
   ModeState? _mode;
@@ -527,6 +528,13 @@ class ConversationReducer {
           _responseMeta = {..._responseMeta, method: value!['meta']};
         }
 
+      case ag_ui.CustomEvent(name: 'acp:source', :final value):
+        _recordSource(value);
+      case ag_ui.RawEvent(:final event):
+        _diagnose(DiagnosticKind.raw, 'raw', event);
+      case ag_ui.CustomEvent(:final name, :final value):
+        _diagnose(DiagnosticKind.unknownCustom, name, value);
+
       case ag_ui.StateSnapshotEvent():
         final snapshot = event.snapshot;
         _pocketcoder.clear();
@@ -538,13 +546,23 @@ class ConversationReducer {
         _syncPermission();
         _syncElicitation();
         _onStateChanged();
+        if (snapshot is Map) {
+          for (final key in snapshot.keys) {
+            if (key != namespace && _reportedSnapshotKeys.add('$key')) {
+              _diagnose(
+                  DiagnosticKind.unknownStateKey, 'snapshot/$key', snapshot[key]);
+            }
+          }
+        } else if (snapshot != null) {
+          _diagnose(DiagnosticKind.malformedPayload, 'snapshot', snapshot);
+        }
       case ag_ui.StateDeltaEvent():
         for (final op in event.delta) {
           _applyPatch(op);
         }
 
       default:
-        break; // event kinds this reducer doesn't surface.
+        _diagnose(DiagnosticKind.unhandledEvent, event.eventType.value);
     }
   }
 
@@ -608,7 +626,6 @@ class ConversationReducer {
   /// Keeps an `acp:source` wire record. Kept apart from [_diagnostics]: there
   /// is one per batch, so sharing a bounded list would let routine traffic
   /// evict real diagnostics.
-  // ignore: unused_element
   void _recordSource(Object? value) {
     final record = asJsonMap(value);
     if (record == null) {
@@ -849,49 +866,76 @@ class ConversationReducer {
   }
 
   void _applyPatch(Map<String, dynamic> op) {
-    final path = op['path'] as String?;
-    if (path == null) return;
-    final segments =
-        path.split('/').where((s) => s.isNotEmpty).toList(growable: false);
-    if (segments.isEmpty || segments.first != namespace) return;
-    if (segments.length == 1) {
+    final path = op['path'];
+    final kind = op['op'];
+    if (path is! String ||
+        kind is! String ||
+        (kind != 'add' && kind != 'replace' && kind != 'remove')) {
+      _diagnose(DiagnosticKind.malformedPayload, '$namespace/patch', op);
+      return;
+    }
+    final segments = [
+      for (final s in path.split('/'))
+        if (s.isNotEmpty) _unescapePointer(s),
+    ];
+    if (segments.isEmpty || segments.first != namespace) {
+      _diagnose(DiagnosticKind.unknownStateKey, path, op);
+      return;
+    }
+    final keys = segments.sublist(1);
+    if (keys.isEmpty) {
       // The whole namespace at once — acp-agui-adapter sends every state
       // change as a `replace` of `/<namespace>` carrying the full state.
       _pocketcoder.clear();
       final value = op['value'];
-      if (op['op'] != 'remove' && value is Map) {
+      if (kind != 'remove' && value is Map) {
         _pocketcoder.addAll(Map<String, dynamic>.from(value));
       }
-      _syncPermission();
-      _syncElicitation();
-      _onStateChanged();
-    } else if (segments.length == 2) {
-      final ns = segments[1];
-      switch (op['op']) {
-        case 'remove':
-          _pocketcoder.remove(ns);
-        default:
-          _pocketcoder[ns] = op['value'];
-      }
-      if (ns == 'permission') _syncPermission();
-      if (ns == 'elicitation') _syncElicitation();
-      _onStateChanged();
-    } else if (segments.length >= 3) {
-      final ns = segments[1];
-      final key = segments[2];
-      final existing = _pocketcoder[ns];
-      final sub = existing is Map
-          ? Map<String, dynamic>.from(existing)
-          : <String, dynamic>{};
-      switch (op['op']) {
-        case 'remove':
-          sub.remove(key);
-        default:
-          sub[key] = op['value'];
-      }
-      _pocketcoder[ns] = sub;
-      _onStateChanged();
+    } else if (!_setAt(_pocketcoder, keys, op['value'],
+        remove: kind == 'remove')) {
+      // Descends through a value that exists but is not a map (e.g. a list
+      // index). Leave the state untouched rather than corrupt it, and say so.
+      _diagnose(DiagnosticKind.malformedPayload, '$namespace/patch', op);
+      return;
     }
+    _syncPermission();
+    _syncElicitation();
+    _onStateChanged();
+  }
+
+  static String _unescapePointer(String s) =>
+      s.replaceAll('~1', '/').replaceAll('~0', '~');
+
+  /// Sets or removes [keys] under [root], copying each map on the way so no
+  /// map the caller (or a typed model) still holds is mutated. Returns false,
+  /// changing nothing, when the path would descend through an existing value
+  /// that is not a map (a list, a scalar).
+  static bool _setAt(
+    Map<String, dynamic> root,
+    List<String> keys,
+    Object? value, {
+    required bool remove,
+  }) {
+    Object? probe = root;
+    for (var i = 0; i < keys.length - 1; i++) {
+      probe = (probe as Map)[keys[i]];
+      if (probe == null) break;
+      if (probe is! Map) return false;
+    }
+    var current = root;
+    for (var i = 0; i < keys.length - 1; i++) {
+      final next = current[keys[i]];
+      final child =
+          next is Map ? Map<String, dynamic>.from(next) : <String, dynamic>{};
+      current[keys[i]] = child;
+      current = child;
+    }
+    if (remove) {
+      current.remove(keys.last);
+    } else {
+      current[keys.last] = value;
+    }
+    return true;
   }
 
   SessionState _sessionState() {

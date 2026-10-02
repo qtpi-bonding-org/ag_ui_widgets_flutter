@@ -16,4 +16,28 @@ void main() {
     expect(m.metadata!['messageId'], 'm1');
     expect((m.metadata!['media'] as Map)['kind'], 'audio');
   });
+
+  test('a tool call forwards locations, terminals, patches, media, results and meta',
+      () {
+    final item = TimelineItem.toolCall(
+      id: 't',
+      name: 'edit',
+      order: const OrderKey(1),
+      locations: const [ToolLocation(path: 'a.dart', line: 3)],
+      terminals: const [ToolTerminal(terminalId: 'x')],
+      patches: const [ToolPatch(format: 'unified', patch: 'p')],
+      media: const [MediaDescriptor(kind: 'image', mimeType: 'image/png')],
+      resultParts: const [ToolResultPart(messageId: 'r1', content: 'A')],
+      meta: const {'k': 1},
+    );
+    final m = timelineToMessages([item]).single as chat_core.CustomMessage;
+    expect(m.metadata!['locations'], [
+      {'path': 'a.dart', 'line': 3},
+    ]);
+    expect((m.metadata!['terminals'] as List).single['terminalId'], 'x');
+    expect((m.metadata!['patches'] as List).single['patch'], 'p');
+    expect((m.metadata!['media'] as List).single['mimeType'], 'image/png');
+    expect((m.metadata!['resultParts'] as List).single['content'], 'A');
+    expect(m.metadata!['meta'], {'k': 1});
+  });
 }

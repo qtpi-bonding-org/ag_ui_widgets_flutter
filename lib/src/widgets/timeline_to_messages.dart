@@ -69,6 +69,12 @@ chat_core.Message _toMessage(TimelineItem item) {
       :final toolKind,
       :final hasEnded,
       :final status,
+      :final locations,
+      :final terminals,
+      :final patches,
+      :final media,
+      :final resultParts,
+      :final meta,
     ) =>
       chat_core.Message.custom(
         id: id,
@@ -84,6 +90,20 @@ chat_core.Message _toMessage(TimelineItem item) {
           'toolKind': toolKind,
           'hasEnded': hasEnded,
           'status': status,
+          'locations': [
+            for (final l in locations) {'path': l.path, 'line': l.line},
+          ],
+          'terminals': [
+            for (final t in terminals) {'terminalId': t.terminalId, 'meta': t.meta},
+          ],
+          'patches': [
+            for (final p in patches) {'format': p.format, 'patch': p.patch},
+          ],
+          'media': [for (final d in media) _mediaToMap(d)],
+          'resultParts': [
+            for (final p in resultParts) {'messageId': p.messageId, 'content': p.content},
+          ],
+          'meta': meta,
         },
       ),
     PermissionRequestTimelineItem(:final requestId) => chat_core.Message.custom(

@@ -6,6 +6,32 @@ import 'wire_parse.dart';
 part 'session_models.freezed.dart';
 
 @freezed
+abstract class ElicitationScope with _$ElicitationScope {
+  const ElicitationScope._();
+  const factory ElicitationScope({
+    String? kind,
+    String? requestId,
+    String? sessionId,
+    String? toolCallId,
+    @Default(<String, dynamic>{}) Map<String, dynamic> extras,
+  }) = _ElicitationScope;
+
+  static const _known = {'kind', 'request_id', 'session_id', 'tool_call_id'};
+
+  static ElicitationScope? parse(Object? raw) {
+    final m = asJsonMap(raw);
+    if (m == null) return null;
+    return ElicitationScope(
+      kind: asString(m['kind']),
+      requestId: asString(m['request_id']),
+      sessionId: asString(m['session_id']),
+      toolCallId: asString(m['tool_call_id']),
+      extras: extrasOf(m, _known),
+    );
+  }
+}
+
+@freezed
 abstract class AuthMethod with _$AuthMethod {
   const AuthMethod._();
   const factory AuthMethod({

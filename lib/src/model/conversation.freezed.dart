@@ -17,6 +17,7 @@ mixin _$PermissionOption {
   String get optionId;
   String get label;
   String get kind;
+  Map<String, dynamic> get extras;
 
   /// Create a copy of PermissionOption
   /// with the given fields replaced by the non-null parameter values.
@@ -34,15 +35,17 @@ mixin _$PermissionOption {
             (identical(other.optionId, optionId) ||
                 other.optionId == optionId) &&
             (identical(other.label, label) || other.label == label) &&
-            (identical(other.kind, kind) || other.kind == kind));
+            (identical(other.kind, kind) || other.kind == kind) &&
+            const DeepCollectionEquality().equals(other.extras, extras));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, optionId, label, kind);
+  int get hashCode => Object.hash(runtimeType, optionId, label, kind,
+      const DeepCollectionEquality().hash(extras));
 
   @override
   String toString() {
-    return 'PermissionOption(optionId: $optionId, label: $label, kind: $kind)';
+    return 'PermissionOption(optionId: $optionId, label: $label, kind: $kind, extras: $extras)';
   }
 }
 
@@ -52,7 +55,11 @@ abstract mixin class $PermissionOptionCopyWith<$Res> {
           PermissionOption value, $Res Function(PermissionOption) _then) =
       _$PermissionOptionCopyWithImpl;
   @useResult
-  $Res call({String optionId, String label, String kind});
+  $Res call(
+      {String optionId,
+      String label,
+      String kind,
+      Map<String, dynamic> extras});
 }
 
 /// @nodoc
@@ -71,6 +78,7 @@ class _$PermissionOptionCopyWithImpl<$Res>
     Object? optionId = null,
     Object? label = null,
     Object? kind = null,
+    Object? extras = null,
   }) {
     return _then(_self.copyWith(
       optionId: null == optionId
@@ -85,6 +93,10 @@ class _$PermissionOptionCopyWithImpl<$Res>
           ? _self.kind
           : kind // ignore: cast_nullable_to_non_nullable
               as String,
+      extras: null == extras
+          ? _self.extras
+          : extras // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
     ));
   }
 }
@@ -182,13 +194,15 @@ extension PermissionOptionPatterns on PermissionOption {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String optionId, String label, String kind)? $default, {
+    TResult Function(String optionId, String label, String kind,
+            Map<String, dynamic> extras)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _PermissionOption() when $default != null:
-        return $default(_that.optionId, _that.label, _that.kind);
+        return $default(_that.optionId, _that.label, _that.kind, _that.extras);
       case _:
         return orElse();
     }
@@ -209,12 +223,14 @@ extension PermissionOptionPatterns on PermissionOption {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String optionId, String label, String kind) $default,
+    TResult Function(String optionId, String label, String kind,
+            Map<String, dynamic> extras)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PermissionOption():
-        return $default(_that.optionId, _that.label, _that.kind);
+        return $default(_that.optionId, _that.label, _that.kind, _that.extras);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -234,12 +250,14 @@ extension PermissionOptionPatterns on PermissionOption {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String optionId, String label, String kind)? $default,
+    TResult? Function(String optionId, String label, String kind,
+            Map<String, dynamic> extras)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PermissionOption() when $default != null:
-        return $default(_that.optionId, _that.label, _that.kind);
+        return $default(_that.optionId, _that.label, _that.kind, _that.extras);
       case _:
         return null;
     }
@@ -250,7 +268,11 @@ extension PermissionOptionPatterns on PermissionOption {
 
 class _PermissionOption implements PermissionOption {
   const _PermissionOption(
-      {required this.optionId, required this.label, required this.kind});
+      {required this.optionId,
+      required this.label,
+      required this.kind,
+      final Map<String, dynamic> extras = const <String, dynamic>{}})
+      : _extras = extras;
 
   @override
   final String optionId;
@@ -258,6 +280,14 @@ class _PermissionOption implements PermissionOption {
   final String label;
   @override
   final String kind;
+  final Map<String, dynamic> _extras;
+  @override
+  @JsonKey()
+  Map<String, dynamic> get extras {
+    if (_extras is EqualUnmodifiableMapView) return _extras;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_extras);
+  }
 
   /// Create a copy of PermissionOption
   /// with the given fields replaced by the non-null parameter values.
@@ -275,15 +305,17 @@ class _PermissionOption implements PermissionOption {
             (identical(other.optionId, optionId) ||
                 other.optionId == optionId) &&
             (identical(other.label, label) || other.label == label) &&
-            (identical(other.kind, kind) || other.kind == kind));
+            (identical(other.kind, kind) || other.kind == kind) &&
+            const DeepCollectionEquality().equals(other._extras, _extras));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, optionId, label, kind);
+  int get hashCode => Object.hash(runtimeType, optionId, label, kind,
+      const DeepCollectionEquality().hash(_extras));
 
   @override
   String toString() {
-    return 'PermissionOption(optionId: $optionId, label: $label, kind: $kind)';
+    return 'PermissionOption(optionId: $optionId, label: $label, kind: $kind, extras: $extras)';
   }
 }
 
@@ -295,7 +327,11 @@ abstract mixin class _$PermissionOptionCopyWith<$Res>
       __$PermissionOptionCopyWithImpl;
   @override
   @useResult
-  $Res call({String optionId, String label, String kind});
+  $Res call(
+      {String optionId,
+      String label,
+      String kind,
+      Map<String, dynamic> extras});
 }
 
 /// @nodoc
@@ -314,6 +350,7 @@ class __$PermissionOptionCopyWithImpl<$Res>
     Object? optionId = null,
     Object? label = null,
     Object? kind = null,
+    Object? extras = null,
   }) {
     return _then(_PermissionOption(
       optionId: null == optionId
@@ -328,6 +365,10 @@ class __$PermissionOptionCopyWithImpl<$Res>
           ? _self.kind
           : kind // ignore: cast_nullable_to_non_nullable
               as String,
+      extras: null == extras
+          ? _self._extras
+          : extras // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
     ));
   }
 }
@@ -884,7 +925,11 @@ extension TimelineItemPatterns on TimelineItem {
             String? description,
             String? toolArgs,
             List<PermissionOption> options,
-            OrderKey order)?
+            OrderKey order,
+            List<ToolContent> content,
+            Map<String, dynamic>? meta,
+            String? sessionId,
+            Map<String, dynamic> extras)?
         permissionRequest,
     TResult Function(
             String requestId,
@@ -893,7 +938,11 @@ extension TimelineItemPatterns on TimelineItem {
             String mode,
             OrderKey order,
             Map<String, dynamic>? schema,
-            String? url)?
+            String? url,
+            ElicitationScope? scope,
+            Map<String, dynamic>? meta,
+            Map<String, dynamic>? rawMode,
+            Map<String, dynamic> extras)?
         elicitationRequest,
     TResult Function(String requestId, String toolName, OrderKey order,
             String? toolTitle, String? toolKind, String argsJson)?
@@ -935,10 +984,24 @@ extension TimelineItemPatterns on TimelineItem {
             _that.description,
             _that.toolArgs,
             _that.options,
-            _that.order);
+            _that.order,
+            _that.content,
+            _that.meta,
+            _that.sessionId,
+            _that.extras);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
-        return elicitationRequest(_that.requestId, _that.toolCallId,
-            _that.message, _that.mode, _that.order, _that.schema, _that.url);
+        return elicitationRequest(
+            _that.requestId,
+            _that.toolCallId,
+            _that.message,
+            _that.mode,
+            _that.order,
+            _that.schema,
+            _that.url,
+            _that.scope,
+            _that.meta,
+            _that.rawMode,
+            _that.extras);
       case ToolRequestTimelineItem() when toolRequest != null:
         return toolRequest(_that.requestId, _that.toolName, _that.order,
             _that.toolTitle, _that.toolKind, _that.argsJson);
@@ -996,7 +1059,11 @@ extension TimelineItemPatterns on TimelineItem {
             String? description,
             String? toolArgs,
             List<PermissionOption> options,
-            OrderKey order)
+            OrderKey order,
+            List<ToolContent> content,
+            Map<String, dynamic>? meta,
+            String? sessionId,
+            Map<String, dynamic> extras)
         permissionRequest,
     required TResult Function(
             String requestId,
@@ -1005,7 +1072,11 @@ extension TimelineItemPatterns on TimelineItem {
             String mode,
             OrderKey order,
             Map<String, dynamic>? schema,
-            String? url)
+            String? url,
+            ElicitationScope? scope,
+            Map<String, dynamic>? meta,
+            Map<String, dynamic>? rawMode,
+            Map<String, dynamic> extras)
         elicitationRequest,
     required TResult Function(String requestId, String toolName, OrderKey order,
             String? toolTitle, String? toolKind, String argsJson)
@@ -1046,10 +1117,24 @@ extension TimelineItemPatterns on TimelineItem {
             _that.description,
             _that.toolArgs,
             _that.options,
-            _that.order);
+            _that.order,
+            _that.content,
+            _that.meta,
+            _that.sessionId,
+            _that.extras);
       case ElicitationRequestTimelineItem():
-        return elicitationRequest(_that.requestId, _that.toolCallId,
-            _that.message, _that.mode, _that.order, _that.schema, _that.url);
+        return elicitationRequest(
+            _that.requestId,
+            _that.toolCallId,
+            _that.message,
+            _that.mode,
+            _that.order,
+            _that.schema,
+            _that.url,
+            _that.scope,
+            _that.meta,
+            _that.rawMode,
+            _that.extras);
       case ToolRequestTimelineItem():
         return toolRequest(_that.requestId, _that.toolName, _that.order,
             _that.toolTitle, _that.toolKind, _that.argsJson);
@@ -1104,7 +1189,11 @@ extension TimelineItemPatterns on TimelineItem {
             String? description,
             String? toolArgs,
             List<PermissionOption> options,
-            OrderKey order)?
+            OrderKey order,
+            List<ToolContent> content,
+            Map<String, dynamic>? meta,
+            String? sessionId,
+            Map<String, dynamic> extras)?
         permissionRequest,
     TResult? Function(
             String requestId,
@@ -1113,7 +1202,11 @@ extension TimelineItemPatterns on TimelineItem {
             String mode,
             OrderKey order,
             Map<String, dynamic>? schema,
-            String? url)?
+            String? url,
+            ElicitationScope? scope,
+            Map<String, dynamic>? meta,
+            Map<String, dynamic>? rawMode,
+            Map<String, dynamic> extras)?
         elicitationRequest,
     TResult? Function(String requestId, String toolName, OrderKey order,
             String? toolTitle, String? toolKind, String argsJson)?
@@ -1154,10 +1247,24 @@ extension TimelineItemPatterns on TimelineItem {
             _that.description,
             _that.toolArgs,
             _that.options,
-            _that.order);
+            _that.order,
+            _that.content,
+            _that.meta,
+            _that.sessionId,
+            _that.extras);
       case ElicitationRequestTimelineItem() when elicitationRequest != null:
-        return elicitationRequest(_that.requestId, _that.toolCallId,
-            _that.message, _that.mode, _that.order, _that.schema, _that.url);
+        return elicitationRequest(
+            _that.requestId,
+            _that.toolCallId,
+            _that.message,
+            _that.mode,
+            _that.order,
+            _that.schema,
+            _that.url,
+            _that.scope,
+            _that.meta,
+            _that.rawMode,
+            _that.extras);
       case ToolRequestTimelineItem() when toolRequest != null:
         return toolRequest(_that.requestId, _that.toolName, _that.order,
             _that.toolTitle, _that.toolKind, _that.argsJson);
@@ -1830,8 +1937,15 @@ class PermissionRequestTimelineItem extends TimelineItem {
       this.description,
       this.toolArgs,
       required final List<PermissionOption> options,
-      required this.order})
+      required this.order,
+      final List<ToolContent> content = const <ToolContent>[],
+      final Map<String, dynamic>? meta,
+      this.sessionId,
+      final Map<String, dynamic> extras = const <String, dynamic>{}})
       : _options = options,
+        _content = content,
+        _meta = meta,
+        _extras = extras,
         super._();
 
   final String requestId;
@@ -1849,6 +1963,31 @@ class PermissionRequestTimelineItem extends TimelineItem {
 
   @override
   final OrderKey order;
+  final List<ToolContent> _content;
+  @JsonKey()
+  List<ToolContent> get content {
+    if (_content is EqualUnmodifiableListView) return _content;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_content);
+  }
+
+  final Map<String, dynamic>? _meta;
+  Map<String, dynamic>? get meta {
+    final value = _meta;
+    if (value == null) return null;
+    if (_meta is EqualUnmodifiableMapView) return _meta;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final String? sessionId;
+  final Map<String, dynamic> _extras;
+  @JsonKey()
+  Map<String, dynamic> get extras {
+    if (_extras is EqualUnmodifiableMapView) return _extras;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_extras);
+  }
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
@@ -1877,7 +2016,12 @@ class PermissionRequestTimelineItem extends TimelineItem {
             (identical(other.toolArgs, toolArgs) ||
                 other.toolArgs == toolArgs) &&
             const DeepCollectionEquality().equals(other._options, _options) &&
-            (identical(other.order, order) || other.order == order));
+            (identical(other.order, order) || other.order == order) &&
+            const DeepCollectionEquality().equals(other._content, _content) &&
+            const DeepCollectionEquality().equals(other._meta, _meta) &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            const DeepCollectionEquality().equals(other._extras, _extras));
   }
 
   @override
@@ -1890,11 +2034,15 @@ class PermissionRequestTimelineItem extends TimelineItem {
       description,
       toolArgs,
       const DeepCollectionEquality().hash(_options),
-      order);
+      order,
+      const DeepCollectionEquality().hash(_content),
+      const DeepCollectionEquality().hash(_meta),
+      sessionId,
+      const DeepCollectionEquality().hash(_extras));
 
   @override
   String toString() {
-    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolCallId: $toolCallId, toolKind: $toolKind, description: $description, toolArgs: $toolArgs, options: $options, order: $order)';
+    return 'TimelineItem.permissionRequest(requestId: $requestId, toolTitle: $toolTitle, toolCallId: $toolCallId, toolKind: $toolKind, description: $description, toolArgs: $toolArgs, options: $options, order: $order, content: $content, meta: $meta, sessionId: $sessionId, extras: $extras)';
   }
 }
 
@@ -1915,7 +2063,11 @@ abstract mixin class $PermissionRequestTimelineItemCopyWith<$Res>
       String? description,
       String? toolArgs,
       List<PermissionOption> options,
-      OrderKey order});
+      OrderKey order,
+      List<ToolContent> content,
+      Map<String, dynamic>? meta,
+      String? sessionId,
+      Map<String, dynamic> extras});
 
   @override
   $OrderKeyCopyWith<$Res> get order;
@@ -1942,6 +2094,10 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
     Object? toolArgs = freezed,
     Object? options = null,
     Object? order = null,
+    Object? content = null,
+    Object? meta = freezed,
+    Object? sessionId = freezed,
+    Object? extras = null,
   }) {
     return _then(PermissionRequestTimelineItem(
       requestId: null == requestId
@@ -1976,6 +2132,22 @@ class _$PermissionRequestTimelineItemCopyWithImpl<$Res>
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
               as OrderKey,
+      content: null == content
+          ? _self._content
+          : content // ignore: cast_nullable_to_non_nullable
+              as List<ToolContent>,
+      meta: freezed == meta
+          ? _self._meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      sessionId: freezed == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      extras: null == extras
+          ? _self._extras
+          : extras // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
     ));
   }
 
@@ -2000,8 +2172,15 @@ class ElicitationRequestTimelineItem extends TimelineItem {
       required this.mode,
       required this.order,
       final Map<String, dynamic>? schema,
-      this.url})
+      this.url,
+      this.scope,
+      final Map<String, dynamic>? meta,
+      final Map<String, dynamic>? rawMode,
+      final Map<String, dynamic> extras = const <String, dynamic>{}})
       : _schema = schema,
+        _meta = meta,
+        _rawMode = rawMode,
+        _extras = extras,
         super._();
 
   final String requestId;
@@ -2020,6 +2199,32 @@ class ElicitationRequestTimelineItem extends TimelineItem {
   }
 
   final String? url;
+  final ElicitationScope? scope;
+  final Map<String, dynamic>? _meta;
+  Map<String, dynamic>? get meta {
+    final value = _meta;
+    if (value == null) return null;
+    if (_meta is EqualUnmodifiableMapView) return _meta;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final Map<String, dynamic>? _rawMode;
+  Map<String, dynamic>? get rawMode {
+    final value = _rawMode;
+    if (value == null) return null;
+    if (_rawMode is EqualUnmodifiableMapView) return _rawMode;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final Map<String, dynamic> _extras;
+  @JsonKey()
+  Map<String, dynamic> get extras {
+    if (_extras is EqualUnmodifiableMapView) return _extras;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_extras);
+  }
 
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
@@ -2043,16 +2248,31 @@ class ElicitationRequestTimelineItem extends TimelineItem {
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.order, order) || other.order == order) &&
             const DeepCollectionEquality().equals(other._schema, _schema) &&
-            (identical(other.url, url) || other.url == url));
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.scope, scope) || other.scope == scope) &&
+            const DeepCollectionEquality().equals(other._meta, _meta) &&
+            const DeepCollectionEquality().equals(other._rawMode, _rawMode) &&
+            const DeepCollectionEquality().equals(other._extras, _extras));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, requestId, toolCallId, message,
-      mode, order, const DeepCollectionEquality().hash(_schema), url);
+  int get hashCode => Object.hash(
+      runtimeType,
+      requestId,
+      toolCallId,
+      message,
+      mode,
+      order,
+      const DeepCollectionEquality().hash(_schema),
+      url,
+      scope,
+      const DeepCollectionEquality().hash(_meta),
+      const DeepCollectionEquality().hash(_rawMode),
+      const DeepCollectionEquality().hash(_extras));
 
   @override
   String toString() {
-    return 'TimelineItem.elicitationRequest(requestId: $requestId, toolCallId: $toolCallId, message: $message, mode: $mode, order: $order, schema: $schema, url: $url)';
+    return 'TimelineItem.elicitationRequest(requestId: $requestId, toolCallId: $toolCallId, message: $message, mode: $mode, order: $order, schema: $schema, url: $url, scope: $scope, meta: $meta, rawMode: $rawMode, extras: $extras)';
   }
 }
 
@@ -2072,10 +2292,15 @@ abstract mixin class $ElicitationRequestTimelineItemCopyWith<$Res>
       String mode,
       OrderKey order,
       Map<String, dynamic>? schema,
-      String? url});
+      String? url,
+      ElicitationScope? scope,
+      Map<String, dynamic>? meta,
+      Map<String, dynamic>? rawMode,
+      Map<String, dynamic> extras});
 
   @override
   $OrderKeyCopyWith<$Res> get order;
+  $ElicitationScopeCopyWith<$Res>? get scope;
 }
 
 /// @nodoc
@@ -2098,6 +2323,10 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
     Object? order = null,
     Object? schema = freezed,
     Object? url = freezed,
+    Object? scope = freezed,
+    Object? meta = freezed,
+    Object? rawMode = freezed,
+    Object? extras = null,
   }) {
     return _then(ElicitationRequestTimelineItem(
       requestId: null == requestId
@@ -2128,6 +2357,22 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
           ? _self.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
+      scope: freezed == scope
+          ? _self.scope
+          : scope // ignore: cast_nullable_to_non_nullable
+              as ElicitationScope?,
+      meta: freezed == meta
+          ? _self._meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      rawMode: freezed == rawMode
+          ? _self._rawMode
+          : rawMode // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      extras: null == extras
+          ? _self._extras
+          : extras // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
     ));
   }
 
@@ -2138,6 +2383,20 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
   $OrderKeyCopyWith<$Res> get order {
     return $OrderKeyCopyWith<$Res>(_self.order, (value) {
       return _then(_self.copyWith(order: value));
+    });
+  }
+
+  /// Create a copy of TimelineItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ElicitationScopeCopyWith<$Res>? get scope {
+    if (_self.scope == null) {
+      return null;
+    }
+
+    return $ElicitationScopeCopyWith<$Res>(_self.scope!, (value) {
+      return _then(_self.copyWith(scope: value));
     });
   }
 }

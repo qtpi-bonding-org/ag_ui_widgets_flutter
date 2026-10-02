@@ -24,6 +24,7 @@ abstract class PermissionOption with _$PermissionOption {
     required String optionId,
     required String label,
     required String kind,
+    @Default(<String, dynamic>{}) Map<String, dynamic> extras,
   }) = _PermissionOption;
 }
 
@@ -128,6 +129,10 @@ sealed class TimelineItem with _$TimelineItem {
     String? toolArgs,
     required List<PermissionOption> options,
     required OrderKey order,
+    @Default(<ToolContent>[]) List<ToolContent> content,
+    Map<String, dynamic>? meta,
+    String? sessionId,
+    @Default(<String, dynamic>{}) Map<String, dynamic> extras,
   }) = PermissionRequestTimelineItem;
 
   /// A pending elicitation request — full payload. `message` and `mode` are
@@ -141,6 +146,10 @@ sealed class TimelineItem with _$TimelineItem {
     required OrderKey order,
     Map<String, dynamic>? schema,
     String? url,
+    ElicitationScope? scope,
+    Map<String, dynamic>? meta,
+    Map<String, dynamic>? rawMode,
+    @Default(<String, dynamic>{}) Map<String, dynamic> extras,
   }) = ElicitationRequestTimelineItem;
 
   /// A client-executed tool request — full payload. `toolTitle`/`toolKind`

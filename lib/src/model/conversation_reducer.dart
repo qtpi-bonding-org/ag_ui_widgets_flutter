@@ -78,6 +78,7 @@ class ConversationReducer {
   // comes back.
   final Set<String> _reportedMalformed = {};
   final Set<String> _reportedUnknown = {};
+  final Set<String> _reportedContent = {};
 
   AgentState? _agent;
   ModeState? _mode;
@@ -703,14 +704,34 @@ class ConversationReducer {
     final requestId = permission['requestId'];
     if (requestId is! String) return;
     if (_resolvedIds.contains(requestId)) return;
-    final options = (permission['options'] as List? ?? const [])
-        .whereType<Map>()
-        .map((o) => PermissionOption(
-              optionId: (o['optionId'] as String?) ?? '',
-              label: (o['name'] as String?) ?? '',
-              kind: (o['kind'] as String?) ?? '',
-            ))
-        .toList();
+    const permissionKnown = {
+      'requestId', 'sessionId', 'toolCallId', 'title', 'kind', 'options',
+      'content', 'meta',
+    };
+    final options = [
+      for (final o in asJsonMapList(permission['options']))
+        PermissionOption(
+          optionId: asString(o['optionId']) ?? '',
+          label: asString(o['name']) ?? '',
+          kind: asString(o['kind']) ?? '',
+          extras: extrasOf(o, const {'optionId', 'name', 'kind'}),
+        ),
+    ];
+    final content = <ToolContent>[];
+    final rawContent = permission['content'];
+    if (rawContent is List) {
+      for (final c in rawContent) {
+        final parsed = ToolContent.parse(c);
+        if (parsed == null) {
+          if (_reportedContent.add('$requestId|$c')) {
+            _diagnose(DiagnosticKind.malformedPayload,
+                '$namespace/permissions/content', c);
+          }
+        } else {
+          content.add(parsed);
+        }
+      }
+    }
     final toolCallId = permission['toolCallId'];
     final correlatedTool =
         toolCallId is String ? _items[toolCallId] : null;
@@ -728,6 +749,10 @@ class ConversationReducer {
             : null,
         options: options,
         order: anchor != null ? OrderKey(anchor.seq, 1) : order,
+        content: content,
+        meta: asJsonMap(permission['meta']),
+        sessionId: asString(permission['sessionId']),
+        extras: extrasOf(Map<String, dynamic>.from(permission), permissionKnown),
       ),
     );
   }
@@ -775,6 +800,10 @@ class ConversationReducer {
         schema: schema is Map ? Map<String, dynamic>.from(schema) : null,
         url: url,
         order: order,
+        scope: ElicitationScope.parse(elicitation['scope']),
+        meta: asJsonMap(elicitation['meta']),
+        rawMode: rawMode is Map ? Map<String, dynamic>.from(rawMode) : null,
+        extras: extrasOf(Map<String, dynamic>.from(elicitation), const {'elicitationId', 'message', 'mode', 'scope', 'meta', 'requestedSchema', 'url'}),
       ),
     );
   }

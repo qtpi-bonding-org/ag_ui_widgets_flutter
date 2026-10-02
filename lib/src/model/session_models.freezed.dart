@@ -13,6 +13,393 @@ part of 'session_models.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$ElicitationScope {
+  String? get kind;
+  String? get requestId;
+  String? get sessionId;
+  String? get toolCallId;
+  Map<String, dynamic> get extras;
+
+  /// Create a copy of ElicitationScope
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ElicitationScopeCopyWith<ElicitationScope> get copyWith =>
+      _$ElicitationScopeCopyWithImpl<ElicitationScope>(
+          this as ElicitationScope, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ElicitationScope &&
+            (identical(other.kind, kind) || other.kind == kind) &&
+            (identical(other.requestId, requestId) ||
+                other.requestId == requestId) &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.toolCallId, toolCallId) ||
+                other.toolCallId == toolCallId) &&
+            const DeepCollectionEquality().equals(other.extras, extras));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, kind, requestId, sessionId,
+      toolCallId, const DeepCollectionEquality().hash(extras));
+
+  @override
+  String toString() {
+    return 'ElicitationScope(kind: $kind, requestId: $requestId, sessionId: $sessionId, toolCallId: $toolCallId, extras: $extras)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ElicitationScopeCopyWith<$Res> {
+  factory $ElicitationScopeCopyWith(
+          ElicitationScope value, $Res Function(ElicitationScope) _then) =
+      _$ElicitationScopeCopyWithImpl;
+  @useResult
+  $Res call(
+      {String? kind,
+      String? requestId,
+      String? sessionId,
+      String? toolCallId,
+      Map<String, dynamic> extras});
+}
+
+/// @nodoc
+class _$ElicitationScopeCopyWithImpl<$Res>
+    implements $ElicitationScopeCopyWith<$Res> {
+  _$ElicitationScopeCopyWithImpl(this._self, this._then);
+
+  final ElicitationScope _self;
+  final $Res Function(ElicitationScope) _then;
+
+  /// Create a copy of ElicitationScope
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? kind = freezed,
+    Object? requestId = freezed,
+    Object? sessionId = freezed,
+    Object? toolCallId = freezed,
+    Object? extras = null,
+  }) {
+    return _then(_self.copyWith(
+      kind: freezed == kind
+          ? _self.kind
+          : kind // ignore: cast_nullable_to_non_nullable
+              as String?,
+      requestId: freezed == requestId
+          ? _self.requestId
+          : requestId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sessionId: freezed == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      toolCallId: freezed == toolCallId
+          ? _self.toolCallId
+          : toolCallId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      extras: null == extras
+          ? _self.extras
+          : extras // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ElicitationScope].
+extension ElicitationScopePatterns on ElicitationScope {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ElicitationScope value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ElicitationScope() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ElicitationScope value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ElicitationScope():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ElicitationScope value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ElicitationScope() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String? kind, String? requestId, String? sessionId,
+            String? toolCallId, Map<String, dynamic> extras)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ElicitationScope() when $default != null:
+        return $default(_that.kind, _that.requestId, _that.sessionId,
+            _that.toolCallId, _that.extras);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String? kind, String? requestId, String? sessionId,
+            String? toolCallId, Map<String, dynamic> extras)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ElicitationScope():
+        return $default(_that.kind, _that.requestId, _that.sessionId,
+            _that.toolCallId, _that.extras);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String? kind, String? requestId, String? sessionId,
+            String? toolCallId, Map<String, dynamic> extras)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ElicitationScope() when $default != null:
+        return $default(_that.kind, _that.requestId, _that.sessionId,
+            _that.toolCallId, _that.extras);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _ElicitationScope extends ElicitationScope {
+  const _ElicitationScope(
+      {this.kind,
+      this.requestId,
+      this.sessionId,
+      this.toolCallId,
+      final Map<String, dynamic> extras = const <String, dynamic>{}})
+      : _extras = extras,
+        super._();
+
+  @override
+  final String? kind;
+  @override
+  final String? requestId;
+  @override
+  final String? sessionId;
+  @override
+  final String? toolCallId;
+  final Map<String, dynamic> _extras;
+  @override
+  @JsonKey()
+  Map<String, dynamic> get extras {
+    if (_extras is EqualUnmodifiableMapView) return _extras;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_extras);
+  }
+
+  /// Create a copy of ElicitationScope
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ElicitationScopeCopyWith<_ElicitationScope> get copyWith =>
+      __$ElicitationScopeCopyWithImpl<_ElicitationScope>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _ElicitationScope &&
+            (identical(other.kind, kind) || other.kind == kind) &&
+            (identical(other.requestId, requestId) ||
+                other.requestId == requestId) &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId) &&
+            (identical(other.toolCallId, toolCallId) ||
+                other.toolCallId == toolCallId) &&
+            const DeepCollectionEquality().equals(other._extras, _extras));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, kind, requestId, sessionId,
+      toolCallId, const DeepCollectionEquality().hash(_extras));
+
+  @override
+  String toString() {
+    return 'ElicitationScope(kind: $kind, requestId: $requestId, sessionId: $sessionId, toolCallId: $toolCallId, extras: $extras)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ElicitationScopeCopyWith<$Res>
+    implements $ElicitationScopeCopyWith<$Res> {
+  factory _$ElicitationScopeCopyWith(
+          _ElicitationScope value, $Res Function(_ElicitationScope) _then) =
+      __$ElicitationScopeCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String? kind,
+      String? requestId,
+      String? sessionId,
+      String? toolCallId,
+      Map<String, dynamic> extras});
+}
+
+/// @nodoc
+class __$ElicitationScopeCopyWithImpl<$Res>
+    implements _$ElicitationScopeCopyWith<$Res> {
+  __$ElicitationScopeCopyWithImpl(this._self, this._then);
+
+  final _ElicitationScope _self;
+  final $Res Function(_ElicitationScope) _then;
+
+  /// Create a copy of ElicitationScope
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? kind = freezed,
+    Object? requestId = freezed,
+    Object? sessionId = freezed,
+    Object? toolCallId = freezed,
+    Object? extras = null,
+  }) {
+    return _then(_ElicitationScope(
+      kind: freezed == kind
+          ? _self.kind
+          : kind // ignore: cast_nullable_to_non_nullable
+              as String?,
+      requestId: freezed == requestId
+          ? _self.requestId
+          : requestId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sessionId: freezed == sessionId
+          ? _self.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      toolCallId: freezed == toolCallId
+          ? _self.toolCallId
+          : toolCallId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      extras: null == extras
+          ? _self._extras
+          : extras // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$AuthMethod {
   String? get id;
   String? get name;

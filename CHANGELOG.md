@@ -1,5 +1,8 @@
 ## 0.8.0
 
+Added (post-release): `DiffLinesView` is exported from the package barrel so
+apps can reuse the diff renderer without importing from `src/`.
+
 Breaking:
 
 - `ConversationReducer`, `reduce` and `isReplaceMarker` take a required

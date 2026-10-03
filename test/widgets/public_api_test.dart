@@ -111,4 +111,16 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('hi'), findsWidgets);
   });
+
+  test('barrel exports DiffLinesView', () {
+    const view = DiffLinesView(
+      path: 'a.txt',
+      oldText: 'a',
+      newText: 'b',
+      textStyle: TextStyle(),
+      addedColor: Colors.green,
+      removedColor: Colors.red,
+    );
+    expect(view.path, 'a.txt');
+  });
 }

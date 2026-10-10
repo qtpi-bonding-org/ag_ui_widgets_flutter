@@ -84,6 +84,7 @@ class ConversationReducer {
   String? _threadId;
   String? _runId;
   String? _stopReason;
+  Map<String, dynamic>? _runResult;
   String? _runErrorCode;
 
   AgentState? _agent;
@@ -205,6 +206,7 @@ class ConversationReducer {
         _threadId = threadId;
         _runId = runId;
         _stopReason = null;
+        _runResult = null;
         _runErrorCode = null;
       case ag_ui.RunFinishedEvent(:final result):
         _isRunning = false;
@@ -212,6 +214,7 @@ class ConversationReducer {
         final stopReason =
             result is Map ? asString(result['stopReason']) : null;
         _stopReason = stopReason;
+        _runResult = asJsonMap(result);
         _runOutcome = switch (stopReason) {
           'cancelled' => RunOutcome.cancelled,
           null => RunOutcome.success,
@@ -703,6 +706,7 @@ class ConversationReducer {
     _threadId = null;
     _runId = null;
     _stopReason = null;
+    _runResult = null;
     _runErrorCode = null;
     _mediaCount = 0;
     _responseMeta = const {};
@@ -1113,6 +1117,7 @@ class ConversationReducer {
       threadId: _threadId,
       runId: _runId,
       stopReason: _stopReason,
+      runResult: _runResult,
       runErrorCode: _runErrorCode,
       agent: _agent,
       mode: _mode,

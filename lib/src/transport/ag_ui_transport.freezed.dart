@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$AgUiContextItem {
   String get uri;
   String get text;
+  String? get mimeType;
 
   /// Create a copy of AgUiContextItem
   /// with the given fields replaced by the non-null parameter values.
@@ -31,15 +32,17 @@ mixin _$AgUiContextItem {
         (other.runtimeType == runtimeType &&
             other is AgUiContextItem &&
             (identical(other.uri, uri) || other.uri == uri) &&
-            (identical(other.text, text) || other.text == text));
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.mimeType, mimeType) ||
+                other.mimeType == mimeType));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uri, text);
+  int get hashCode => Object.hash(runtimeType, uri, text, mimeType);
 
   @override
   String toString() {
-    return 'AgUiContextItem(uri: $uri, text: $text)';
+    return 'AgUiContextItem(uri: $uri, text: $text, mimeType: $mimeType)';
   }
 }
 
@@ -49,7 +52,7 @@ abstract mixin class $AgUiContextItemCopyWith<$Res> {
           AgUiContextItem value, $Res Function(AgUiContextItem) _then) =
       _$AgUiContextItemCopyWithImpl;
   @useResult
-  $Res call({String uri, String text});
+  $Res call({String uri, String text, String? mimeType});
 }
 
 /// @nodoc
@@ -67,6 +70,7 @@ class _$AgUiContextItemCopyWithImpl<$Res>
   $Res call({
     Object? uri = null,
     Object? text = null,
+    Object? mimeType = freezed,
   }) {
     return _then(_self.copyWith(
       uri: null == uri
@@ -77,6 +81,10 @@ class _$AgUiContextItemCopyWithImpl<$Res>
           ? _self.text
           : text // ignore: cast_nullable_to_non_nullable
               as String,
+      mimeType: freezed == mimeType
+          ? _self.mimeType
+          : mimeType // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -174,13 +182,13 @@ extension AgUiContextItemPatterns on AgUiContextItem {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String uri, String text)? $default, {
+    TResult Function(String uri, String text, String? mimeType)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _AgUiContextItem() when $default != null:
-        return $default(_that.uri, _that.text);
+        return $default(_that.uri, _that.text, _that.mimeType);
       case _:
         return orElse();
     }
@@ -201,12 +209,12 @@ extension AgUiContextItemPatterns on AgUiContextItem {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String uri, String text) $default,
+    TResult Function(String uri, String text, String? mimeType) $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AgUiContextItem():
-        return $default(_that.uri, _that.text);
+        return $default(_that.uri, _that.text, _that.mimeType);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -226,12 +234,12 @@ extension AgUiContextItemPatterns on AgUiContextItem {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String uri, String text)? $default,
+    TResult? Function(String uri, String text, String? mimeType)? $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AgUiContextItem() when $default != null:
-        return $default(_that.uri, _that.text);
+        return $default(_that.uri, _that.text, _that.mimeType);
       case _:
         return null;
     }
@@ -241,12 +249,15 @@ extension AgUiContextItemPatterns on AgUiContextItem {
 /// @nodoc
 
 class _AgUiContextItem implements AgUiContextItem {
-  const _AgUiContextItem({required this.uri, required this.text});
+  const _AgUiContextItem(
+      {required this.uri, required this.text, this.mimeType});
 
   @override
   final String uri;
   @override
   final String text;
+  @override
+  final String? mimeType;
 
   /// Create a copy of AgUiContextItem
   /// with the given fields replaced by the non-null parameter values.
@@ -262,15 +273,17 @@ class _AgUiContextItem implements AgUiContextItem {
         (other.runtimeType == runtimeType &&
             other is _AgUiContextItem &&
             (identical(other.uri, uri) || other.uri == uri) &&
-            (identical(other.text, text) || other.text == text));
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.mimeType, mimeType) ||
+                other.mimeType == mimeType));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uri, text);
+  int get hashCode => Object.hash(runtimeType, uri, text, mimeType);
 
   @override
   String toString() {
-    return 'AgUiContextItem(uri: $uri, text: $text)';
+    return 'AgUiContextItem(uri: $uri, text: $text, mimeType: $mimeType)';
   }
 }
 
@@ -282,7 +295,7 @@ abstract mixin class _$AgUiContextItemCopyWith<$Res>
       __$AgUiContextItemCopyWithImpl;
   @override
   @useResult
-  $Res call({String uri, String text});
+  $Res call({String uri, String text, String? mimeType});
 }
 
 /// @nodoc
@@ -300,6 +313,7 @@ class __$AgUiContextItemCopyWithImpl<$Res>
   $Res call({
     Object? uri = null,
     Object? text = null,
+    Object? mimeType = freezed,
   }) {
     return _then(_AgUiContextItem(
       uri: null == uri
@@ -310,6 +324,10 @@ class __$AgUiContextItemCopyWithImpl<$Res>
           ? _self.text
           : text // ignore: cast_nullable_to_non_nullable
               as String,
+      mimeType: freezed == mimeType
+          ? _self.mimeType
+          : mimeType // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

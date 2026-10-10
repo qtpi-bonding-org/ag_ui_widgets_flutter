@@ -2627,6 +2627,11 @@ mixin _$SessionState {
   String? get threadId;
   String? get runId;
   String? get stopReason;
+
+  /// The whole `RUN_FINISHED.result` object (stop reason, turn id, duration,
+  /// anything the backend adds), not just [stopReason]. Null until a run
+  /// finishes; cleared when the next run starts.
+  Map<String, dynamic>? get runResult;
   String? get runErrorCode;
   AgentState? get agent;
   ModeState? get mode;
@@ -2671,6 +2676,7 @@ mixin _$SessionState {
             (identical(other.runId, runId) || other.runId == runId) &&
             (identical(other.stopReason, stopReason) ||
                 other.stopReason == stopReason) &&
+            const DeepCollectionEquality().equals(other.runResult, runResult) &&
             (identical(other.runErrorCode, runErrorCode) ||
                 other.runErrorCode == runErrorCode) &&
             (identical(other.agent, agent) || other.agent == agent) &&
@@ -2690,30 +2696,32 @@ mixin _$SessionState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      isRunning,
-      isStarting,
-      runError,
-      runOutcome,
-      threadId,
-      runId,
-      stopReason,
-      runErrorCode,
-      agent,
-      mode,
-      commands,
-      configState,
-      usage,
-      sessionInfo,
-      plans,
-      const DeepCollectionEquality().hash(responseMeta),
-      const DeepCollectionEquality().hash(resolutions));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        title,
+        isRunning,
+        isStarting,
+        runError,
+        runOutcome,
+        threadId,
+        runId,
+        stopReason,
+        const DeepCollectionEquality().hash(runResult),
+        runErrorCode,
+        agent,
+        mode,
+        commands,
+        configState,
+        usage,
+        sessionInfo,
+        plans,
+        const DeepCollectionEquality().hash(responseMeta),
+        const DeepCollectionEquality().hash(resolutions)
+      ]);
 
   @override
   String toString() {
-    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runResult: $runResult, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
   }
 }
 
@@ -2732,6 +2740,7 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       String? threadId,
       String? runId,
       String? stopReason,
+      Map<String, dynamic>? runResult,
       String? runErrorCode,
       AgentState? agent,
       ModeState? mode,
@@ -2772,6 +2781,7 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? threadId = freezed,
     Object? runId = freezed,
     Object? stopReason = freezed,
+    Object? runResult = freezed,
     Object? runErrorCode = freezed,
     Object? agent = freezed,
     Object? mode = freezed,
@@ -2816,6 +2826,10 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
           ? _self.stopReason
           : stopReason // ignore: cast_nullable_to_non_nullable
               as String?,
+      runResult: freezed == runResult
+          ? _self.runResult
+          : runResult // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       runErrorCode: freezed == runErrorCode
           ? _self.runErrorCode
           : runErrorCode // ignore: cast_nullable_to_non_nullable
@@ -3054,6 +3068,7 @@ extension SessionStatePatterns on SessionState {
             String? threadId,
             String? runId,
             String? stopReason,
+            Map<String, dynamic>? runResult,
             String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
@@ -3079,6 +3094,7 @@ extension SessionStatePatterns on SessionState {
             _that.threadId,
             _that.runId,
             _that.stopReason,
+            _that.runResult,
             _that.runErrorCode,
             _that.agent,
             _that.mode,
@@ -3118,6 +3134,7 @@ extension SessionStatePatterns on SessionState {
             String? threadId,
             String? runId,
             String? stopReason,
+            Map<String, dynamic>? runResult,
             String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
@@ -3142,6 +3159,7 @@ extension SessionStatePatterns on SessionState {
             _that.threadId,
             _that.runId,
             _that.stopReason,
+            _that.runResult,
             _that.runErrorCode,
             _that.agent,
             _that.mode,
@@ -3178,6 +3196,7 @@ extension SessionStatePatterns on SessionState {
             String? threadId,
             String? runId,
             String? stopReason,
+            Map<String, dynamic>? runResult,
             String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
@@ -3202,6 +3221,7 @@ extension SessionStatePatterns on SessionState {
             _that.threadId,
             _that.runId,
             _that.stopReason,
+            _that.runResult,
             _that.runErrorCode,
             _that.agent,
             _that.mode,
@@ -3230,6 +3250,7 @@ class _SessionState extends SessionState {
       this.threadId,
       this.runId,
       this.stopReason,
+      final Map<String, dynamic>? runResult,
       this.runErrorCode,
       this.agent,
       this.mode,
@@ -3241,7 +3262,8 @@ class _SessionState extends SessionState {
       final Map<String, dynamic> responseMeta = const <String, dynamic>{},
       final Map<String, Map<String, dynamic>> resolutions =
           const <String, Map<String, dynamic>>{}})
-      : _responseMeta = responseMeta,
+      : _runResult = runResult,
+        _responseMeta = responseMeta,
         _resolutions = resolutions,
         super._();
 
@@ -3269,6 +3291,24 @@ class _SessionState extends SessionState {
   final String? runId;
   @override
   final String? stopReason;
+
+  /// The whole `RUN_FINISHED.result` object (stop reason, turn id, duration,
+  /// anything the backend adds), not just [stopReason]. Null until a run
+  /// finishes; cleared when the next run starts.
+  final Map<String, dynamic>? _runResult;
+
+  /// The whole `RUN_FINISHED.result` object (stop reason, turn id, duration,
+  /// anything the backend adds), not just [stopReason]. Null until a run
+  /// finishes; cleared when the next run starts.
+  @override
+  Map<String, dynamic>? get runResult {
+    final value = _runResult;
+    if (value == null) return null;
+    if (_runResult is EqualUnmodifiableMapView) return _runResult;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   final String? runErrorCode;
   @override
@@ -3342,6 +3382,8 @@ class _SessionState extends SessionState {
             (identical(other.runId, runId) || other.runId == runId) &&
             (identical(other.stopReason, stopReason) ||
                 other.stopReason == stopReason) &&
+            const DeepCollectionEquality()
+                .equals(other._runResult, _runResult) &&
             (identical(other.runErrorCode, runErrorCode) ||
                 other.runErrorCode == runErrorCode) &&
             (identical(other.agent, agent) || other.agent == agent) &&
@@ -3361,30 +3403,32 @@ class _SessionState extends SessionState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      isRunning,
-      isStarting,
-      runError,
-      runOutcome,
-      threadId,
-      runId,
-      stopReason,
-      runErrorCode,
-      agent,
-      mode,
-      commands,
-      configState,
-      usage,
-      sessionInfo,
-      plans,
-      const DeepCollectionEquality().hash(_responseMeta),
-      const DeepCollectionEquality().hash(_resolutions));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        title,
+        isRunning,
+        isStarting,
+        runError,
+        runOutcome,
+        threadId,
+        runId,
+        stopReason,
+        const DeepCollectionEquality().hash(_runResult),
+        runErrorCode,
+        agent,
+        mode,
+        commands,
+        configState,
+        usage,
+        sessionInfo,
+        plans,
+        const DeepCollectionEquality().hash(_responseMeta),
+        const DeepCollectionEquality().hash(_resolutions)
+      ]);
 
   @override
   String toString() {
-    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runResult: $runResult, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
   }
 }
 
@@ -3405,6 +3449,7 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       String? threadId,
       String? runId,
       String? stopReason,
+      Map<String, dynamic>? runResult,
       String? runErrorCode,
       AgentState? agent,
       ModeState? mode,
@@ -3453,6 +3498,7 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? threadId = freezed,
     Object? runId = freezed,
     Object? stopReason = freezed,
+    Object? runResult = freezed,
     Object? runErrorCode = freezed,
     Object? agent = freezed,
     Object? mode = freezed,
@@ -3497,6 +3543,10 @@ class __$SessionStateCopyWithImpl<$Res>
           ? _self.stopReason
           : stopReason // ignore: cast_nullable_to_non_nullable
               as String?,
+      runResult: freezed == runResult
+          ? _self._runResult
+          : runResult // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       runErrorCode: freezed == runErrorCode
           ? _self.runErrorCode
           : runErrorCode // ignore: cast_nullable_to_non_nullable

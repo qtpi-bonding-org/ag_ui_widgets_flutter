@@ -13,6 +13,7 @@ ToolCallTimelineItem _tool(ConversationReducer r) =>
 
 void main() {
   _resolutionTests();
+  _runResultTests();
   test('<ns>:tool keeps rawOutput, success and pastTenseMessage', () {
     final r = _r()
       ..apply(const CustomEvent(name: '$_ns:tool', value: {
@@ -130,5 +131,32 @@ void _resolutionTests() {
     expect(res.containsKey('permission:tc129'), isTrue);
     r.apply(const CustomEvent(name: '$_ns:permission_resolved', value: 'junk'));
     expect(r.current.diagnostics, isNotEmpty);
+  });
+}
+
+void _runResultTests() {
+  test('RunFinished keeps the whole result, and the next run clears it', () {
+    final r = ConversationReducer(namespace: _ns)
+      ..apply(RunStartedEvent(threadId: 't', runId: 'r'))
+      ..apply(RunFinishedEvent(threadId: 't', runId: 'r', result: {
+        'stopReason': 'end_turn',
+        'durationMs': 1200,
+        'turnId': 'x'
+      }));
+    final s = r.current.sessionState;
+    expect(s.stopReason, 'end_turn');
+    expect(s.runResult, {
+      'stopReason': 'end_turn',
+      'durationMs': 1200,
+      'turnId': 'x',
+    });
+    r.apply(RunStartedEvent(threadId: 't', runId: 'r2'));
+    expect(r.current.sessionState.runResult, isNull);
+  });
+
+  test('RunFinished without a map result leaves runResult null', () {
+    final r = ConversationReducer(namespace: _ns)
+      ..apply(RunFinishedEvent(threadId: 't', runId: 'r'));
+    expect(r.current.sessionState.runResult, isNull);
   });
 }

@@ -5,7 +5,9 @@ Added (post-release): `ToolCallTimelineItem` gains `rawOutput`, `success`,
 replaces the earlier name; new `<ns>:tool_text`, `<ns>:permission_resolved`
 and `<ns>:elicitation_resolved` events (the latter two land in the new
 `SessionState.resolutions`); `SessionInfo.parse` reads camelCase `updatedAt`
-(snake_case `updated_at` still accepted).
+(snake_case `updated_at` still accepted). `SessionState.runResult` keeps the
+whole `RUN_FINISHED.result` object; `AgUiContextItem` gains an optional
+`mimeType`.
 
 Added (post-release): `DiffLinesView` is exported from the package barrel so
 apps can reuse the diff renderer without importing from `src/`.

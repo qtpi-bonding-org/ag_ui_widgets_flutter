@@ -217,6 +217,11 @@ sealed class SessionState with _$SessionState {
     String? threadId,
     String? runId,
     String? stopReason,
+
+    /// The whole `RUN_FINISHED.result` object (stop reason, turn id, duration,
+    /// anything the backend adds), not just [stopReason]. Null until a run
+    /// finishes; cleared when the next run starts.
+    Map<String, dynamic>? runResult,
     String? runErrorCode,
     AgentState? agent,
     ModeState? mode,

@@ -10,7 +10,13 @@ part "ag_ui_transport.freezed.dart";
 /// boundary, same pattern as every other parameter on this interface.
 @freezed
 abstract class AgUiContextItem with _$AgUiContextItem {
-  const factory AgUiContextItem({required String uri, required String text}) = _AgUiContextItem;
+  /// [mimeType] is the type of [text] (e.g. `text/markdown` for a note body);
+  /// null lets the transport default it (plain text).
+  const factory AgUiContextItem({
+    required String uri,
+    required String text,
+    String? mimeType,
+  }) = _AgUiContextItem;
 }
 
 /// A backend-agnostic source of AG-UI events plus the actions a UI can

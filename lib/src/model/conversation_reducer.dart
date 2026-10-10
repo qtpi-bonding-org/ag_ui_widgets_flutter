@@ -96,6 +96,8 @@ class ConversationReducer {
 
   int _mediaCount = 0;
   Map<String, dynamic> _responseMeta = const {};
+  Map<String, Map<String, dynamic>> _resolutions = const {};
+  static const int _maxResolutions = 100;
 
   /// Called with a tool's name for every incoming `acp.client_execute_request`; return
   /// `true` to skip creating a [ToolRequestTimelineItem] for it entirely.
@@ -341,6 +343,7 @@ class ConversationReducer {
           event.toolCallId,
           (t) => t.copyWith(
             result: event.content,
+            partialText: null,
             resultParts: [
               ...t.resultParts,
               ToolResultPart(
@@ -381,15 +384,52 @@ class ConversationReducer {
           _updateTool(
             toolCallId,
             (t) => t.copyWith(
-              name: t.name.isEmpty && title is String && title.isNotEmpty
-                  ? title
-                  : t.name,
+              name: title is String && title.isNotEmpty ? title : t.name,
               toolKind: kind is String && kind.isNotEmpty ? kind : t.toolKind,
               status: status is String && status.isNotEmpty ? status : t.status,
               locations: locations ?? t.locations,
               meta: meta ?? t.meta,
+              rawOutput: value.containsKey('rawOutput')
+                  ? value['rawOutput']
+                  : t.rawOutput,
+              success: value['success'] is bool
+                  ? value['success'] as bool
+                  : t.success,
+              pastTenseMessage:
+                  asString(value['pastTenseMessage']) ?? t.pastTenseMessage,
             ),
           );
+        }
+
+      case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:permission_resolved' ||
+              name == '$namespace:elicitation_resolved':
+        final value = asJsonMap(event.value);
+        final isPermission = name == '$namespace:permission_resolved';
+        final id =
+            asString(value?[isPermission ? 'toolCallId' : 'elicitationId']);
+        final resolution = asJsonMap(value?['resolution']);
+        if (value == null || id == null || resolution == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          final key = '${isPermission ? 'permission' : 'elicitation'}:$id';
+          final next = {..._resolutions}..remove(key);
+          next[key] = resolution;
+          while (next.length > _maxResolutions) {
+            next.remove(next.keys.first);
+          }
+          _resolutions = next;
+        }
+
+      case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:tool_text':
+        final value = asJsonMap(event.value);
+        final toolCallId = asString(value?['toolCallId']);
+        final text = asString(value?['text']);
+        if (value == null || toolCallId == null || text == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          _updateTool(toolCallId, (t) => t.copyWith(partialText: text));
         }
 
       case ag_ui.CustomEvent(name: 'acp.permission_request', :final value):
@@ -666,6 +706,7 @@ class ConversationReducer {
     _runErrorCode = null;
     _mediaCount = 0;
     _responseMeta = const {};
+    _resolutions = const {};
     // Reset typed state fields only. Do NOT clear _diagnostics,
     // _sourceRecords, _diagnosticCount or the _reported* sets — they
     // describe what the reducer has seen, and a replay re-sends the same state.
@@ -1081,6 +1122,7 @@ class ConversationReducer {
       sessionInfo: _sessionInfo,
       plans: _plans,
       responseMeta: _responseMeta,
+      resolutions: _resolutions,
     );
   }
 }

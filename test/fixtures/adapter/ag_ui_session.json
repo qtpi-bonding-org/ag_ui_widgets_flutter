@@ -266,6 +266,19 @@
     "sourceEventId": "src-8"
   },
   {
+    "type": "CUSTOM",
+    "name": "episutra:tool",
+    "value": {
+      "toolCallId": "tc1",
+      "title": "Edit a.txt",
+      "kind": "edit",
+      "status": "completed",
+      "success": true,
+      "pastTenseMessage": "Edited a.txt"
+    },
+    "sourceEventId": "src-8"
+  },
+  {
     "type": "TOOL_CALL_RESULT",
     "messageId": "tool-result-tc1-0",
     "toolCallId": "tc1",

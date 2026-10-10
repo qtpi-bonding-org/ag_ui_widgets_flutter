@@ -912,7 +912,11 @@ extension TimelineItemPatterns on TimelineItem {
             List<ToolPatch> patches,
             List<MediaDescriptor> media,
             List<ToolResultPart> resultParts,
-            Map<String, dynamic>? meta)?
+            Map<String, dynamic>? meta,
+            Object? rawOutput,
+            bool? success,
+            String? pastTenseMessage,
+            String? partialText)?
         toolCall,
     TResult Function(String id, String? messageId, MediaDescriptor media,
             OrderKey order)?
@@ -972,7 +976,11 @@ extension TimelineItemPatterns on TimelineItem {
             _that.patches,
             _that.media,
             _that.resultParts,
-            _that.meta);
+            _that.meta,
+            _that.rawOutput,
+            _that.success,
+            _that.pastTenseMessage,
+            _that.partialText);
       case MediaTimelineItem() when media != null:
         return media(_that.id, _that.messageId, _that.media, _that.order);
       case PermissionRequestTimelineItem() when permissionRequest != null:
@@ -1046,7 +1054,11 @@ extension TimelineItemPatterns on TimelineItem {
             List<ToolPatch> patches,
             List<MediaDescriptor> media,
             List<ToolResultPart> resultParts,
-            Map<String, dynamic>? meta)
+            Map<String, dynamic>? meta,
+            Object? rawOutput,
+            bool? success,
+            String? pastTenseMessage,
+            String? partialText)
         toolCall,
     required TResult Function(
             String id, String? messageId, MediaDescriptor media, OrderKey order)
@@ -1105,7 +1117,11 @@ extension TimelineItemPatterns on TimelineItem {
             _that.patches,
             _that.media,
             _that.resultParts,
-            _that.meta);
+            _that.meta,
+            _that.rawOutput,
+            _that.success,
+            _that.pastTenseMessage,
+            _that.partialText);
       case MediaTimelineItem():
         return media(_that.id, _that.messageId, _that.media, _that.order);
       case PermissionRequestTimelineItem():
@@ -1176,7 +1192,11 @@ extension TimelineItemPatterns on TimelineItem {
             List<ToolPatch> patches,
             List<MediaDescriptor> media,
             List<ToolResultPart> resultParts,
-            Map<String, dynamic>? meta)?
+            Map<String, dynamic>? meta,
+            Object? rawOutput,
+            bool? success,
+            String? pastTenseMessage,
+            String? partialText)?
         toolCall,
     TResult? Function(String id, String? messageId, MediaDescriptor media,
             OrderKey order)?
@@ -1235,7 +1255,11 @@ extension TimelineItemPatterns on TimelineItem {
             _that.patches,
             _that.media,
             _that.resultParts,
-            _that.meta);
+            _that.meta,
+            _that.rawOutput,
+            _that.success,
+            _that.pastTenseMessage,
+            _that.partialText);
       case MediaTimelineItem() when media != null:
         return media(_that.id, _that.messageId, _that.media, _that.order);
       case PermissionRequestTimelineItem() when permissionRequest != null:
@@ -1534,7 +1558,11 @@ class ToolCallTimelineItem extends TimelineItem {
       final List<ToolPatch> patches = const <ToolPatch>[],
       final List<MediaDescriptor> media = const <MediaDescriptor>[],
       final List<ToolResultPart> resultParts = const <ToolResultPart>[],
-      final Map<String, dynamic>? meta})
+      final Map<String, dynamic>? meta,
+      this.rawOutput,
+      this.success,
+      this.pastTenseMessage,
+      this.partialText})
       : _diffs = diffs,
         _locations = locations,
         _terminals = terminals,
@@ -1612,6 +1640,20 @@ class ToolCallTimelineItem extends TimelineItem {
     return EqualUnmodifiableMapView(value);
   }
 
+  /// ACP's `rawOutput` for the call, as forwarded on the `<namespace>:tool`
+  /// event. Null when the agent sent none.
+  final Object? rawOutput;
+
+  /// Whether the call finished successfully / the agent's past-tense summary
+  /// ("Ran bash"); set by the completion `<namespace>:tool` event.
+  final bool? success;
+  final String? pastTenseMessage;
+
+  /// Text streamed on progress updates (`<namespace>:tool_text`) before the
+  /// final result exists. Replaced by [result] once it arrives; kept when
+  /// the call never completes (cancelled turn, ended run).
+  final String? partialText;
+
   /// Create a copy of TimelineItem
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -1645,31 +1687,42 @@ class ToolCallTimelineItem extends TimelineItem {
             const DeepCollectionEquality().equals(other._media, _media) &&
             const DeepCollectionEquality()
                 .equals(other._resultParts, _resultParts) &&
-            const DeepCollectionEquality().equals(other._meta, _meta));
+            const DeepCollectionEquality().equals(other._meta, _meta) &&
+            const DeepCollectionEquality().equals(other.rawOutput, rawOutput) &&
+            (identical(other.success, success) || other.success == success) &&
+            (identical(other.pastTenseMessage, pastTenseMessage) ||
+                other.pastTenseMessage == pastTenseMessage) &&
+            (identical(other.partialText, partialText) ||
+                other.partialText == partialText));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      order,
-      args,
-      result,
-      const DeepCollectionEquality().hash(_diffs),
-      toolKind,
-      hasEnded,
-      status,
-      const DeepCollectionEquality().hash(_locations),
-      const DeepCollectionEquality().hash(_terminals),
-      const DeepCollectionEquality().hash(_patches),
-      const DeepCollectionEquality().hash(_media),
-      const DeepCollectionEquality().hash(_resultParts),
-      const DeepCollectionEquality().hash(_meta));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        name,
+        order,
+        args,
+        result,
+        const DeepCollectionEquality().hash(_diffs),
+        toolKind,
+        hasEnded,
+        status,
+        const DeepCollectionEquality().hash(_locations),
+        const DeepCollectionEquality().hash(_terminals),
+        const DeepCollectionEquality().hash(_patches),
+        const DeepCollectionEquality().hash(_media),
+        const DeepCollectionEquality().hash(_resultParts),
+        const DeepCollectionEquality().hash(_meta),
+        const DeepCollectionEquality().hash(rawOutput),
+        success,
+        pastTenseMessage,
+        partialText
+      ]);
 
   @override
   String toString() {
-    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind, hasEnded: $hasEnded, status: $status, locations: $locations, terminals: $terminals, patches: $patches, media: $media, resultParts: $resultParts, meta: $meta)';
+    return 'TimelineItem.toolCall(id: $id, name: $name, order: $order, args: $args, result: $result, diffs: $diffs, toolKind: $toolKind, hasEnded: $hasEnded, status: $status, locations: $locations, terminals: $terminals, patches: $patches, media: $media, resultParts: $resultParts, meta: $meta, rawOutput: $rawOutput, success: $success, pastTenseMessage: $pastTenseMessage, partialText: $partialText)';
   }
 }
 
@@ -1696,7 +1749,11 @@ abstract mixin class $ToolCallTimelineItemCopyWith<$Res>
       List<ToolPatch> patches,
       List<MediaDescriptor> media,
       List<ToolResultPart> resultParts,
-      Map<String, dynamic>? meta});
+      Map<String, dynamic>? meta,
+      Object? rawOutput,
+      bool? success,
+      String? pastTenseMessage,
+      String? partialText});
 
   @override
   $OrderKeyCopyWith<$Res> get order;
@@ -1730,6 +1787,10 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
     Object? media = null,
     Object? resultParts = null,
     Object? meta = freezed,
+    Object? rawOutput = freezed,
+    Object? success = freezed,
+    Object? pastTenseMessage = freezed,
+    Object? partialText = freezed,
   }) {
     return _then(ToolCallTimelineItem(
       id: null == id
@@ -1792,6 +1853,19 @@ class _$ToolCallTimelineItemCopyWithImpl<$Res>
           ? _self._meta
           : meta // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      rawOutput: freezed == rawOutput ? _self.rawOutput : rawOutput,
+      success: freezed == success
+          ? _self.success
+          : success // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      pastTenseMessage: freezed == pastTenseMessage
+          ? _self.pastTenseMessage
+          : pastTenseMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      partialText: freezed == partialText
+          ? _self.partialText
+          : partialText // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 
@@ -2563,6 +2637,13 @@ mixin _$SessionState {
   PlansState get plans;
   Map<String, dynamic> get responseMeta;
 
+  /// How recent permission and elicitation requests were resolved, keyed
+  /// `permission:<toolCallId>` / `elicitation:<requestId>` (from the
+  /// `<namespace>:permission_resolved` / `:elicitation_resolved` events).
+  /// The card itself disappears on resolution; this keeps the outcome.
+  /// Bounded to the most recent 100.
+  Map<String, Map<String, dynamic>> get resolutions;
+
   /// Create a copy of SessionState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2603,7 +2684,9 @@ mixin _$SessionState {
                 other.sessionInfo == sessionInfo) &&
             (identical(other.plans, plans) || other.plans == plans) &&
             const DeepCollectionEquality()
-                .equals(other.responseMeta, responseMeta));
+                .equals(other.responseMeta, responseMeta) &&
+            const DeepCollectionEquality()
+                .equals(other.resolutions, resolutions));
   }
 
   @override
@@ -2625,11 +2708,12 @@ mixin _$SessionState {
       usage,
       sessionInfo,
       plans,
-      const DeepCollectionEquality().hash(responseMeta));
+      const DeepCollectionEquality().hash(responseMeta),
+      const DeepCollectionEquality().hash(resolutions));
 
   @override
   String toString() {
-    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
   }
 }
 
@@ -2656,7 +2740,8 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       UsageState? usage,
       SessionInfo? sessionInfo,
       PlansState plans,
-      Map<String, dynamic> responseMeta});
+      Map<String, dynamic> responseMeta,
+      Map<String, Map<String, dynamic>> resolutions});
 
   $AgentStateCopyWith<$Res>? get agent;
   $ModeStateCopyWith<$Res>? get mode;
@@ -2696,6 +2781,7 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? sessionInfo = freezed,
     Object? plans = null,
     Object? responseMeta = null,
+    Object? resolutions = null,
   }) {
     return _then(_self.copyWith(
       title: freezed == title
@@ -2766,6 +2852,10 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
           ? _self.responseMeta
           : responseMeta // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
+      resolutions: null == resolutions
+          ? _self.resolutions
+          : resolutions // ignore: cast_nullable_to_non_nullable
+              as Map<String, Map<String, dynamic>>,
     ));
   }
 
@@ -2972,7 +3062,8 @@ extension SessionStatePatterns on SessionState {
             UsageState? usage,
             SessionInfo? sessionInfo,
             PlansState plans,
-            Map<String, dynamic> responseMeta)?
+            Map<String, dynamic> responseMeta,
+            Map<String, Map<String, dynamic>> resolutions)?
         $default, {
     required TResult orElse(),
   }) {
@@ -2996,7 +3087,8 @@ extension SessionStatePatterns on SessionState {
             _that.usage,
             _that.sessionInfo,
             _that.plans,
-            _that.responseMeta);
+            _that.responseMeta,
+            _that.resolutions);
       case _:
         return orElse();
     }
@@ -3034,7 +3126,8 @@ extension SessionStatePatterns on SessionState {
             UsageState? usage,
             SessionInfo? sessionInfo,
             PlansState plans,
-            Map<String, dynamic> responseMeta)
+            Map<String, dynamic> responseMeta,
+            Map<String, Map<String, dynamic>> resolutions)
         $default,
   ) {
     final _that = this;
@@ -3057,7 +3150,8 @@ extension SessionStatePatterns on SessionState {
             _that.usage,
             _that.sessionInfo,
             _that.plans,
-            _that.responseMeta);
+            _that.responseMeta,
+            _that.resolutions);
     }
   }
 
@@ -3092,7 +3186,8 @@ extension SessionStatePatterns on SessionState {
             UsageState? usage,
             SessionInfo? sessionInfo,
             PlansState plans,
-            Map<String, dynamic> responseMeta)?
+            Map<String, dynamic> responseMeta,
+            Map<String, Map<String, dynamic>> resolutions)?
         $default,
   ) {
     final _that = this;
@@ -3115,7 +3210,8 @@ extension SessionStatePatterns on SessionState {
             _that.usage,
             _that.sessionInfo,
             _that.plans,
-            _that.responseMeta);
+            _that.responseMeta,
+            _that.resolutions);
       case _:
         return null;
     }
@@ -3142,8 +3238,11 @@ class _SessionState extends SessionState {
       this.usage,
       this.sessionInfo,
       this.plans = const PlansState(),
-      final Map<String, dynamic> responseMeta = const <String, dynamic>{}})
+      final Map<String, dynamic> responseMeta = const <String, dynamic>{},
+      final Map<String, Map<String, dynamic>> resolutions =
+          const <String, Map<String, dynamic>>{}})
       : _responseMeta = responseMeta,
+        _resolutions = resolutions,
         super._();
 
   @override
@@ -3196,6 +3295,26 @@ class _SessionState extends SessionState {
     return EqualUnmodifiableMapView(_responseMeta);
   }
 
+  /// How recent permission and elicitation requests were resolved, keyed
+  /// `permission:<toolCallId>` / `elicitation:<requestId>` (from the
+  /// `<namespace>:permission_resolved` / `:elicitation_resolved` events).
+  /// The card itself disappears on resolution; this keeps the outcome.
+  /// Bounded to the most recent 100.
+  final Map<String, Map<String, dynamic>> _resolutions;
+
+  /// How recent permission and elicitation requests were resolved, keyed
+  /// `permission:<toolCallId>` / `elicitation:<requestId>` (from the
+  /// `<namespace>:permission_resolved` / `:elicitation_resolved` events).
+  /// The card itself disappears on resolution; this keeps the outcome.
+  /// Bounded to the most recent 100.
+  @override
+  @JsonKey()
+  Map<String, Map<String, dynamic>> get resolutions {
+    if (_resolutions is EqualUnmodifiableMapView) return _resolutions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_resolutions);
+  }
+
   /// Create a copy of SessionState
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -3236,7 +3355,9 @@ class _SessionState extends SessionState {
                 other.sessionInfo == sessionInfo) &&
             (identical(other.plans, plans) || other.plans == plans) &&
             const DeepCollectionEquality()
-                .equals(other._responseMeta, _responseMeta));
+                .equals(other._responseMeta, _responseMeta) &&
+            const DeepCollectionEquality()
+                .equals(other._resolutions, _resolutions));
   }
 
   @override
@@ -3258,11 +3379,12 @@ class _SessionState extends SessionState {
       usage,
       sessionInfo,
       plans,
-      const DeepCollectionEquality().hash(_responseMeta));
+      const DeepCollectionEquality().hash(_responseMeta),
+      const DeepCollectionEquality().hash(_resolutions));
 
   @override
   String toString() {
-    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
   }
 }
 
@@ -3291,7 +3413,8 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       UsageState? usage,
       SessionInfo? sessionInfo,
       PlansState plans,
-      Map<String, dynamic> responseMeta});
+      Map<String, dynamic> responseMeta,
+      Map<String, Map<String, dynamic>> resolutions});
 
   @override
   $AgentStateCopyWith<$Res>? get agent;
@@ -3339,6 +3462,7 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? sessionInfo = freezed,
     Object? plans = null,
     Object? responseMeta = null,
+    Object? resolutions = null,
   }) {
     return _then(_SessionState(
       title: freezed == title
@@ -3409,6 +3533,10 @@ class __$SessionStateCopyWithImpl<$Res>
           ? _self._responseMeta
           : responseMeta // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
+      resolutions: null == resolutions
+          ? _self._resolutions
+          : resolutions // ignore: cast_nullable_to_non_nullable
+              as Map<String, Map<String, dynamic>>,
     ));
   }
 

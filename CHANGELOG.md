@@ -1,5 +1,12 @@
 ## 0.8.0
 
+Added (post-release): `ToolCallTimelineItem` gains `rawOutput`, `success`,
+`pastTenseMessage` and `partialText`; a non-empty `<ns>:tool` title now
+replaces the earlier name; new `<ns>:tool_text`, `<ns>:permission_resolved`
+and `<ns>:elicitation_resolved` events (the latter two land in the new
+`SessionState.resolutions`); `SessionInfo.parse` reads camelCase `updatedAt`
+(snake_case `updated_at` still accepted).
+
 Added (post-release): `DiffLinesView` is exported from the package barrel so
 apps can reuse the diff renderer without importing from `src/`.
 

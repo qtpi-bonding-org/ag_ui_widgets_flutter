@@ -53,6 +53,9 @@ void main() {
       'episutra:terminal',
       'episutra:content',
       'episutra:response_meta',
+      'episutra:tool_text',
+      'episutra:permission_resolved',
+      'episutra:elicitation_resolved',
       'episutra:sync',
     };
     expect(names.difference(known), isEmpty,

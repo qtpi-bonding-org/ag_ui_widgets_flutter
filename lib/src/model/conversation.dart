@@ -102,6 +102,20 @@ sealed class TimelineItem with _$TimelineItem {
     @Default(<MediaDescriptor>[]) List<MediaDescriptor> media,
     @Default(<ToolResultPart>[]) List<ToolResultPart> resultParts,
     Map<String, dynamic>? meta,
+
+    /// ACP's `rawOutput` for the call, as forwarded on the `<namespace>:tool`
+    /// event. Null when the agent sent none.
+    Object? rawOutput,
+
+    /// Whether the call finished successfully / the agent's past-tense summary
+    /// ("Ran bash"); set by the completion `<namespace>:tool` event.
+    bool? success,
+    String? pastTenseMessage,
+
+    /// Text streamed on progress updates (`<namespace>:tool_text`) before the
+    /// final result exists. Replaced by [result] once it arrives; kept when
+    /// the call never completes (cancelled turn, ended run).
+    String? partialText,
   }) = ToolCallTimelineItem;
 
   /// A non-text content block that belongs to a message (not to a tool call).
@@ -212,6 +226,14 @@ sealed class SessionState with _$SessionState {
     SessionInfo? sessionInfo,
     @Default(PlansState()) PlansState plans,
     @Default(<String, dynamic>{}) Map<String, dynamic> responseMeta,
+
+    /// How recent permission and elicitation requests were resolved, keyed
+    /// `permission:<toolCallId>` / `elicitation:<requestId>` (from the
+    /// `<namespace>:permission_resolved` / `:elicitation_resolved` events).
+    /// The card itself disappears on resolution; this keeps the outcome.
+    /// Bounded to the most recent 100.
+    @Default(<String, Map<String, dynamic>>{})
+    Map<String, Map<String, dynamic>> resolutions,
   }) = _SessionState;
 
   const SessionState._();

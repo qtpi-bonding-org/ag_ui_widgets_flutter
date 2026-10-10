@@ -399,7 +399,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -464,7 +465,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -556,7 +558,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -652,7 +655,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -752,7 +756,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -852,7 +857,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -961,7 +967,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -1088,7 +1095,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -1229,7 +1237,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -1370,7 +1379,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -1528,7 +1538,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -1622,9 +1633,8 @@
             "meta": null
           },
           "session_info": {
-            "meta": null,
             "title": "Hello",
-            "updated_at": "2026-10-01T00:00:00Z"
+            "updatedAt": "2026-10-01T00:00:00Z"
           }
         }
       }
@@ -1691,7 +1701,8 @@
                   {
                     "optionId": "allow_once",
                     "name": "Allow",
-                    "kind": "allow_once"
+                    "kind": "allow_once",
+                    "group": 0
                   }
                 ],
                 "content": [
@@ -1785,9 +1796,8 @@
             "meta": null
           },
           "session_info": {
-            "meta": null,
             "title": "Hello",
-            "updated_at": "2026-10-01T00:00:00Z"
+            "updatedAt": "2026-10-01T00:00:00Z"
           },
           "usage": {
             "used": 10,

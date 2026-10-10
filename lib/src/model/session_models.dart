@@ -340,14 +340,16 @@ abstract class SessionInfo with _$SessionInfo {
     @Default(<String, dynamic>{}) Map<String, dynamic> extras,
   }) = _SessionInfo;
 
-  static const _known = {'title', 'updated_at', 'meta'};
+  static const _known = {'title', 'updatedAt', 'updated_at', 'meta'};
 
   static SessionInfo? parse(Object? raw) {
     final m = asJsonMap(raw);
     if (m == null) return null;
     return SessionInfo(
       title: asString(m['title']),
-      updatedAt: asString(m['updated_at']),
+      // The adapter emits camelCase `updatedAt`; older payloads used
+      // snake_case `updated_at`.
+      updatedAt: asString(m['updatedAt']) ?? asString(m['updated_at']),
       meta: asJsonMap(m['meta']),
       extras: extrasOf(m, _known),
     );

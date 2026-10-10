@@ -92,6 +92,12 @@ void main() {
     expect(u.cost!.currency, 'USD');
   });
 
+  test('SessionInfo.parse maps camelCase updatedAt', () {
+    final s = SessionInfo.parse({'title': 'T', 'updatedAt': '2026-10-02'})!;
+    expect(s.updatedAt, '2026-10-02');
+    expect(s.extras, isEmpty);
+  });
+
   test('SessionInfo.parse maps updated_at', () {
     final s = SessionInfo.parse({'title': 'T', 'updated_at': '2026-10-01'})!;
     expect(s.title, 'T');

@@ -101,6 +101,7 @@
     "value": {
       "kind": "audio",
       "mimeType": "audio/wav",
+      "channel": "message",
       "messageId": "m1"
     },
     "sourceEventId": "src-4"
@@ -1910,7 +1911,8 @@
     "threadId": "session-1",
     "runId": "turn-1",
     "result": {
-      "stopReason": "end_turn"
+      "stopReason": "end_turn",
+      "durationMs": 1
     },
     "sourceEventId": "src-25"
   }

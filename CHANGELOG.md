@@ -7,7 +7,8 @@ and `<ns>:elicitation_resolved` events (the latter two land in the new
 `SessionState.resolutions`); `SessionInfo.parse` reads camelCase `updatedAt`
 (snake_case `updated_at` still accepted). `SessionState.runResult` keeps the
 whole `RUN_FINISHED.result` object; `AgUiContextItem` gains an optional
-`mimeType`.
+`mimeType`. A tool-call message's metadata now includes `rawOutput`, `success`,
+`pastTenseMessage` and `partialText`.
 
 Added (post-release): `DiffLinesView` is exported from the package barrel so
 apps can reuse the diff renderer without importing from `src/`.

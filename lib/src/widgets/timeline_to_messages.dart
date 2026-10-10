@@ -75,6 +75,10 @@ chat_core.Message _toMessage(TimelineItem item) {
       :final media,
       :final resultParts,
       :final meta,
+      :final rawOutput,
+      :final success,
+      :final pastTenseMessage,
+      :final partialText,
     ) =>
       chat_core.Message.custom(
         id: id,
@@ -84,6 +88,10 @@ chat_core.Message _toMessage(TimelineItem item) {
           'name': name,
           'args': args,
           'result': result,
+          'rawOutput': rawOutput,
+          'success': success,
+          'pastTenseMessage': pastTenseMessage,
+          'partialText': partialText,
           'diffs': diffs
               .map((d) => {
                     ...d.extras,

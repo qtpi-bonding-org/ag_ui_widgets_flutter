@@ -20,6 +20,23 @@ void main() {
       expect(diffs.single, {'path': 'lib/foo.dart', 'oldText': 'a', 'newText': 'b'});
     });
 
+    test('toolCall item exposes rawOutput, success, pastTenseMessage and partialText', () {
+      const item = TimelineItem.toolCall(
+        id: 't1',
+        name: 'bash',
+        order: OrderKey(0),
+        rawOutput: {'exit': 0},
+        success: true,
+        pastTenseMessage: 'Ran bash',
+        partialText: 'half',
+      );
+      final message = timelineToMessages([item]).single;
+      expect(message.metadata?['rawOutput'], {'exit': 0});
+      expect(message.metadata?['success'], isTrue);
+      expect(message.metadata?['pastTenseMessage'], 'Ran bash');
+      expect(message.metadata?['partialText'], 'half');
+    });
+
     test('toolCall item with no diffs produces an empty diffs list', () {
       const item = TimelineItem.toolCall(id: 't1', name: 'search', order: OrderKey(0));
       final messages = timelineToMessages([item]);

@@ -49,7 +49,8 @@
     "type": "TEXT_MESSAGE_START",
     "messageId": "m1",
     "role": "assistant",
-    "sourceEventId": "src-2"
+    "sourceEventId": "src-2",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -74,7 +75,8 @@
     "type": "TEXT_MESSAGE_CONTENT",
     "messageId": "m1",
     "delta": "hello",
-    "sourceEventId": "src-3"
+    "sourceEventId": "src-3",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -104,7 +106,8 @@
       "channel": "message",
       "messageId": "m1"
     },
-    "sourceEventId": "src-4"
+    "sourceEventId": "src-4",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -128,7 +131,8 @@
   {
     "type": "TEXT_MESSAGE_END",
     "messageId": "m1",
-    "sourceEventId": "src-5"
+    "sourceEventId": "src-5",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -153,7 +157,8 @@
     "type": "TOOL_CALL_START",
     "toolCallId": "tc1",
     "toolCallName": "Edit a.txt",
-    "sourceEventId": "src-6"
+    "sourceEventId": "src-6",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -183,7 +188,8 @@
       "oldText": null,
       "newText": "x"
     },
-    "sourceEventId": "src-7"
+    "sourceEventId": "src-7",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -193,7 +199,8 @@
       "format": "unified",
       "patch": "@@ -1 +1 @@"
     },
-    "sourceEventId": "src-7"
+    "sourceEventId": "src-7",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -205,7 +212,8 @@
         "cwd": "/"
       }
     },
-    "sourceEventId": "src-7"
+    "sourceEventId": "src-7",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -215,7 +223,8 @@
       "mimeType": "image/png",
       "toolCallId": "tc1"
     },
-    "sourceEventId": "src-7"
+    "sourceEventId": "src-7",
+    "turnId": "turn-1"
   },
   {
     "type": "RAW",
@@ -225,7 +234,8 @@
         "type": "future"
       }
     },
-    "sourceEventId": "src-7"
+    "sourceEventId": "src-7",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -245,7 +255,8 @@
         "k": 1
       }
     },
-    "sourceEventId": "src-7"
+    "sourceEventId": "src-7",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -277,19 +288,22 @@
       "success": true,
       "pastTenseMessage": "Edited a.txt"
     },
-    "sourceEventId": "src-8"
+    "sourceEventId": "src-8",
+    "turnId": "turn-1"
   },
   {
     "type": "TOOL_CALL_RESULT",
     "messageId": "tool-result-tc1-0",
     "toolCallId": "tc1",
     "content": "Edited a.txt",
-    "sourceEventId": "src-8"
+    "sourceEventId": "src-8",
+    "turnId": "turn-1"
   },
   {
     "type": "TOOL_CALL_END",
     "toolCallId": "tc1",
-    "sourceEventId": "src-8"
+    "sourceEventId": "src-8",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -323,7 +337,8 @@
       "locations": [],
       "meta": null
     },
-    "sourceEventId": "src-9"
+    "sourceEventId": "src-9",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -436,7 +451,8 @@
         }
       }
     ],
-    "sourceEventId": "src-11"
+    "sourceEventId": "src-11",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -1825,7 +1841,8 @@
         }
       }
     ],
-    "sourceEventId": "src-22"
+    "sourceEventId": "src-22",
+    "turnId": "turn-1"
   },
   {
     "type": "CUSTOM",
@@ -1914,6 +1931,7 @@
       "stopReason": "end_turn",
       "durationMs": 1
     },
-    "sourceEventId": "src-25"
+    "sourceEventId": "src-25",
+    "turnId": "turn-1"
   }
 ]

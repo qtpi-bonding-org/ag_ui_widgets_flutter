@@ -14,6 +14,7 @@ ToolCallTimelineItem _tool(ConversationReducer r) =>
 void main() {
   _resolutionTests();
   _runResultTests();
+  _runInfoTests();
   test('<ns>:tool keeps rawOutput, success and pastTenseMessage', () {
     final r = _r()
       ..apply(const CustomEvent(name: '$_ns:tool', value: {
@@ -158,5 +159,38 @@ void _runResultTests() {
     final r = ConversationReducer(namespace: _ns)
       ..apply(RunFinishedEvent(threadId: 't', runId: 'r'));
     expect(r.current.sessionState.runResult, isNull);
+  });
+}
+
+void _runInfoTests() {
+  test('<ns>:run info is merged per run and cleared by the next run', () {
+    final r = ConversationReducer(namespace: _ns)
+      ..apply(RunStartedEvent(threadId: 't', runId: 'r1'))
+      ..apply(const CustomEvent(name: '$_ns:run', value: {
+        'phase': 'started',
+        'runId': 'r1',
+        'startedAt': '2026-10-10T00:00:00Z',
+        'message': {'id': 'm'},
+      }))
+      ..apply(const CustomEvent(name: '$_ns:run', value: {
+        'phase': 'error',
+        'runId': 'r1',
+        'durationMs': 99,
+      }));
+    expect(r.current.sessionState.runInfo, {
+      'runId': 'r1',
+      'startedAt': '2026-10-10T00:00:00Z',
+      'message': {'id': 'm'},
+      'durationMs': 99,
+    });
+    r.apply(RunStartedEvent(threadId: 't', runId: 'r2'));
+    expect(r.current.sessionState.runInfo, isEmpty);
+  });
+
+  test('a <ns>:run payload without a phase is a diagnostic', () {
+    final r = ConversationReducer(namespace: _ns)
+      ..apply(const CustomEvent(name: '$_ns:run', value: {'runId': 'r'}));
+    expect(r.current.diagnostics, isNotEmpty);
+    expect(r.current.sessionState.runInfo, isEmpty);
   });
 }

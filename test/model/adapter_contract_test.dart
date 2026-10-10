@@ -54,6 +54,7 @@ void main() {
       'episutra:content',
       'episutra:response_meta',
       'episutra:tool_text',
+      'episutra:run',
       'episutra:permission_resolved',
       'episutra:elicitation_resolved',
       'episutra:sync',

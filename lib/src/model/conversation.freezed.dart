@@ -2632,6 +2632,11 @@ mixin _$SessionState {
   /// anything the backend adds), not just [stopReason]. Null until a run
   /// finishes; cleared when the next run starts.
   Map<String, dynamic>? get runResult;
+
+  /// Extra facts about the current run from the `<namespace>:run` event:
+  /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
+  /// the run ended in an error. Cleared when the next run starts.
+  Map<String, dynamic> get runInfo;
   String? get runErrorCode;
   AgentState? get agent;
   ModeState? get mode;
@@ -2677,6 +2682,7 @@ mixin _$SessionState {
             (identical(other.stopReason, stopReason) ||
                 other.stopReason == stopReason) &&
             const DeepCollectionEquality().equals(other.runResult, runResult) &&
+            const DeepCollectionEquality().equals(other.runInfo, runInfo) &&
             (identical(other.runErrorCode, runErrorCode) ||
                 other.runErrorCode == runErrorCode) &&
             (identical(other.agent, agent) || other.agent == agent) &&
@@ -2707,6 +2713,7 @@ mixin _$SessionState {
         runId,
         stopReason,
         const DeepCollectionEquality().hash(runResult),
+        const DeepCollectionEquality().hash(runInfo),
         runErrorCode,
         agent,
         mode,
@@ -2721,7 +2728,7 @@ mixin _$SessionState {
 
   @override
   String toString() {
-    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runResult: $runResult, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runResult: $runResult, runInfo: $runInfo, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
   }
 }
 
@@ -2741,6 +2748,7 @@ abstract mixin class $SessionStateCopyWith<$Res> {
       String? runId,
       String? stopReason,
       Map<String, dynamic>? runResult,
+      Map<String, dynamic> runInfo,
       String? runErrorCode,
       AgentState? agent,
       ModeState? mode,
@@ -2782,6 +2790,7 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
     Object? runId = freezed,
     Object? stopReason = freezed,
     Object? runResult = freezed,
+    Object? runInfo = null,
     Object? runErrorCode = freezed,
     Object? agent = freezed,
     Object? mode = freezed,
@@ -2830,6 +2839,10 @@ class _$SessionStateCopyWithImpl<$Res> implements $SessionStateCopyWith<$Res> {
           ? _self.runResult
           : runResult // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      runInfo: null == runInfo
+          ? _self.runInfo
+          : runInfo // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
       runErrorCode: freezed == runErrorCode
           ? _self.runErrorCode
           : runErrorCode // ignore: cast_nullable_to_non_nullable
@@ -3069,6 +3082,7 @@ extension SessionStatePatterns on SessionState {
             String? runId,
             String? stopReason,
             Map<String, dynamic>? runResult,
+            Map<String, dynamic> runInfo,
             String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
@@ -3095,6 +3109,7 @@ extension SessionStatePatterns on SessionState {
             _that.runId,
             _that.stopReason,
             _that.runResult,
+            _that.runInfo,
             _that.runErrorCode,
             _that.agent,
             _that.mode,
@@ -3135,6 +3150,7 @@ extension SessionStatePatterns on SessionState {
             String? runId,
             String? stopReason,
             Map<String, dynamic>? runResult,
+            Map<String, dynamic> runInfo,
             String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
@@ -3160,6 +3176,7 @@ extension SessionStatePatterns on SessionState {
             _that.runId,
             _that.stopReason,
             _that.runResult,
+            _that.runInfo,
             _that.runErrorCode,
             _that.agent,
             _that.mode,
@@ -3197,6 +3214,7 @@ extension SessionStatePatterns on SessionState {
             String? runId,
             String? stopReason,
             Map<String, dynamic>? runResult,
+            Map<String, dynamic> runInfo,
             String? runErrorCode,
             AgentState? agent,
             ModeState? mode,
@@ -3222,6 +3240,7 @@ extension SessionStatePatterns on SessionState {
             _that.runId,
             _that.stopReason,
             _that.runResult,
+            _that.runInfo,
             _that.runErrorCode,
             _that.agent,
             _that.mode,
@@ -3251,6 +3270,7 @@ class _SessionState extends SessionState {
       this.runId,
       this.stopReason,
       final Map<String, dynamic>? runResult,
+      final Map<String, dynamic> runInfo = const <String, dynamic>{},
       this.runErrorCode,
       this.agent,
       this.mode,
@@ -3263,6 +3283,7 @@ class _SessionState extends SessionState {
       final Map<String, Map<String, dynamic>> resolutions =
           const <String, Map<String, dynamic>>{}})
       : _runResult = runResult,
+        _runInfo = runInfo,
         _responseMeta = responseMeta,
         _resolutions = resolutions,
         super._();
@@ -3307,6 +3328,22 @@ class _SessionState extends SessionState {
     if (_runResult is EqualUnmodifiableMapView) return _runResult;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableMapView(value);
+  }
+
+  /// Extra facts about the current run from the `<namespace>:run` event:
+  /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
+  /// the run ended in an error. Cleared when the next run starts.
+  final Map<String, dynamic> _runInfo;
+
+  /// Extra facts about the current run from the `<namespace>:run` event:
+  /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
+  /// the run ended in an error. Cleared when the next run starts.
+  @override
+  @JsonKey()
+  Map<String, dynamic> get runInfo {
+    if (_runInfo is EqualUnmodifiableMapView) return _runInfo;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_runInfo);
   }
 
   @override
@@ -3384,6 +3421,7 @@ class _SessionState extends SessionState {
                 other.stopReason == stopReason) &&
             const DeepCollectionEquality()
                 .equals(other._runResult, _runResult) &&
+            const DeepCollectionEquality().equals(other._runInfo, _runInfo) &&
             (identical(other.runErrorCode, runErrorCode) ||
                 other.runErrorCode == runErrorCode) &&
             (identical(other.agent, agent) || other.agent == agent) &&
@@ -3414,6 +3452,7 @@ class _SessionState extends SessionState {
         runId,
         stopReason,
         const DeepCollectionEquality().hash(_runResult),
+        const DeepCollectionEquality().hash(_runInfo),
         runErrorCode,
         agent,
         mode,
@@ -3428,7 +3467,7 @@ class _SessionState extends SessionState {
 
   @override
   String toString() {
-    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runResult: $runResult, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
+    return 'SessionState(title: $title, isRunning: $isRunning, isStarting: $isStarting, runError: $runError, runOutcome: $runOutcome, threadId: $threadId, runId: $runId, stopReason: $stopReason, runResult: $runResult, runInfo: $runInfo, runErrorCode: $runErrorCode, agent: $agent, mode: $mode, commands: $commands, configState: $configState, usage: $usage, sessionInfo: $sessionInfo, plans: $plans, responseMeta: $responseMeta, resolutions: $resolutions)';
   }
 }
 
@@ -3450,6 +3489,7 @@ abstract mixin class _$SessionStateCopyWith<$Res>
       String? runId,
       String? stopReason,
       Map<String, dynamic>? runResult,
+      Map<String, dynamic> runInfo,
       String? runErrorCode,
       AgentState? agent,
       ModeState? mode,
@@ -3499,6 +3539,7 @@ class __$SessionStateCopyWithImpl<$Res>
     Object? runId = freezed,
     Object? stopReason = freezed,
     Object? runResult = freezed,
+    Object? runInfo = null,
     Object? runErrorCode = freezed,
     Object? agent = freezed,
     Object? mode = freezed,
@@ -3547,6 +3588,10 @@ class __$SessionStateCopyWithImpl<$Res>
           ? _self._runResult
           : runResult // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      runInfo: null == runInfo
+          ? _self._runInfo
+          : runInfo // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
       runErrorCode: freezed == runErrorCode
           ? _self.runErrorCode
           : runErrorCode // ignore: cast_nullable_to_non_nullable

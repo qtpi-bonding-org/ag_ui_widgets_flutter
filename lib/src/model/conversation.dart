@@ -222,6 +222,11 @@ sealed class SessionState with _$SessionState {
     /// anything the backend adds), not just [stopReason]. Null until a run
     /// finishes; cleared when the next run starts.
     Map<String, dynamic>? runResult,
+
+    /// Extra facts about the current run from the `<namespace>:run` event:
+    /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
+    /// the run ended in an error. Cleared when the next run starts.
+    @Default(<String, dynamic>{}) Map<String, dynamic> runInfo,
     String? runErrorCode,
     AgentState? agent,
     ModeState? mode,

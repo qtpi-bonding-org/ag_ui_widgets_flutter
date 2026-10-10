@@ -85,6 +85,7 @@ class ConversationReducer {
   String? _runId;
   String? _stopReason;
   Map<String, dynamic>? _runResult;
+  Map<String, dynamic> _runInfo = const {};
   String? _runErrorCode;
 
   AgentState? _agent;
@@ -207,6 +208,7 @@ class ConversationReducer {
         _runId = runId;
         _stopReason = null;
         _runResult = null;
+        _runInfo = const {};
         _runErrorCode = null;
       case ag_ui.RunFinishedEvent(:final result):
         _isRunning = false;
@@ -422,6 +424,20 @@ class ConversationReducer {
             next.remove(next.keys.first);
           }
           _resolutions = next;
+        }
+
+      case ag_ui.CustomEvent(name: final name) when name == '$namespace:run':
+        final value = asJsonMap(event.value);
+        if (value == null || asString(value['phase']) == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          // Merged, not replaced: the start event carries startedAt and the
+          // user message, a later error event carries durationMs.
+          _runInfo = {
+            ..._runInfo,
+            for (final e in value.entries)
+              if (e.key != 'phase') e.key: e.value,
+          };
         }
 
       case ag_ui.CustomEvent(name: final name)
@@ -707,6 +723,7 @@ class ConversationReducer {
     _runId = null;
     _stopReason = null;
     _runResult = null;
+    _runInfo = const {};
     _runErrorCode = null;
     _mediaCount = 0;
     _responseMeta = const {};
@@ -1118,6 +1135,7 @@ class ConversationReducer {
       runId: _runId,
       stopReason: _stopReason,
       runResult: _runResult,
+      runInfo: _runInfo,
       runErrorCode: _runErrorCode,
       agent: _agent,
       mode: _mode,

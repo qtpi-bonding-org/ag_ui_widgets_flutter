@@ -1,3 +1,31 @@
+## 0.9.0
+
+Reads the AG-UI stream `acp-agui-adapter`'s `ProtocolBridge` emits (adapter
+`ab7ccca`). Breaking; see `docs/event-vocabulary.md` and
+`docs/superpowers/plans/2026-10-23-adapter-facade-wire.md`.
+
+- New `decodeAgUiWire(Map)`: `ag_ui` 0.3.0 reads `TOOL_CALL_RESULT.content` as a
+  `String`, the adapter sends content parts. Decode every event through it. The
+  parts survive on `ToolResultPart.parts`.
+- Real `RUN_STARTED`/`RUN_FINISHED`. A run whose id starts `synthetic-`
+  (`kSyntheticRunPrefix`) wraps a session-level event and is ignored for run
+  state. `runInfo` now comes from `RUN_STARTED`/`RUN_FINISHED`.
+- Permissions: `permissions.by-id.<toolCallId>` holds the raw ACP request
+  (`request.toolCall`, `request.options`); the card id is the tool call id and
+  the JSON-RPC id is in `extras['requestId']`. Elicitations read the flat ACP
+  request. `<ns>:permission_resolved` is `{toolCallId, response, approved}`;
+  `<ns>:elicitation_resolved` is `{requestId, ...response}`.
+- New: `<ns>:media` (replaces `<ns>:content`), `<ns>:message_replaced`,
+  `<ns>:session_creation_failed`, `ACTIVITY_SNAPSHOT` plans, state keys
+  `client`, `session_setup`, `working_directories`, `session`, `activity`;
+  `_meta` is read on `<ns>:tool` and `<ns>:response_meta`; diff-v2 patches
+  (`patch: {format, text}`).
+- Removed: `<ns>:run`, `<ns>:tool_text` (the adapter no longer emits them;
+  `ToolCallTimelineItem.partialText` stays but nothing fills it),
+  `ElicitationRequestTimelineItem.rawMode`.
+- The replay reset is no longer on the wire. Hosts emit a local
+  `<ns>:sync {mode: replace}` whenever they (re)subscribe to a full replay.
+
 ## 0.8.0
 
 Added (post-release): `ToolCallTimelineItem` gains `rawOutput`, `success`,

@@ -13,6 +13,10 @@ abstract class ToolResultPart with _$ToolResultPart {
   const factory ToolResultPart({
     required String messageId,
     required String content,
+
+    /// The result's AG-UI content parts as sent (text, image, document ...), when
+    /// the backend sent a list; [content] is the text of its text parts.
+    List<Map<String, dynamic>>? parts,
   }) = _ToolResultPart;
 }
 
@@ -90,9 +94,23 @@ abstract class ToolPatch with _$ToolPatch {
 
   static const _known = {'format', 'patch', 'toolCallId'};
 
+  /// Reads `{format, patch}` (the older flat shape) or the ACP diff-v2 shape
+  /// `{type: diff, changes, patch: {format, text}}`; the latter keeps `changes`
+  /// and anything else beside the patch in [extras].
   static ToolPatch? parse(Object? raw) {
     final m = asJsonMap(raw);
     if (m == null) return null;
+    final nested = asJsonMap(m['patch']);
+    if (nested != null) {
+      return ToolPatch(
+        format: asString(nested['format']),
+        patch: asString(nested['text']) ?? '',
+        extras: {
+          ...extrasOf(m, const {'patch', 'toolCallId'}),
+          ...extrasOf(nested, const {'format', 'text'}),
+        },
+      );
+    }
     return ToolPatch(
       format: asString(m['format']),
       patch: asString(m['patch']) ?? '',
@@ -176,7 +194,9 @@ sealed class ToolContent with _$ToolContent {
     if (m['terminalId'] is String) {
       return ToolContent.terminal(ToolTerminal.parse(m)!);
     }
-    if (m['patch'] is String) return ToolContent.patch(ToolPatch.parse(m)!);
+    if (m['patch'] is String || m['patch'] is Map) {
+      return ToolContent.patch(ToolPatch.parse(m)!);
+    }
     if (m['path'] is String && m['newText'] is String) {
       return ToolContent.diff(ToolDiff(
         path: m['path'] as String,

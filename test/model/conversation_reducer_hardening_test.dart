@@ -20,10 +20,11 @@ void main() {
                 'permissions': {
                   'by-id': {
                     'p1': {
-                      'requestId': 'p1',
-                      'title': 5,
-                      'kind': 6,
-                      'options': [],
+                      'requestId': 'rpc',
+                      'request': {
+                        'toolCall': {'toolCallId': 'p1', 'title': 5, 'kind': 6},
+                        'options': [],
+                      },
                     },
                   },
                 },
@@ -35,7 +36,13 @@ void main() {
       r.apply(snap({
         'permissions': {
           'by-id': {
-            'p1': {'requestId': 'p1', 'title': 'ok', 'options': []},
+            'p1': {
+              'requestId': 'rpc',
+              'request': {
+                'toolCall': {'toolCallId': 'p1', 'title': 'ok'},
+                'options': [],
+              },
+            },
           },
         },
       }));
@@ -364,8 +371,13 @@ void main() {
               'permissions': {
                 'by-id': {
                   'p': {
-                    'requestId': 'p',
-                    'content': [for (var i = 0; i < 501; i++) 'bad$i'],
+                    'requestId': 'rpc',
+                    'request': {
+                      'toolCall': {
+                        'toolCallId': 'p',
+                        'content': [for (var i = 0; i < 501; i++) 'bad$i'],
+                      },
+                    },
                   },
                 },
               },

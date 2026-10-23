@@ -945,7 +945,6 @@ extension TimelineItemPatterns on TimelineItem {
             String? url,
             ElicitationScope? scope,
             Map<String, dynamic>? meta,
-            Map<String, dynamic>? rawMode,
             Map<String, dynamic> extras)?
         elicitationRequest,
     TResult Function(String requestId, String toolName, OrderKey order,
@@ -1008,7 +1007,6 @@ extension TimelineItemPatterns on TimelineItem {
             _that.url,
             _that.scope,
             _that.meta,
-            _that.rawMode,
             _that.extras);
       case ToolRequestTimelineItem() when toolRequest != null:
         return toolRequest(_that.requestId, _that.toolName, _that.order,
@@ -1087,7 +1085,6 @@ extension TimelineItemPatterns on TimelineItem {
             String? url,
             ElicitationScope? scope,
             Map<String, dynamic>? meta,
-            Map<String, dynamic>? rawMode,
             Map<String, dynamic> extras)
         elicitationRequest,
     required TResult Function(String requestId, String toolName, OrderKey order,
@@ -1149,7 +1146,6 @@ extension TimelineItemPatterns on TimelineItem {
             _that.url,
             _that.scope,
             _that.meta,
-            _that.rawMode,
             _that.extras);
       case ToolRequestTimelineItem():
         return toolRequest(_that.requestId, _that.toolName, _that.order,
@@ -1225,7 +1221,6 @@ extension TimelineItemPatterns on TimelineItem {
             String? url,
             ElicitationScope? scope,
             Map<String, dynamic>? meta,
-            Map<String, dynamic>? rawMode,
             Map<String, dynamic> extras)?
         elicitationRequest,
     TResult? Function(String requestId, String toolName, OrderKey order,
@@ -1287,7 +1282,6 @@ extension TimelineItemPatterns on TimelineItem {
             _that.url,
             _that.scope,
             _that.meta,
-            _that.rawMode,
             _that.extras);
       case ToolRequestTimelineItem() when toolRequest != null:
         return toolRequest(_that.requestId, _that.toolName, _that.order,
@@ -2249,11 +2243,9 @@ class ElicitationRequestTimelineItem extends TimelineItem {
       this.url,
       this.scope,
       final Map<String, dynamic>? meta,
-      final Map<String, dynamic>? rawMode,
       final Map<String, dynamic> extras = const <String, dynamic>{}})
       : _schema = schema,
         _meta = meta,
-        _rawMode = rawMode,
         _extras = extras,
         super._();
 
@@ -2279,15 +2271,6 @@ class ElicitationRequestTimelineItem extends TimelineItem {
     final value = _meta;
     if (value == null) return null;
     if (_meta is EqualUnmodifiableMapView) return _meta;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
-
-  final Map<String, dynamic>? _rawMode;
-  Map<String, dynamic>? get rawMode {
-    final value = _rawMode;
-    if (value == null) return null;
-    if (_rawMode is EqualUnmodifiableMapView) return _rawMode;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableMapView(value);
   }
@@ -2325,7 +2308,6 @@ class ElicitationRequestTimelineItem extends TimelineItem {
             (identical(other.url, url) || other.url == url) &&
             (identical(other.scope, scope) || other.scope == scope) &&
             const DeepCollectionEquality().equals(other._meta, _meta) &&
-            const DeepCollectionEquality().equals(other._rawMode, _rawMode) &&
             const DeepCollectionEquality().equals(other._extras, _extras));
   }
 
@@ -2341,12 +2323,11 @@ class ElicitationRequestTimelineItem extends TimelineItem {
       url,
       scope,
       const DeepCollectionEquality().hash(_meta),
-      const DeepCollectionEquality().hash(_rawMode),
       const DeepCollectionEquality().hash(_extras));
 
   @override
   String toString() {
-    return 'TimelineItem.elicitationRequest(requestId: $requestId, toolCallId: $toolCallId, message: $message, mode: $mode, order: $order, schema: $schema, url: $url, scope: $scope, meta: $meta, rawMode: $rawMode, extras: $extras)';
+    return 'TimelineItem.elicitationRequest(requestId: $requestId, toolCallId: $toolCallId, message: $message, mode: $mode, order: $order, schema: $schema, url: $url, scope: $scope, meta: $meta, extras: $extras)';
   }
 }
 
@@ -2369,7 +2350,6 @@ abstract mixin class $ElicitationRequestTimelineItemCopyWith<$Res>
       String? url,
       ElicitationScope? scope,
       Map<String, dynamic>? meta,
-      Map<String, dynamic>? rawMode,
       Map<String, dynamic> extras});
 
   @override
@@ -2399,7 +2379,6 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
     Object? url = freezed,
     Object? scope = freezed,
     Object? meta = freezed,
-    Object? rawMode = freezed,
     Object? extras = null,
   }) {
     return _then(ElicitationRequestTimelineItem(
@@ -2438,10 +2417,6 @@ class _$ElicitationRequestTimelineItemCopyWithImpl<$Res>
       meta: freezed == meta
           ? _self._meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      rawMode: freezed == rawMode
-          ? _self._rawMode
-          : rawMode // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
       extras: null == extras
           ? _self._extras
@@ -2633,9 +2608,9 @@ mixin _$SessionState {
   /// finishes; cleared when the next run starts.
   Map<String, dynamic>? get runResult;
 
-  /// Extra facts about the current run from the `<namespace>:run` event:
-  /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
-  /// the run ended in an error. Cleared when the next run starts.
+  /// Extra facts about the current run: `runId`, `startedAt` and the user
+  /// `message` from `RUN_STARTED`, `durationMs` from `RUN_FINISHED.result`.
+  /// Replaced when the next run starts.
   Map<String, dynamic> get runInfo;
   String? get runErrorCode;
   AgentState? get agent;
@@ -3330,14 +3305,14 @@ class _SessionState extends SessionState {
     return EqualUnmodifiableMapView(value);
   }
 
-  /// Extra facts about the current run from the `<namespace>:run` event:
-  /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
-  /// the run ended in an error. Cleared when the next run starts.
+  /// Extra facts about the current run: `runId`, `startedAt` and the user
+  /// `message` from `RUN_STARTED`, `durationMs` from `RUN_FINISHED.result`.
+  /// Replaced when the next run starts.
   final Map<String, dynamic> _runInfo;
 
-  /// Extra facts about the current run from the `<namespace>:run` event:
-  /// `runId`, `startedAt` and the user `message` on start, `durationMs` when
-  /// the run ended in an error. Cleared when the next run starts.
+  /// Extra facts about the current run: `runId`, `startedAt` and the user
+  /// `message` from `RUN_STARTED`, `durationMs` from `RUN_FINISHED.result`.
+  /// Replaced when the next run starts.
   @override
   @JsonKey()
   Map<String, dynamic> get runInfo {

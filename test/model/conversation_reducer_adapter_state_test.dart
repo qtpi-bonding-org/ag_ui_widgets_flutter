@@ -1,9 +1,8 @@
-// The state shape acp-agui-adapter's AgUiBatchProjector emits: one
-// STATE_SNAPSHOT `{<ns>: state}` on the first state change, then every later
-// change as a single `replace` of the WHOLE `/<ns>` path with the full state.
-// Pending permissions/elicitations live under `permissions.by-id` /
-// `elicitations.by-id`, keyed by tool-call id / request id, so several can be
-// pending at once.
+// The state shape acp-agui-adapter's ProtocolBridge emits: a STATE_SNAPSHOT
+// `{<ns>: state}`, then key-level STATE_DELTA patches (these tests also cover a
+// whole-namespace `replace`). Pending permissions/elicitations live under
+// `permissions.by-id` / `elicitations.by-id`, keyed by tool-call id / elicitation
+// id, so several can be pending at once. Each entry holds the raw ACP request.
 import 'package:ag_ui/ag_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
@@ -18,15 +17,19 @@ Map<String, dynamic> _permission(
 }) =>
     {
       'requestId': requestId,
-      'sessionId': 's1',
-      'toolCallId': toolCallId,
       'status': 'pending',
-      'title': title,
-      'kind': 'execute',
-      'options': [
-        {'optionId': 'allow_once', 'name': 'Allow', 'kind': 'allow_once'},
-        {'optionId': 'reject_once', 'name': 'Deny', 'kind': 'reject_once'},
-      ],
+      'request': {
+        'sessionId': 's1',
+        'toolCall': {
+          'toolCallId': toolCallId,
+          'title': title,
+          'kind': 'execute',
+        },
+        'options': [
+          {'optionId': 'allow_once', 'name': 'Allow', 'kind': 'allow_once'},
+          {'optionId': 'reject_once', 'name': 'Deny', 'kind': 'reject_once'},
+        ],
+      },
     };
 
 Map<String, dynamic> _state({
@@ -60,7 +63,8 @@ void main() {
       final r = ConversationReducer(namespace: _ns)
         ..apply(_snapshot(_state(permissions: {'tc1': _permission('tc1')})));
       final card = _permissions(r).single;
-      expect(card.requestId, 'req-1');
+      expect(card.requestId, 'tc1', reason: 'the by-id key');
+      expect(card.extras['requestId'], 'req-1', reason: 'the JSON-RPC id');
       expect(card.toolCallId, 'tc1');
       expect(card.toolTitle, 'Run ls');
       expect(card.toolKind, 'execute');
@@ -90,7 +94,7 @@ void main() {
           'tc2': _permission('tc2', requestId: 'req-2', title: 'Write file'),
         })));
       expect(
-          _permissions(r).map((p) => p.requestId).toSet(), {'req-1', 'req-2'});
+          _permissions(r).map((p) => p.requestId).toSet(), {'tc1', 'tc2'});
     });
 
     test('resolving one of several leaves the others', () {
@@ -102,14 +106,14 @@ void main() {
         ..apply(_snapshot(_state(permissions: both)))
         ..apply(_replaceAll(
             _state(permissions: {'tc2': both['tc2'] as Map<String, dynamic>})));
-      expect(_permissions(r).single.requestId, 'req-2');
+      expect(_permissions(r).single.requestId, 'tc2');
     });
 
     test('a locally resolved request is not resurrected by the next replace',
         () {
       final r = ConversationReducer(namespace: _ns)
         ..apply(_snapshot(_state(permissions: {'tc1': _permission('tc1')})));
-      r.resolveRequest('req-1');
+      r.resolveRequest('tc1');
       expect(_permissions(r), isEmpty);
       r.apply(_replaceAll(_state(permissions: {'tc1': _permission('tc1')})));
       expect(_permissions(r), isEmpty);
@@ -161,13 +165,13 @@ void main() {
 
   group('elicitations.by-id (adapter state shape)', () {
     Map<String, dynamic> form() => {
-          'elicitationId': 'e1',
-          'message': 'Need input',
-          'mode': {
-            'kind': 'form',
-            'schema': {'type': 'object'},
+          'requestId': 'e1',
+          'request': {
+            'mode': 'form',
+            'requestId': 'r1',
+            'message': 'Need input',
+            'requestedSchema': {'type': 'object'},
           },
-          'scope': {'kind': 'request', 'request_id': 'r1'},
         };
 
     test('a form elicitation renders with its schema', () {
@@ -184,14 +188,14 @@ void main() {
       final r = ConversationReducer(namespace: _ns)
         ..apply(_snapshot(_state(elicitations: {
           'e2': {
-            'elicitationId': 'e2',
-            'message': 'Sign in',
-            'mode': {
-              'kind': 'url',
+            'requestId': 'e2',
+            'request': {
+              'mode': 'url',
+              'requestId': 'r2',
+              'message': 'Sign in',
               'url': 'https://example.com/auth',
-              'elicitation_id': 'e2',
+              'elicitationId': 'e2',
             },
-            'scope': {'kind': 'request', 'request_id': 'r2'},
           },
         })));
       final e = _elicitations(r).single;
@@ -228,16 +232,16 @@ void main() {
       expect(d.name, 'episutra/elicitation');
     });
 
-    test(
-        'a string `mode` (legacy shape) is not read but is diagnosed once, '
-        'and its sibling keys survive in extras', () {
+    test('a mode that is not a string is diagnosed once and shown as a form',
+        () {
       final state = _state(elicitations: {
         'e9': {
-          'elicitationId': 'e9',
-          'message': 'hi',
-          'mode': 'url',
-          'requestedSchema': {'type': 'object'},
-          'url': 'https://example.com/x',
+          'requestId': 'e9',
+          'request': {
+            'mode': {'kind': 'url'},
+            'message': 'hi',
+            'toolCallId': 'tc9',
+          },
         },
       });
       final r = ConversationReducer(namespace: _ns)
@@ -245,10 +249,7 @@ void main() {
         ..apply(_replaceAll(state));
       final e = _elicitations(r).single;
       expect(e.mode, 'form');
-      expect(e.schema, isNull);
-      expect(e.url, isNull);
-      expect(e.extras['requestedSchema'], {'type': 'object'});
-      expect(e.extras['url'], 'https://example.com/x');
+      expect(e.scope!.kind, 'tool');
       final d = r.current.diagnostics.single;
       expect(d.kind, DiagnosticKind.malformedPayload);
       expect(d.name, 'episutra/elicitations/mode');
@@ -257,7 +258,10 @@ void main() {
     test('an absent `mode` is a form card with no diagnostic', () {
       final r = ConversationReducer(namespace: _ns)
         ..apply(_snapshot(_state(elicitations: {
-          'e8': {'elicitationId': 'e8', 'message': 'hi'},
+          'e8': {
+            'requestId': 'e8',
+            'request': {'message': 'hi'},
+          },
         })));
       expect(_elicitations(r).single.mode, 'form');
       expect(r.current.diagnostics, isEmpty);

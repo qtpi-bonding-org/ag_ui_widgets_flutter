@@ -21,6 +21,12 @@ bool isReplaceMarker(ag_ui.BaseEvent event, {required String namespace}) =>
     event.name == '$namespace:sync' &&
     (event.value is Map && (event.value as Map)['mode'] == 'replace');
 
+/// `runId` prefix of the run acp-agui-adapter wraps around a session-level event
+/// (a mode change, a permission, a tool update outside a prompt turn) so every
+/// AG-UI event sits inside a run. Such a run says nothing about whether the agent
+/// is working, so the reducer ignores it for run state.
+const kSyntheticRunPrefix = 'synthetic-';
+
 class _OpenMessage {
   _OpenMessage(this.role);
   final String role;
@@ -95,6 +101,10 @@ class ConversationReducer {
   UsageState? _usage;
   SessionInfo? _sessionInfo;
   PlansState _plans = const PlansState();
+
+  /// Plans from `ACTIVITY_SNAPSHOT` events, by plan id. Kept apart from [_plans]
+  /// (the state tree's), which every state change rebuilds.
+  Map<String, PlanState> _activityPlans = const {};
 
   int _mediaCount = 0;
   Map<String, dynamic> _responseMeta = const {};
@@ -200,6 +210,12 @@ class ConversationReducer {
       return;
     }
     switch (event) {
+      case ag_ui.RunStartedEvent(:final threadId, :final runId)
+          when runId.startsWith(kSyntheticRunPrefix):
+        _threadId = threadId;
+      case ag_ui.RunFinishedEvent(:final runId)
+          when runId.startsWith(kSyntheticRunPrefix):
+        break;
       case ag_ui.RunStartedEvent(:final threadId, :final runId):
         _isRunning = true;
         _runError = null;
@@ -208,7 +224,14 @@ class ConversationReducer {
         _runId = runId;
         _stopReason = null;
         _runResult = null;
-        _runInfo = const {};
+        _runInfo = {
+          'runId': runId,
+          if (event.timestamp != null)
+            'startedAt': DateTime.fromMillisecondsSinceEpoch(event.timestamp!,
+                    isUtc: true)
+                .toIso8601String(),
+          if (_userMessage(event.input) case final message?) 'message': message,
+        };
         _runErrorCode = null;
       case ag_ui.RunFinishedEvent(:final result):
         _isRunning = false;
@@ -217,6 +240,8 @@ class ConversationReducer {
             result is Map ? asString(result['stopReason']) : null;
         _stopReason = stopReason;
         _runResult = asJsonMap(result);
+        final durationMs = result is Map ? asInt(result['durationMs']) : null;
+        if (durationMs != null) _runInfo = {..._runInfo, 'durationMs': durationMs};
         _runOutcome = switch (stopReason) {
           'cancelled' => RunOutcome.cancelled,
           null => RunOutcome.success,
@@ -352,7 +377,10 @@ class ConversationReducer {
             resultParts: [
               ...t.resultParts,
               ToolResultPart(
-                  messageId: event.messageId, content: event.content),
+                messageId: event.messageId,
+                content: event.content,
+                parts: asJsonMapList((event.rawEvent as Map?)?['parts']),
+              ),
             ],
           ),
         );
@@ -385,7 +413,7 @@ class ConversationReducer {
             _diagnoseOnce(DiagnosticKind.malformedPayload, '$name/locations',
                 rawLocations);
           }
-          final meta = asJsonMap(value['meta']);
+          final meta = asJsonMap(value['_meta'] ?? value['meta']);
           _updateTool(
             toolCallId,
             (t) => t.copyWith(
@@ -407,48 +435,42 @@ class ConversationReducer {
         }
 
       case ag_ui.CustomEvent(name: final name)
-          when name == '$namespace:permission_resolved' ||
-              name == '$namespace:elicitation_resolved':
+          when name == '$namespace:permission_resolved':
         final value = asJsonMap(event.value);
-        final isPermission = name == '$namespace:permission_resolved';
-        final id =
-            asString(value?[isPermission ? 'toolCallId' : 'elicitationId']);
-        final resolution = asJsonMap(value?['resolution']);
-        if (value == null || id == null || resolution == null) {
+        final id = asString(value?['toolCallId']);
+        final outcome = asJsonMap(asJsonMap(value?['response'])?['outcome']);
+        if (value == null || id == null || outcome == null) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else {
-          final key = '${isPermission ? 'permission' : 'elicitation'}:$id';
-          final next = {..._resolutions}..remove(key);
-          next[key] = resolution;
-          while (next.length > _maxResolutions) {
-            next.remove(next.keys.first);
-          }
-          _resolutions = next;
-        }
-
-      case ag_ui.CustomEvent(name: final name) when name == '$namespace:run':
-        final value = asJsonMap(event.value);
-        if (value == null || asString(value['phase']) == null) {
-          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
-        } else {
-          // Merged, not replaced: the start event carries startedAt and the
-          // user message, a later error event carries durationMs.
-          _runInfo = {
-            ..._runInfo,
-            for (final e in value.entries)
-              if (e.key != 'phase') e.key: e.value,
-          };
+          // `approved` is absent when no one chose (auto-approval, cancel).
+          final approved = value['approved'];
+          final kind = outcome['outcome'] == 'cancelled'
+              ? 'cancelled'
+              : approved == null
+                  ? 'auto_approved'
+                  : 'user_selected';
+          _recordResolution('permission:$id', {
+            'kind': kind,
+            if (asString(outcome['optionId']) case final optionId?)
+              'optionId': optionId,
+            if (approved != null) 'approved': approved,
+            'response': value['response'],
+          });
         }
 
       case ag_ui.CustomEvent(name: final name)
-          when name == '$namespace:tool_text':
+          when name == '$namespace:elicitation_resolved':
         final value = asJsonMap(event.value);
-        final toolCallId = asString(value?['toolCallId']);
-        final text = asString(value?['text']);
-        if (value == null || toolCallId == null || text == null) {
+        final id = asString(value?['requestId']);
+        if (value == null || id == null) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else {
-          _updateTool(toolCallId, (t) => t.copyWith(partialText: text));
+          // The ACP response (`action`, `content`) or completion notification
+          // sits beside the adapter's `requestId`.
+          _recordResolution('elicitation:$id', {
+            for (final e in value.entries)
+              if (e.key != 'requestId') e.key: e.value,
+          });
         }
 
       case ag_ui.CustomEvent(name: 'acp.permission_request', :final value):
@@ -622,8 +644,20 @@ class ConversationReducer {
               (t) => t.copyWith(terminals: [...t.terminals, terminal]));
         }
       case ag_ui.CustomEvent(name: final name)
-          when name == '$namespace:content':
-        final media = MediaDescriptor.parse(event.value);
+          when name == '$namespace:media':
+        // `{turnId, messageId, channel, content}`: `content` is the ACP content
+        // block (`type`, `uri`, `mimeType`, ...); a `toolCallId` beside it
+        // attaches the media to that tool call.
+        final value = asJsonMap(event.value);
+        final block = asJsonMap(value?['content']);
+        final media = block == null
+            ? null
+            : MediaDescriptor.parse({
+                ...block,
+                'kind': block['type'],
+                'messageId': value!['messageId'],
+                'toolCallId': value['toolCallId'],
+              });
         if (media == null || media.kind.isEmpty) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else if (media.toolCallId != null) {
@@ -642,13 +676,70 @@ class ConversationReducer {
           );
         }
       case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:message_replaced':
+        // The agent rewrote a message it already streamed (`agent_message`,
+        // `agent_thought` or `user_message`); its text replaces the old text.
+        final value = asJsonMap(event.value);
+        final messageId = asString(value?['messageId']);
+        final update = asString(value?['sessionUpdate']);
+        final content = value?['content'];
+        if (messageId == null || update == null || content is! List) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          final text = [
+            for (final part in asJsonMapList(content))
+              if (asString(part['text']) case final t?) t,
+          ].join();
+          final reasoning = update == 'agent_thought';
+          if (reasoning) {
+            _openReasoning.remove(messageId);
+          } else {
+            _openText.remove(messageId);
+          }
+          _upsert(
+            reasoning ? 'reasoning:$messageId' : messageId,
+            (order) => TimelineItem.text(
+              id: messageId,
+              kind: reasoning ? ChatMessageKind.reasoning : ChatMessageKind.text,
+              role: update == 'user_message' ? 'user' : 'assistant',
+              text: text,
+              order: order,
+            ),
+          );
+        }
+      case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:session_creation_failed':
+        final error = asJsonMap(asJsonMap(event.value)?['error']);
+        if (error == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          _isRunning = false;
+          _isStarting = false;
+          _runError = asString(error['message']) ?? 'session creation failed';
+          _runErrorCode = asInt(error['code'])?.toString();
+          _runOutcome = RunOutcome.failed;
+        }
+      case ag_ui.ActivitySnapshotEvent(activityType: 'plan'):
+        final content = asJsonMap(event.content);
+        final plan = _planFromActivity(content);
+        final planId = asString(content?['planId']) ?? event.messageId;
+        if (plan == null) {
+          _diagnose(DiagnosticKind.malformedPayload, 'ACTIVITY_SNAPSHOT/plan',
+              event.content);
+        } else {
+          _activityPlans = {..._activityPlans, planId: plan};
+        }
+      case ag_ui.CustomEvent(name: final name)
           when name == '$namespace:response_meta':
         final value = asJsonMap(event.value);
         final method = asString(value?['method']);
         if (method == null) {
           _diagnose(DiagnosticKind.malformedPayload, name, event.value);
         } else {
-          _responseMeta = {..._responseMeta, method: value!['meta']};
+          _responseMeta = {
+            ..._responseMeta,
+            method: value!['_meta'] ?? value['meta'],
+          };
         }
 
       case ag_ui.CustomEvent(name: 'acp:source', :final value):
@@ -702,6 +793,36 @@ class ConversationReducer {
     }
   }
 
+  /// `ACTIVITY_SNAPSHOT.content` of a plan: `{planId, body}` where `body.kind` is
+  /// `entries`, `file` or `markdown`.
+  PlanState? _planFromActivity(Map<String, dynamic>? content) {
+    final body = asJsonMap(content?['body']);
+    return switch (asString(body?['kind'])) {
+      'entries' => PlanState.parse({'entries': body!['entries']}),
+      'file' => PlanState(uri: asString(body!['uri'])),
+      'markdown' => PlanState(markdown: asString(body!['content'])),
+      _ => null,
+    };
+  }
+
+  void _recordResolution(String key, Map<String, dynamic> resolution) {
+    final next = {..._resolutions}..remove(key);
+    next[key] = resolution;
+    while (next.length > _maxResolutions) {
+      next.remove(next.keys.first);
+    }
+    _resolutions = next;
+  }
+
+  /// The content of the last user message in a run's input, as sent (a string
+  /// or a list of content parts).
+  Object? _userMessage(ag_ui.RunAgentInput? input) {
+    for (final m in (input?.messages ?? const <ag_ui.Message>[]).reversed) {
+      if (m is ag_ui.UserMessage) return m.messageContent.toJson();
+    }
+    return null;
+  }
+
   void _reset() {
     // _resolvedIds is deliberately NOT cleared here — see resolveRequest's
     // doc comment. Clearing it would resurrect already-resolved
@@ -738,6 +859,7 @@ class ConversationReducer {
     _usage = null;
     _sessionInfo = null;
     _plans = const PlansState();
+    _activityPlans = const {};
   }
 
   void _updateTool(
@@ -850,54 +972,59 @@ class ConversationReducer {
     'usage',
     'session_info',
     'plans',
+    'client',
+    'session_setup',
+    'working_directories',
+    'session',
+    'activity',
     'permissions',
     'elicitations',
   };
 
-  /// Pending state entries of one kind, from the keyed map
-  /// (`<byIdKey>.by-id`, any number pending at once — acp-agui-adapter).
-  Iterable<Map> _stateEntries(String byIdKey) sync* {
+  /// State entries of one kind, from the keyed map (`<byIdKey>.by-id`, any
+  /// number at once — acp-agui-adapter), with their `by-id` key.
+  Iterable<MapEntry<String, Map>> _stateEntries(String byIdKey) sync* {
     final keyed = _state[byIdKey];
     final byId = keyed is Map ? keyed['by-id'] : null;
     if (byId is Map) {
-      for (final entry in byId.values) {
-        if (entry is Map) yield entry;
+      for (final entry in byId.entries) {
+        if (entry.key is String && entry.value is Map) {
+          yield MapEntry(entry.key as String, entry.value as Map);
+        }
       }
     }
   }
+
+  /// A state entry with no `status`, or `pending`, is waiting for an answer.
+  static bool _isPending(Map entry) =>
+      entry['status'] == null || entry['status'] == 'pending';
 
   // Both syncs drop only the cards that are no longer pending and update the
   // rest in place. A whole-namespace replace arrives on EVERY state change
   // (a usage tick, a mode change), so removing and re-adding every card would
   // hand each a fresh order key and move it to the end of the timeline.
+  //
+  // A permission is keyed by its tool call id (the `by-id` key; the entry's own
+  // `requestId` is the JSON-RPC id and stays in `extras`). The card lives at
+  // `perm:<toolCallId>` because the bare id is the tool call's own timeline key.
   void _syncPermission() {
-    final entries = _stateEntries('permissions').toList();
-    final pending = {
-      for (final e in entries)
-        if (e['requestId'] is String) e['requestId'] as String,
-    };
+    final entries =
+        _stateEntries('permissions').where((e) => _isPending(e.value)).toList();
+    final pending = {for (final e in entries) e.key};
     _removeAdapterItemsWhere((item) =>
         item is PermissionRequestTimelineItem &&
         !pending.contains(item.requestId));
-    entries.forEach(_upsertPermission);
+    for (final e in entries) {
+      _upsertPermission(e.key, e.value);
+    }
   }
 
-  void _upsertPermission(Map permission) {
-    final requestId = permission['requestId'];
-    if (requestId is! String) return;
-    if (_resolvedIds.contains(requestId)) return;
-    const permissionKnown = {
-      'requestId',
-      'sessionId',
-      'toolCallId',
-      'title',
-      'kind',
-      'options',
-      'content',
-      'meta',
-    };
+  void _upsertPermission(String id, Map entry) {
+    if (_resolvedIds.contains(id)) return;
+    final request = asJsonMap(entry['request']) ?? const <String, dynamic>{};
+    final toolCall = asJsonMap(request['toolCall']) ?? const <String, dynamic>{};
     final options = [
-      for (final o in asJsonMapList(permission['options']))
+      for (final o in asJsonMapList(request['options']))
         PermissionOption(
           optionId: asString(o['optionId']) ?? '',
           label: asString(o['name']) ?? '',
@@ -906,12 +1033,12 @@ class ConversationReducer {
         ),
     ];
     final content = <ToolContent>[];
-    final rawContent = permission['content'];
+    final rawContent = toolCall['content'];
     if (rawContent is List) {
       for (final c in rawContent) {
         final parsed = ToolContent.parse(c);
         if (parsed == null) {
-          if (_firstTime(_reportedContent, '$requestId|$c')) {
+          if (_firstTime(_reportedContent, '$id|$c')) {
             _diagnose(DiagnosticKind.malformedPayload,
                 '$namespace/permissions/content', c);
           }
@@ -920,83 +1047,99 @@ class ConversationReducer {
         }
       }
     }
-    final toolCallId = permission['toolCallId'];
-    final correlatedTool = toolCallId is String ? _items[toolCallId] : null;
+    final toolCallId = asString(toolCall['toolCallId']) ?? id;
+    final correlatedTool = _items[toolCallId];
     final anchor = correlatedTool?.order;
-    _adapterAIds.add(requestId);
+    final rawInput = toolCall['rawInput'];
+    _adapterAIds.add(id);
     _upsert(
-      requestId,
+      'perm:$id',
       (order) => TimelineItem.permissionRequest(
-        requestId: requestId,
-        toolTitle: asString(permission['title']),
-        toolKind: asString(permission['kind']),
-        toolCallId: toolCallId is String ? toolCallId : null,
-        toolArgs:
-            correlatedTool is ToolCallTimelineItem ? correlatedTool.args : null,
+        requestId: id,
+        toolTitle: asString(toolCall['title']),
+        toolKind: asString(toolCall['kind']),
+        toolCallId: toolCallId,
+        toolArgs: correlatedTool is ToolCallTimelineItem
+            ? correlatedTool.args
+            : (rawInput == null ? null : jsonEncode(rawInput)),
         options: options,
         order: anchor != null ? OrderKey(anchor.seq, 1) : order,
         content: content,
-        meta: asJsonMap(permission['meta']),
-        sessionId: asString(permission['sessionId']),
-        extras:
-            extrasOf(Map<String, dynamic>.from(permission), permissionKnown),
+        meta: asJsonMap(request['_meta']),
+        sessionId: asString(request['sessionId']),
+        extras: extrasOf(Map<String, dynamic>.from(entry),
+            const {'status', 'request'}),
       ),
     );
   }
 
   void _syncElicitation() {
     final entries = _stateEntries('elicitations').toList();
-    final pending = {
-      for (final e in entries)
-        if (e['elicitationId'] is String) e['elicitationId'] as String,
-    };
+    final pending = {for (final e in entries) e.key};
     _removeAdapterItemsWhere((item) =>
         item is ElicitationRequestTimelineItem &&
         !pending.contains(item.requestId));
-    entries.forEach(_upsertElicitation);
+    for (final e in entries) {
+      _upsertElicitation(e.key, e.value);
+    }
   }
 
-  void _upsertElicitation(Map elicitation) {
-    final requestId = elicitation['elicitationId'];
-    if (requestId is! String) return;
-    if (_resolvedIds.contains(requestId)) return;
-    final message = asString(elicitation['message']) ?? '';
-    // `mode` is a tagged object — `{kind: form, schema}` / `{kind: url, url}`.
-    final rawMode = elicitation['mode'];
-    final String mode;
-    final Object? schema;
-    final String? url;
-    if (rawMode is Map) {
-      mode = asString(rawMode['kind']) ?? 'form';
-      schema = rawMode['schema'];
-      url = asString(rawMode['url']);
-    } else {
-      mode = 'form';
-      schema = null;
-      url = null;
-      // A string mode (the old `requestedSchema`/`url`-beside-it shape) is no
-      // longer read; say so once. Those sibling keys stay in `extras`.
-      if (rawMode != null &&
-          _firstTime(_reportedContent, 'mode|$requestId|$rawMode')) {
-        _diagnose(DiagnosticKind.malformedPayload,
-            '$namespace/elicitations/mode', rawMode);
-      }
+  // The entry holds the ACP elicitation request: `mode` is a string, a form
+  // carries `requestedSchema` and a url request `url`. Its scope is whichever of
+  // `requestId`, `toolCallId` and `sessionId` it names.
+  void _upsertElicitation(String id, Map entry) {
+    if (_resolvedIds.contains(id)) return;
+    final request = asJsonMap(entry['request']) ?? const <String, dynamic>{};
+    final rawMode = request['mode'];
+    if (rawMode != null &&
+        rawMode is! String &&
+        _firstTime(_reportedContent, 'mode|$id|$rawMode')) {
+      _diagnose(DiagnosticKind.malformedPayload,
+          '$namespace/elicitations/mode', rawMode);
     }
-    _adapterAIds.add(requestId);
+    final toolCallId = asString(request['toolCallId']);
+    final scopeRequestId = asString(request['requestId']);
+    final scopeSessionId = asString(request['sessionId']);
+    final scopeKind = scopeRequestId != null
+        ? 'request'
+        : toolCallId != null
+            ? 'tool'
+            : scopeSessionId != null
+                ? 'session'
+                : null;
+    _adapterAIds.add(id);
     _upsert(
-      requestId,
+      id,
       (order) => TimelineItem.elicitationRequest(
-        requestId: requestId,
-        message: message,
-        mode: mode,
-        schema: schema is Map ? Map<String, dynamic>.from(schema) : null,
-        url: url,
+        requestId: id,
+        toolCallId: toolCallId,
+        message: asString(request['message']) ?? '',
+        mode: rawMode is String ? rawMode : 'form',
+        schema: asJsonMap(request['requestedSchema']),
+        url: asString(request['url']),
         order: order,
-        scope: ElicitationScope.parse(elicitation['scope']),
-        meta: asJsonMap(elicitation['meta']),
-        rawMode: rawMode is Map ? Map<String, dynamic>.from(rawMode) : null,
-        extras: extrasOf(Map<String, dynamic>.from(elicitation),
-            const {'elicitationId', 'message', 'mode', 'scope', 'meta'}),
+        scope: scopeKind == null
+            ? null
+            : ElicitationScope(
+                kind: scopeKind,
+                requestId: scopeRequestId,
+                sessionId: scopeSessionId,
+                toolCallId: toolCallId,
+              ),
+        meta: asJsonMap(request['_meta']),
+        extras: {
+          ...extrasOf(Map<String, dynamic>.from(entry), const {'request'}),
+          ...extrasOf(request, const {
+            'mode',
+            'message',
+            'requestedSchema',
+            'url',
+            'requestId',
+            'toolCallId',
+            'sessionId',
+            '_meta',
+          }),
+        },
       ),
     );
   }
@@ -1143,7 +1286,9 @@ class ConversationReducer {
       configState: _configState,
       usage: _usage,
       sessionInfo: _sessionInfo,
-      plans: _plans,
+      plans: _activityPlans.isEmpty
+          ? _plans
+          : _plans.copyWith(byId: {..._plans.byId, ..._activityPlans}),
       responseMeta: _responseMeta,
       resolutions: _resolutions,
     );

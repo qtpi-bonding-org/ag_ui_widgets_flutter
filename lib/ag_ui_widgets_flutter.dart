@@ -6,6 +6,7 @@ export 'src/model/session_models.dart';
 export 'src/model/diagnostics.dart';
 export 'src/model/tool_models.dart';
 export 'src/transport/ag_ui_transport.dart';
+export 'src/transport/wire_decoder.dart';
 export 'src/widgets/ag_ui_chat.dart';
 export 'src/widgets/ag_ui_transcript.dart';
 export 'src/widgets/composer_placement.dart';

@@ -3,6 +3,8 @@
 // emits an event name or state key the reducer neither folds nor deliberately
 // records, which is how a silent drop starts.
 //
+// Each fixture item is a `Sourced` envelope; the AG-UI event is its `payload`.
+//
 // Refresh the fixture: in acp-agui-adapter run
 //   UPDATE_FIXTURES=1 cargo test golden_session_fixture
 // then copy tests/fixtures/ag_ui_session.json to test/fixtures/adapter/.
@@ -11,6 +13,7 @@ import 'dart:io';
 
 import 'package:ag_ui/ag_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation_reducer.dart';
 
@@ -20,7 +23,7 @@ List<BaseEvent> _fixture() {
       as List;
   return [
     for (final e in raw)
-      BaseEvent.fromJson(Map<String, dynamic>.from(e as Map)),
+      decodeAgUiWire(Map<String, dynamic>.from((e as Map)['payload'] as Map)),
   ];
 }
 
@@ -51,13 +54,12 @@ void main() {
       'episutra:tool',
       'episutra:diff',
       'episutra:terminal',
-      'episutra:content',
+      'episutra:media',
+      'episutra:message_replaced',
+      'episutra:session_creation_failed',
       'episutra:response_meta',
-      'episutra:tool_text',
-      'episutra:run',
       'episutra:permission_resolved',
       'episutra:elicitation_resolved',
-      'episutra:sync',
     };
     expect(names.difference(known), isEmpty,
         reason:
@@ -74,6 +76,11 @@ void main() {
       'usage',
       'session_info',
       'plans',
+      'client',
+      'session_setup',
+      'working_directories',
+      'session',
+      'activity',
       'permissions',
       'elicitations',
     };
@@ -121,19 +128,31 @@ void main() {
     expect(tool.diffs, hasLength(1));
     expect(tool.patches, hasLength(1));
     expect(tool.terminals.single.terminalId, 't1');
-    expect(tool.media, hasLength(1));
     expect(tool.hasEnded, isTrue);
-    expect(tool.resultParts, isNotEmpty);
+    expect(tool.resultParts.single.parts, hasLength(2),
+        reason: 'the document part must survive the String-only decoder');
+    expect(tool.success, isTrue);
+    expect(tool.pastTenseMessage, 'Edited a.txt');
 
     final permission =
         c.timeline.whereType<PermissionRequestTimelineItem>().single;
+    expect(permission.requestId, 'tc2', reason: 'the by-id key, the tool call id');
+    expect(permission.toolTitle, 'Run ls');
+    expect(permission.toolKind, 'execute');
+    expect(permission.options.single.optionId, 'allow_once');
+    expect(permission.sessionId, 's1');
     expect(permission.content.single, isA<ToolContentTerminal>());
     final elicitation =
         c.timeline.whereType<ElicitationRequestTimelineItem>().single;
+    expect(elicitation.requestId, 'e1');
     expect(elicitation.scope!.kind, 'request');
+    expect(elicitation.message, 'Need input');
+    expect(elicitation.schema, {'type': 'object'});
     expect(c.timeline.whereType<MediaTimelineItem>(), hasLength(1));
-    expect(c.timeline.whereType<ToolRequestTimelineItem>().single.toolName,
-        'create_note');
-    expect(c.sourceRecords, isNotEmpty);
+    expect(s.isRunning, isFalse,
+        reason: 'synthetic runs around session-level events are not work');
+    expect(s.runOutcome, RunOutcome.success);
+    expect(s.runError, 'agent unavailable',
+        reason: 'episutra:session_creation_failed');
   });
 }

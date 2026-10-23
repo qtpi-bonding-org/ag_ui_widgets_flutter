@@ -1,1048 +1,1759 @@
 [
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-1",
-      "sourceSequence": "1",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-1"
+    "sourceEventId": "src-1",
+    "sourceSequence": "1",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-1",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-1",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-1",
+          "sourceSequence": "1",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "episutra:sync",
-    "value": {
-      "mode": "replace"
-    },
-    "sourceEventId": "src-1"
+    "sourceEventId": "src-1",
+    "sourceSequence": "1",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_SNAPSHOT",
+      "snapshot": {
+        "episutra": {
+          "permissions": {
+            "by-id": {}
+          },
+          "elicitations": {
+            "by-id": {}
+          }
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-1",
+          "sourceSequence": "1",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-2",
-      "sourceSequence": "2",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-2"
+    "sourceEventId": "src-1",
+    "sourceSequence": "1",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-1",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-1",
+          "sourceSequence": "1",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "TEXT_MESSAGE_START",
-    "messageId": "m1",
-    "role": "assistant",
     "sourceEventId": "src-2",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-3",
-      "sourceSequence": "3",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-3"
-  },
-  {
-    "type": "TEXT_MESSAGE_CONTENT",
-    "messageId": "m1",
-    "delta": "hello",
-    "sourceEventId": "src-3",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-4",
-      "sourceSequence": "4",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-4"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "episutra:content",
-    "value": {
-      "kind": "audio",
-      "mimeType": "audio/wav",
-      "channel": "message",
-      "messageId": "m1"
-    },
-    "sourceEventId": "src-4",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-5",
-      "sourceSequence": "5",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-5"
-  },
-  {
-    "type": "TEXT_MESSAGE_END",
-    "messageId": "m1",
-    "sourceEventId": "src-5",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-6",
-      "sourceSequence": "6",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-6"
-  },
-  {
-    "type": "TOOL_CALL_START",
-    "toolCallId": "tc1",
-    "toolCallName": "Edit a.txt",
-    "sourceEventId": "src-6",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-7",
-      "sourceSequence": "7",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-7"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "episutra:diff",
-    "value": {
-      "toolCallId": "tc1",
-      "path": "a.txt",
-      "oldText": null,
-      "newText": "x"
-    },
-    "sourceEventId": "src-7",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "episutra:diff",
-    "value": {
-      "toolCallId": "tc1",
-      "format": "unified",
-      "patch": "@@ -1 +1 @@"
-    },
-    "sourceEventId": "src-7",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "episutra:terminal",
-    "value": {
-      "toolCallId": "tc1",
-      "terminalId": "t1",
-      "meta": {
-        "cwd": "/"
+    "sourceSequence": "2",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-2",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-2",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-2",
+          "sourceSequence": "2",
+          "turnId": null,
+          "index": 0
+        }
       }
-    },
-    "sourceEventId": "src-7",
-    "turnId": "turn-1"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "episutra:content",
-    "value": {
-      "kind": "image",
-      "mimeType": "image/png",
-      "toolCallId": "tc1"
-    },
-    "sourceEventId": "src-7",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "RAW",
-    "event": {
-      "unmapped": "tool_call_content",
-      "raw": {
-        "type": "future"
-      }
-    },
-    "sourceEventId": "src-7",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "episutra:tool",
-    "value": {
-      "toolCallId": "tc1",
-      "title": "Edit a.txt",
-      "kind": "edit",
-      "status": "in_progress",
-      "locations": [
+    "sourceEventId": "src-2",
+    "sourceSequence": "2",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
         {
-          "path": "a.txt",
-          "line": 3
+          "op": "add",
+          "path": "/episutra/client",
+          "value": {
+            "protocolVersion": 1,
+            "info": {
+              "name": "client",
+              "version": "1.0.0"
+            },
+            "capabilities": {
+              "fs": {
+                "readTextFile": true
+              }
+            }
+          }
         }
       ],
-      "meta": {
-        "k": 1
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-2",
+          "sourceSequence": "2",
+          "turnId": null,
+          "index": 1
+        }
       }
-    },
+    }
+  },
+  {
+    "sourceEventId": "src-2",
+    "sourceSequence": "2",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-2",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-2",
+          "sourceSequence": "2",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-3",
+    "sourceSequence": "3",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-3",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-3",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-3",
+          "sourceSequence": "3",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-3",
+    "sourceSequence": "3",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/session_setup",
+          "value": {
+            "method": "session/new",
+            "mcpServers": [
+              {
+                "name": "tools",
+                "command": "tools-mcp",
+                "args": [],
+                "env": []
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-3",
+          "sourceSequence": "3",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-3",
+    "sourceSequence": "3",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-3",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-3",
+          "sourceSequence": "3",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-4",
+    "sourceSequence": "4",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-4",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-4",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-4",
+          "sourceSequence": "4",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-4",
+    "sourceSequence": "4",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/working_directories",
+          "value": {
+            "/work/project": {
+              "path": "/work/project"
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-4",
+          "sourceSequence": "4",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-4",
+    "sourceSequence": "4",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-4",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-4",
+          "sourceSequence": "4",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-5",
+    "sourceSequence": "5",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-5",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-5",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-5",
+          "sourceSequence": "5",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-5",
+    "sourceSequence": "5",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/session",
+          "value": {
+            "sessionId": "session-1"
+          }
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-5",
+          "sourceSequence": "5",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-5",
+    "sourceSequence": "5",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-5",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-5",
+          "sourceSequence": "5",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-6",
+    "sourceSequence": "6",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-6",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-6",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-6",
+          "sourceSequence": "6",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-6",
+    "sourceSequence": "6",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/activity",
+          "value": {
+            "state": "running"
+          }
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-6",
+          "sourceSequence": "6",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-6",
+    "sourceSequence": "6",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-6",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-6",
+          "sourceSequence": "6",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
     "sourceEventId": "src-7",
-    "turnId": "turn-1"
+    "sourceSequence": "7",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-7",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-7",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-7",
+          "sourceSequence": "7",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-8",
-      "sourceSequence": "8",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-8"
+    "sourceEventId": "src-7",
+    "sourceSequence": "7",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "replace",
+          "path": "/episutra/activity/state",
+          "value": "idle"
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-7",
+          "sourceSequence": "7",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "episutra:tool",
-    "value": {
-      "toolCallId": "tc1",
-      "title": "Edit a.txt",
-      "kind": "edit",
-      "status": "completed",
-      "success": true,
-      "pastTenseMessage": "Edited a.txt"
-    },
+    "sourceEventId": "src-7",
+    "sourceSequence": "7",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-7",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-7",
+          "sourceSequence": "7",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
     "sourceEventId": "src-8",
-    "turnId": "turn-1"
+    "sourceSequence": "8",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-8",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-8",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-8",
+          "sourceSequence": "8",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
   },
   {
-    "type": "TOOL_CALL_RESULT",
-    "messageId": "tool-result-tc1-0",
-    "toolCallId": "tc1",
-    "content": "Edited a.txt",
     "sourceEventId": "src-8",
-    "turnId": "turn-1"
+    "sourceSequence": "8",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "TEXT_MESSAGE_START",
+      "messageId": "m1",
+      "role": "assistant",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-8",
+          "sourceSequence": "8",
+          "turnId": "turn-1",
+          "index": 1
+        }
+      }
+    }
   },
   {
-    "type": "TOOL_CALL_END",
-    "toolCallId": "tc1",
-    "sourceEventId": "src-8",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-9",
-      "sourceSequence": "9",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-9"
-  },
-  {
-    "type": "RAW",
-    "event": {
-      "unmapped": "tool_call_empty_id",
-      "title": "orphan",
-      "kind": null,
-      "status": null,
-      "content": [],
-      "rawInput": null,
-      "rawOutput": null,
-      "locations": [],
-      "meta": null
-    },
     "sourceEventId": "src-9",
-    "turnId": "turn-1"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-10",
-      "sourceSequence": "10",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-10"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "episutra:response_meta",
-    "value": {
-      "method": "session/new",
-      "meta": {
-        "a": 1
-      }
-    },
-    "sourceEventId": "src-10"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-11",
-      "sourceSequence": "11",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-11"
-  },
-  {
-    "type": "STATE_SNAPSHOT",
-    "snapshot": {
-      "episutra": {
-        "plans": {
-          "by-id": {}
-        },
-        "permissions": {
-          "by-id": {}
-        },
-        "elicitations": {
-          "by-id": {}
+    "sourceSequence": "9",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "TEXT_MESSAGE_CONTENT",
+      "messageId": "m1",
+      "delta": "hello",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-9",
+          "sourceSequence": "9",
+          "turnId": "turn-1",
+          "index": 0
         }
       }
-    },
-    "sourceEventId": "src-11"
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {}
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {}
-          }
+    "sourceEventId": "src-10",
+    "sourceSequence": "10",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:media",
+      "value": {
+        "turnId": "turn-1",
+        "messageId": "m1",
+        "channel": "message",
+        "content": {
+          "type": "resource_link",
+          "name": "clip",
+          "uri": "file:///clip",
+          "mimeType": "audio/wav"
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-10",
+          "sourceSequence": "10",
+          "turnId": "turn-1",
+          "index": 0
         }
       }
-    ],
+    }
+  },
+  {
     "sourceEventId": "src-11",
-    "turnId": "turn-1"
+    "sourceSequence": "11",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "TEXT_MESSAGE_END",
+      "messageId": "m1",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-11",
+          "sourceSequence": "11",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-12",
-      "sourceSequence": "12",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-12"
+    "sourceEventId": "src-11",
+    "sourceSequence": "11",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-8",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-11",
+          "sourceSequence": "11",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {}
+    "sourceEventId": "src-12",
+    "sourceSequence": "12",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-12",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-12",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-12",
+          "sourceSequence": "12",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-12",
+    "sourceSequence": "12",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:message_replaced",
+      "value": {
+        "turnId": "turn-1",
+        "messageId": "m1",
+        "sessionUpdate": "agent_message",
+        "content": [
+          {
+            "type": "text",
+            "text": "hello, again"
+          }
+        ]
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-12",
+          "sourceSequence": "12",
+          "turnId": "turn-1",
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-12",
+    "sourceSequence": "12",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-12",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-12",
+          "sourceSequence": "12",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-13",
+    "sourceSequence": "13",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-13",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-13",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-13",
+          "sourceSequence": "13",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-13",
+    "sourceSequence": "13",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:session_creation_failed",
+      "value": {
+        "method": "session/new",
+        "error": {
+          "code": -32000,
+          "message": "agent unavailable"
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-13",
+          "sourceSequence": "13",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-13",
+    "sourceSequence": "13",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-13",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-13",
+          "sourceSequence": "13",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-14",
+    "sourceSequence": "14",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-14",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-14",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-14",
+          "sourceSequence": "14",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-14",
+    "sourceSequence": "14",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "TOOL_CALL_START",
+      "toolCallId": "tc1",
+      "toolCallName": "Edit a.txt",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-14",
+          "sourceSequence": "14",
+          "turnId": "turn-1",
+          "index": 1
+        },
+        "acpAdapter": {
+          "kind": "edit"
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-15",
+    "sourceSequence": "15",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:diff",
+      "value": {
+        "toolCallId": "tc1",
+        "type": "diff",
+        "path": "a.txt",
+        "newText": "x"
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-15",
+          "sourceSequence": "15",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-15",
+    "sourceSequence": "15",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:diff",
+      "value": {
+        "toolCallId": "tc1",
+        "type": "diff",
+        "changes": [],
+        "patch": {
+          "format": "unified",
+          "text": "@@ -1 +1 @@"
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-15",
+          "sourceSequence": "15",
+          "turnId": "turn-1",
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-15",
+    "sourceSequence": "15",
+    "turnId": "turn-1",
+    "index": 2,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:terminal",
+      "value": {
+        "toolCallId": "tc1",
+        "type": "terminal",
+        "terminalId": "t1",
+        "_meta": {
+          "cwd": "/"
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-15",
+          "sourceSequence": "15",
+          "turnId": "turn-1",
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-15",
+    "sourceSequence": "15",
+    "turnId": "turn-1",
+    "index": 3,
+    "payload": {
+      "type": "RAW",
+      "event": {
+        "type": "future"
+      },
+      "source": "acp",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-15",
+          "sourceSequence": "15",
+          "turnId": "turn-1",
+          "index": 3
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-15",
+    "sourceSequence": "15",
+    "turnId": "turn-1",
+    "index": 4,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:tool",
+      "value": {
+        "toolCallId": "tc1",
+        "title": "Edit a.txt",
+        "kind": "edit",
+        "status": "in_progress",
+        "locations": [
+          {
+            "path": "a.txt",
+            "line": 3
+          }
+        ],
+        "_meta": {
+          "k": 1
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-15",
+          "sourceSequence": "15",
+          "turnId": "turn-1",
+          "index": 4
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-16",
+    "sourceSequence": "16",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:tool",
+      "value": {
+        "toolCallId": "tc1",
+        "title": "Edit a.txt",
+        "kind": "edit",
+        "status": "completed",
+        "success": true,
+        "pastTenseMessage": "Edited a.txt"
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-16",
+          "sourceSequence": "16",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-16",
+    "sourceSequence": "16",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "TOOL_CALL_END",
+      "toolCallId": "tc1",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-16",
+          "sourceSequence": "16",
+          "turnId": "turn-1",
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-16",
+    "sourceSequence": "16",
+    "turnId": "turn-1",
+    "index": 2,
+    "payload": {
+      "type": "TOOL_CALL_RESULT",
+      "messageId": "tool-result-tc1",
+      "toolCallId": "tc1",
+      "content": [
+        {
+          "type": "text",
+          "text": "Edited a.txt"
+        },
+        {
+          "type": "document",
+          "source": {
+            "type": "url",
+            "value": "file:///clip",
+            "mimeType": "image/png"
           },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
+          "metadata": {
+            "acpAdapter": {
+              "name": "clip"
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-16",
+          "sourceSequence": "16",
+          "turnId": "turn-1",
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-16",
+    "sourceSequence": "16",
+    "turnId": null,
+    "index": 3,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-14",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-16",
+          "sourceSequence": "16",
+          "turnId": null,
+          "index": 3
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-17",
+    "sourceSequence": "17",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-17",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-17",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-17",
+          "sourceSequence": "17",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-17",
+    "sourceSequence": "17",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "RAW",
+      "event": {
+        "toolCallId": "",
+        "title": "orphan",
+        "content": [],
+        "locations": []
+      },
+      "source": "acp",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-17",
+          "sourceSequence": "17",
+          "turnId": "turn-1",
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-17",
+    "sourceSequence": "17",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-17",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-17",
+          "sourceSequence": "17",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-18",
+    "sourceSequence": "18",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-18",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-18",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-18",
+          "sourceSequence": "18",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-18",
+    "sourceSequence": "18",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "CUSTOM",
+      "name": "episutra:response_meta",
+      "value": {
+        "method": "session/new",
+        "_meta": {
+          "a": 1
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-18",
+          "sourceSequence": "18",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-18",
+    "sourceSequence": "18",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-18",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-18",
+          "sourceSequence": "18",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-19",
+    "sourceSequence": "19",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-19",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-19",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-19",
+          "sourceSequence": "19",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-19",
+    "sourceSequence": "19",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/permissions/by-id/tc2",
+          "value": {
+            "requestId": "req-1",
+            "status": "pending",
+            "request": {
+              "sessionId": "s1",
+              "toolCall": {
                 "toolCallId": "tc2",
-                "status": "pending",
                 "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
+                "kind": "execute",
                 "content": [
                   {
-                    "toolCallId": "tc2",
+                    "type": "terminal",
                     "terminalId": "t2"
                   }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
+                ]
+              },
+              "options": [
+                {
+                  "optionId": "allow_once",
+                  "name": "Allow",
+                  "kind": "allow_once"
                 }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
+              ],
+              "_meta": {
+                "m": 1
               }
             }
           }
         }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-19",
+          "sourceSequence": "19",
+          "turnId": "turn-1",
+          "index": 1
+        }
       }
-    ],
-    "sourceEventId": "src-12"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-13",
-      "sourceSequence": "13",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-13"
+    "sourceEventId": "src-19",
+    "sourceSequence": "19",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-19",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-19",
+          "sourceSequence": "19",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
+    "sourceEventId": "src-20",
+    "sourceSequence": "20",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-20",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-20",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-20",
+          "sourceSequence": "20",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-20",
+    "sourceSequence": "20",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/elicitations/by-id/e1",
+          "value": {
+            "requestId": "e1",
+            "request": {
+              "mode": "form",
+              "requestId": "req-2",
+              "requestedSchema": {
+                "type": "object"
+              },
+              "message": "Need input"
             }
           }
         }
-      }
-    ],
-    "sourceEventId": "src-13"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-14",
-      "sourceSequence": "14",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-14"
-  },
-  {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-20",
+          "sourceSequence": "20",
+          "turnId": null,
+          "index": 1
         }
       }
-    ],
-    "sourceEventId": "src-14"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-15",
-      "sourceSequence": "15",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-15"
-  },
-  {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          }
+    "sourceEventId": "src-20",
+    "sourceSequence": "20",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-20",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-20",
+          "sourceSequence": "20",
+          "turnId": null,
+          "index": 2
         }
       }
-    ],
-    "sourceEventId": "src-15"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-16",
-      "sourceSequence": "16",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-16"
+    "sourceEventId": "src-21",
+    "sourceSequence": "21",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-21",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-21",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-21",
+          "sourceSequence": "21",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
+    "sourceEventId": "src-21",
+    "sourceSequence": "21",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "ACTIVITY_SNAPSHOT",
+      "messageId": "p1",
+      "activityType": "plan",
+      "content": {
+        "planId": "p1",
+        "body": {
+          "kind": "entries",
+          "entries": [
+            {
+              "content": "do it",
+              "priority": "high",
+              "status": "pending"
             }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
+          ]
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-21",
+          "sourceSequence": "21",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-21",
+    "sourceSequence": "21",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-21",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-21",
+          "sourceSequence": "21",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-22",
+    "sourceSequence": "22",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-22",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-22",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-22",
+          "sourceSequence": "22",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-22",
+    "sourceSequence": "22",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "ACTIVITY_SNAPSHOT",
+      "messageId": "p2",
+      "activityType": "plan",
+      "content": {
+        "planId": "p2",
+        "body": {
+          "kind": "file",
+          "uri": "file:///plan.md"
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-22",
+          "sourceSequence": "22",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-22",
+    "sourceSequence": "22",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-22",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-22",
+          "sourceSequence": "22",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-23",
+    "sourceSequence": "23",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-23",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-23",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-23",
+          "sourceSequence": "23",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-23",
+    "sourceSequence": "23",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "ACTIVITY_SNAPSHOT",
+      "messageId": "p3",
+      "activityType": "plan",
+      "content": {
+        "planId": "p3",
+        "body": {
+          "kind": "markdown",
+          "content": "# plan"
+        }
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-23",
+          "sourceSequence": "23",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-23",
+    "sourceSequence": "23",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-23",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-23",
+          "sourceSequence": "23",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-24",
+    "sourceSequence": "24",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-24",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-24",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-24",
+          "sourceSequence": "24",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-24",
+    "sourceSequence": "24",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/commands",
+          "value": {
             "commands": [
               {
                 "name": "plan",
                 "description": "make a plan"
               }
-            ],
-            "meta": null
+            ]
           }
         }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-24",
+          "sourceSequence": "24",
+          "turnId": null,
+          "index": 1
+        }
       }
-    ],
-    "sourceEventId": "src-16"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-17",
-      "sourceSequence": "17",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-17"
+    "sourceEventId": "src-24",
+    "sourceSequence": "24",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-24",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-24",
+          "sourceSequence": "24",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
-            "commands": [
-              {
-                "name": "plan",
-                "description": "make a plan"
-              }
-            ],
-            "meta": null
-          },
-          "agent": {
+    "sourceEventId": "src-25",
+    "sourceSequence": "25",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-25",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-25",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-25",
+          "sourceSequence": "25",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-25",
+    "sourceSequence": "25",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/agent",
+          "value": {
             "protocolVersion": 1,
             "agentInfo": {
               "name": "claude",
@@ -1057,138 +1768,79 @@
                 "id": "oauth",
                 "name": "OAuth"
               }
-            ],
-            "meta": null
+            ]
           }
         }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-25",
+          "sourceSequence": "25",
+          "turnId": null,
+          "index": 1
+        }
       }
-    ],
-    "sourceEventId": "src-17"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-18",
-      "sourceSequence": "18",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-18"
+    "sourceEventId": "src-25",
+    "sourceSequence": "25",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-25",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-25",
+          "sourceSequence": "25",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
-            "commands": [
-              {
-                "name": "plan",
-                "description": "make a plan"
-              }
-            ],
-            "meta": null
-          },
-          "agent": {
-            "protocolVersion": 1,
-            "agentInfo": {
-              "name": "claude",
-              "title": "Claude",
-              "version": "2"
-            },
-            "agentCapabilities": {
-              "loadSession": true
-            },
-            "authMethods": [
-              {
-                "id": "oauth",
-                "name": "OAuth"
-              }
-            ],
-            "meta": null
-          },
-          "mode": {
+    "sourceEventId": "src-26",
+    "sourceSequence": "26",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-26",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-26",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-26",
+          "sourceSequence": "26",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-26",
+    "sourceSequence": "26",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/mode",
+          "value": {
             "currentModeId": "ask",
             "availableModes": [
               {
@@ -1199,294 +1851,150 @@
                 "id": "code",
                 "name": "Code"
               }
-            ],
-            "meta": null
+            ]
           }
         }
-      }
-    ],
-    "sourceEventId": "src-18"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-19",
-      "sourceSequence": "19",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-19"
-  },
-  {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
-            "commands": [
-              {
-                "name": "plan",
-                "description": "make a plan"
-              }
-            ],
-            "meta": null
-          },
-          "agent": {
-            "protocolVersion": 1,
-            "agentInfo": {
-              "name": "claude",
-              "title": "Claude",
-              "version": "2"
-            },
-            "agentCapabilities": {
-              "loadSession": true
-            },
-            "authMethods": [
-              {
-                "id": "oauth",
-                "name": "OAuth"
-              }
-            ],
-            "meta": null
-          },
-          "mode": {
-            "currentModeId": "code",
-            "availableModes": [
-              {
-                "id": "ask",
-                "name": "Ask"
-              },
-              {
-                "id": "code",
-                "name": "Code"
-              }
-            ],
-            "meta": null
-          }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-26",
+          "sourceSequence": "26",
+          "turnId": null,
+          "index": 1
         }
       }
-    ],
-    "sourceEventId": "src-19"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-20",
-      "sourceSequence": "20",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-20"
+    "sourceEventId": "src-26",
+    "sourceSequence": "26",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-26",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-26",
+          "sourceSequence": "26",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
-            "commands": [
-              {
-                "name": "plan",
-                "description": "make a plan"
-              }
-            ],
-            "meta": null
-          },
-          "agent": {
-            "protocolVersion": 1,
-            "agentInfo": {
-              "name": "claude",
-              "title": "Claude",
-              "version": "2"
-            },
-            "agentCapabilities": {
-              "loadSession": true
-            },
-            "authMethods": [
-              {
-                "id": "oauth",
-                "name": "OAuth"
-              }
-            ],
-            "meta": null
-          },
-          "mode": {
-            "currentModeId": "code",
-            "availableModes": [
-              {
-                "id": "ask",
-                "name": "Ask"
-              },
-              {
-                "id": "code",
-                "name": "Code"
-              }
-            ],
-            "meta": null
-          },
-          "config": {
+    "sourceEventId": "src-27",
+    "sourceSequence": "27",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-27",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-27",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-27",
+          "sourceSequence": "27",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-27",
+    "sourceSequence": "27",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "replace",
+          "path": "/episutra/mode/currentModeId",
+          "value": "code"
+        }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-27",
+          "sourceSequence": "27",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-27",
+    "sourceSequence": "27",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-27",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-27",
+          "sourceSequence": "27",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-28",
+    "sourceSequence": "28",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-28",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-28",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-28",
+          "sourceSequence": "28",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-28",
+    "sourceSequence": "28",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/config",
+          "value": {
             "options": [
               {
                 "id": "model",
@@ -1500,438 +2008,617 @@
                   }
                 ]
               }
-            ],
-            "meta": null
+            ]
           }
         }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-28",
+          "sourceSequence": "28",
+          "turnId": null,
+          "index": 1
+        }
       }
-    ],
-    "sourceEventId": "src-20"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-21",
-      "sourceSequence": "21",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-21"
+    "sourceEventId": "src-28",
+    "sourceSequence": "28",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-28",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-28",
+          "sourceSequence": "28",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
-            "commands": [
-              {
-                "name": "plan",
-                "description": "make a plan"
-              }
-            ],
-            "meta": null
-          },
-          "agent": {
-            "protocolVersion": 1,
-            "agentInfo": {
-              "name": "claude",
-              "title": "Claude",
-              "version": "2"
-            },
-            "agentCapabilities": {
-              "loadSession": true
-            },
-            "authMethods": [
-              {
-                "id": "oauth",
-                "name": "OAuth"
-              }
-            ],
-            "meta": null
-          },
-          "mode": {
-            "currentModeId": "code",
-            "availableModes": [
-              {
-                "id": "ask",
-                "name": "Ask"
-              },
-              {
-                "id": "code",
-                "name": "Code"
-              }
-            ],
-            "meta": null
-          },
-          "config": {
-            "options": [
-              {
-                "id": "model",
-                "name": "Model",
-                "type": "select",
-                "currentValue": "a",
-                "options": [
-                  {
-                    "value": "a",
-                    "name": "A"
-                  }
-                ]
-              }
-            ],
-            "meta": null
-          },
-          "session_info": {
+    "sourceEventId": "src-29",
+    "sourceSequence": "29",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-29",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-29",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-29",
+          "sourceSequence": "29",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-29",
+    "sourceSequence": "29",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/session_info",
+          "value": {
             "title": "Hello",
             "updatedAt": "2026-10-01T00:00:00Z"
           }
         }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-29",
+          "sourceSequence": "29",
+          "turnId": null,
+          "index": 1
+        }
       }
-    ],
-    "sourceEventId": "src-21"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-22",
-      "sourceSequence": "22",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-22"
+    "sourceEventId": "src-29",
+    "sourceSequence": "29",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-29",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-29",
+          "sourceSequence": "29",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "STATE_DELTA",
-    "delta": [
-      {
-        "op": "replace",
-        "path": "/episutra",
-        "value": {
-          "plans": {
-            "by-id": {
-              "p1": {
-                "entries": [
-                  {
-                    "content": "do it",
-                    "priority": "high",
-                    "status": "pending"
-                  }
-                ],
-                "meta": null
-              },
-              "p2": {
-                "uri": "file:///plan.md",
-                "meta": null
-              },
-              "p3": {
-                "markdown": "# plan",
-                "meta": null
-              }
-            }
-          },
-          "permissions": {
-            "by-id": {
-              "tc2": {
-                "requestId": "req-1",
-                "sessionId": "s1",
-                "toolCallId": "tc2",
-                "status": "pending",
-                "title": "Run ls",
-                "options": [
-                  {
-                    "optionId": "allow_once",
-                    "name": "Allow",
-                    "kind": "allow_once",
-                    "group": 0
-                  }
-                ],
-                "content": [
-                  {
-                    "toolCallId": "tc2",
-                    "terminalId": "t2"
-                  }
-                ],
-                "kind": "execute",
-                "meta": {
-                  "m": 1
-                }
-              }
-            }
-          },
-          "elicitations": {
-            "by-id": {
-              "e1": {
-                "elicitationId": "e1",
-                "message": "Need input",
-                "mode": {
-                  "kind": "form",
-                  "schema": {
-                    "type": "object"
-                  }
-                },
-                "scope": {
-                  "kind": "request",
-                  "request_id": "req-2"
-                },
-                "meta": null
-              }
-            }
-          },
-          "commands": {
-            "commands": [
-              {
-                "name": "plan",
-                "description": "make a plan"
-              }
-            ],
-            "meta": null
-          },
-          "agent": {
-            "protocolVersion": 1,
-            "agentInfo": {
-              "name": "claude",
-              "title": "Claude",
-              "version": "2"
-            },
-            "agentCapabilities": {
-              "loadSession": true
-            },
-            "authMethods": [
-              {
-                "id": "oauth",
-                "name": "OAuth"
-              }
-            ],
-            "meta": null
-          },
-          "mode": {
-            "currentModeId": "code",
-            "availableModes": [
-              {
-                "id": "ask",
-                "name": "Ask"
-              },
-              {
-                "id": "code",
-                "name": "Code"
-              }
-            ],
-            "meta": null
-          },
-          "config": {
-            "options": [
-              {
-                "id": "model",
-                "name": "Model",
-                "type": "select",
-                "currentValue": "a",
-                "options": [
-                  {
-                    "value": "a",
-                    "name": "A"
-                  }
-                ]
-              }
-            ],
-            "meta": null
-          },
-          "session_info": {
-            "title": "Hello",
-            "updatedAt": "2026-10-01T00:00:00Z"
-          },
-          "usage": {
+    "sourceEventId": "src-30",
+    "sourceSequence": "30",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-30",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-30",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-30",
+          "sourceSequence": "30",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-30",
+    "sourceSequence": "30",
+    "turnId": "turn-1",
+    "index": 1,
+    "payload": {
+      "type": "STATE_DELTA",
+      "delta": [
+        {
+          "op": "add",
+          "path": "/episutra/usage",
+          "value": {
+            "turnId": "turn-1",
             "used": 10,
             "size": 100,
             "cost": {
               "amount": 0.5,
               "currency": "USD"
-            },
-            "meta": null
+            }
           }
         }
+      ],
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-30",
+          "sourceSequence": "30",
+          "turnId": "turn-1",
+          "index": 1
+        }
       }
-    ],
-    "sourceEventId": "src-22",
-    "turnId": "turn-1"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-23",
-      "sourceSequence": "23",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-23"
-  },
-  {
-    "type": "CUSTOM",
-    "name": "acp.client_execute_request",
-    "value": {
-      "callId": "c1",
-      "toolName": "create_note",
-      "args": {
-        "title": "x"
+    "sourceEventId": "src-30",
+    "sourceSequence": "30",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-30",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-30",
+          "sourceSequence": "30",
+          "turnId": null,
+          "index": 2
+        }
       }
-    },
-    "sourceEventId": "src-23"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-24",
-      "sourceSequence": "24",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-24"
+    "sourceEventId": "src-31",
+    "sourceSequence": "31",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-31",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-31",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-31",
+          "sourceSequence": "31",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
   },
   {
-    "type": "RAW",
-    "event": {
-      "unmapped": "future_update",
-      "payload": {
+    "sourceEventId": "src-31",
+    "sourceSequence": "31",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "RAW",
+      "event": {
         "a": 1
+      },
+      "source": "acp",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-31",
+          "sourceSequence": "31",
+          "turnId": null,
+          "index": 1
+        },
+        "acpAdapter": {
+          "kind": "future_update"
+        }
       }
-    },
-    "sourceEventId": "src-24"
+    }
   },
   {
-    "type": "CUSTOM",
-    "name": "acp:source",
-    "value": {
-      "sourceEventId": "src-25",
-      "sourceSequence": "25",
-      "origin": "local",
-      "direction": "inbound",
-      "kind": "notification",
-      "protocolVersion": "",
-      "sessionId": null,
-      "method": "session/request_permission",
-      "requestIdJson": null,
-      "messageJson": "{}",
-      "decodeError": null,
-      "unknownPayload": null
-    },
-    "sourceEventId": "src-25"
+    "sourceEventId": "src-31",
+    "sourceSequence": "31",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-31",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-31",
+          "sourceSequence": "31",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
   },
   {
-    "type": "RUN_FINISHED",
-    "threadId": "session-1",
-    "runId": "turn-1",
-    "result": {
-      "stopReason": "end_turn",
-      "durationMs": 1
-    },
-    "sourceEventId": "src-25",
-    "turnId": "turn-1"
+    "sourceEventId": "src-32",
+    "sourceSequence": "32",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-32",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-32",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-32",
+          "sourceSequence": "32",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-32",
+    "sourceSequence": "32",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "RAW",
+      "event": {
+        "severity": "info",
+        "title": "notice-title",
+        "description": "notice-description",
+        "_meta": {
+          "sentinel": "notice-meta"
+        }
+      },
+      "source": "acp",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-32",
+          "sourceSequence": "32",
+          "turnId": null,
+          "index": 1
+        },
+        "acpAdapter": {
+          "kind": "notice"
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-32",
+    "sourceSequence": "32",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-32",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-32",
+          "sourceSequence": "32",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-33",
+    "sourceSequence": "33",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-33",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-33",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-33",
+          "sourceSequence": "33",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-33",
+    "sourceSequence": "33",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "RAW",
+      "event": {
+        "compactionId": "compaction-1",
+        "status": "completed",
+        "error": "compaction-error",
+        "_meta": {
+          "sentinel": "compaction-meta"
+        }
+      },
+      "source": "acp",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-33",
+          "sourceSequence": "33",
+          "turnId": null,
+          "index": 1
+        },
+        "acpAdapter": {
+          "kind": "compaction_update"
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-33",
+    "sourceSequence": "33",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-33",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-33",
+          "sourceSequence": "33",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-34",
+    "sourceSequence": "34",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-34",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-34",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-34",
+          "sourceSequence": "34",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-34",
+    "sourceSequence": "34",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "RAW",
+      "event": {
+        "compactionId": "compaction-1",
+        "content": {
+          "type": "text",
+          "text": "summary-text"
+        },
+        "_meta": {
+          "sentinel": "chunk-meta"
+        }
+      },
+      "source": "acp",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-34",
+          "sourceSequence": "34",
+          "turnId": null,
+          "index": 1
+        },
+        "acpAdapter": {
+          "kind": "compaction_summary_chunk"
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-34",
+    "sourceSequence": "34",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-34",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-34",
+          "sourceSequence": "34",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-35",
+    "sourceSequence": "35",
+    "turnId": "turn-1",
+    "index": 0,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "turn-1",
+      "result": {
+        "stopReason": "end_turn",
+        "durationMs": 1
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-35",
+          "sourceSequence": "35",
+          "turnId": "turn-1",
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-36",
+    "sourceSequence": "36",
+    "turnId": null,
+    "index": 0,
+    "payload": {
+      "type": "RUN_STARTED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-36",
+      "input": {
+        "threadId": "session-1",
+        "runId": "synthetic-src-36",
+        "messages": [],
+        "tools": [],
+        "context": [],
+        "state": {},
+        "forwardedProps": {}
+      },
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-36",
+          "sourceSequence": "36",
+          "turnId": null,
+          "index": 0
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-36",
+    "sourceSequence": "36",
+    "turnId": null,
+    "index": 1,
+    "payload": {
+      "type": "TOOL_CALL_START",
+      "toolCallId": "c1",
+      "toolCallName": "create_note",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-36",
+          "sourceSequence": "36",
+          "turnId": null,
+          "index": 1
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-36",
+    "sourceSequence": "36",
+    "turnId": null,
+    "index": 2,
+    "payload": {
+      "type": "TOOL_CALL_ARGS",
+      "toolCallId": "c1",
+      "delta": "{\"title\":\"x\"}",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-36",
+          "sourceSequence": "36",
+          "turnId": null,
+          "index": 2
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-36",
+    "sourceSequence": "36",
+    "turnId": null,
+    "index": 3,
+    "payload": {
+      "type": "TOOL_CALL_END",
+      "toolCallId": "c1",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-36",
+          "sourceSequence": "36",
+          "turnId": null,
+          "index": 3
+        }
+      }
+    }
+  },
+  {
+    "sourceEventId": "src-36",
+    "sourceSequence": "36",
+    "turnId": null,
+    "index": 4,
+    "payload": {
+      "type": "RUN_FINISHED",
+      "threadId": "session-1",
+      "runId": "synthetic-src-36",
+      "metadata": {
+        "acpEnvelope": {
+          "sourceEventId": "src-36",
+          "sourceSequence": "36",
+          "turnId": null,
+          "index": 4
+        }
+      }
+    }
   }
 ]

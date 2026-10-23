@@ -66,22 +66,36 @@ void main() {
     expect(_tool(r).terminals.single.meta, {'cwd': '/'});
   });
 
-  test('<ns>:content with a toolCallId attaches media to the tool', () {
+  test('<ns>:media with a toolCallId attaches media to the tool', () {
     final r = _r()
-      ..apply(const CustomEvent(name: '$_ns:content', value: {
-        'toolCallId': 'tc1', 'kind': 'image', 'mimeType': 'image/png',
+      ..apply(const CustomEvent(name: '$_ns:media', value: {
+        'toolCallId': 'tc1',
+        'content': {'type': 'image', 'mimeType': 'image/png'},
       }));
     expect(_tool(r).media.single.mimeType, 'image/png');
+    expect(_tool(r).media.single.kind, 'image');
   });
 
-  test('<ns>:content with a messageId becomes a MediaTimelineItem', () {
+  test('<ns>:media with a messageId becomes a MediaTimelineItem', () {
     final r = ConversationReducer(namespace: _ns)
-      ..apply(const CustomEvent(name: '$_ns:content', value: {
-        'messageId': 'm1', 'kind': 'audio', 'mimeType': 'audio/wav',
+      ..apply(const CustomEvent(name: '$_ns:media', value: {
+        'turnId': 't',
+        'messageId': 'm1',
+        'channel': 'message',
+        'content': {'type': 'audio', 'mimeType': 'audio/wav'},
       }));
     final item = r.current.timeline.single as MediaTimelineItem;
     expect(item.messageId, 'm1');
     expect(item.media.kind, 'audio');
+    expect(item.media.extras['channel'], isNull,
+        reason: 'channel is on the event, not the block');
+  });
+
+  test('<ns>:media without a content block is a diagnostic', () {
+    final r = ConversationReducer(namespace: _ns)
+      ..apply(const CustomEvent(name: '$_ns:media', value: {'messageId': 'm'}));
+    expect(r.current.diagnostics, isNotEmpty);
+    expect(r.current.timeline, isEmpty);
   });
 
   test('tool detail arriving before TOOL_CALL_START lands on a placeholder', () {

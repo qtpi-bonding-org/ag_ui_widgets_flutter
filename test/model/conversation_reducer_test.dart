@@ -492,11 +492,11 @@ void main() {
             'elicitations': {
               'by-id': {
                 'e1': {
-                  'elicitationId': 'e1',
-                  'message': 'Pick a color',
-                  'mode': {
-                    'kind': 'form',
-                    'schema': {
+                  'requestId': 'e1',
+                  'request': {
+                    'mode': 'form',
+                    'message': 'Pick a color',
+                    'requestedSchema': {
                       'type': 'object',
                       'properties': {
                         'color': {'type': 'string'}
@@ -530,9 +530,12 @@ void main() {
             'elicitations': {
               'by-id': {
                 'e2': {
-                  'elicitationId': 'e2',
-                  'message': 'Open this link',
-                  'mode': {'kind': 'url', 'url': 'https://example.com/auth'},
+                  'requestId': 'e2',
+                  'request': {
+                    'mode': 'url',
+                    'message': 'Open this link',
+                    'url': 'https://example.com/auth',
+                  },
                 }
               }
             }
@@ -547,35 +550,45 @@ void main() {
     });
 
     group('permission (state-sync: by-id map)', () {
-      test(
-          'StateSnapshot with /episutra/permissions/by-id produces a full-payload item (toolTitle null today)',
+      Map<String, dynamic> entry(
+        String toolCallId, {
+        String? title,
+        String? kind,
+        List<Map<String, dynamic>> options = const [],
+      }) =>
+          {
+            'requestId': 'rpc-$toolCallId',
+            'status': 'pending',
+            'request': {
+              'toolCall': {
+                'toolCallId': toolCallId,
+                if (title != null) 'title': title,
+                if (kind != null) 'kind': kind,
+              },
+              'options': options,
+            },
+          };
+
+      StateSnapshotEvent snapshot(Map<String, dynamic> byId) =>
+          StateSnapshotEvent(snapshot: {
+            'episutra': {
+              'permissions': {'by-id': byId},
+            },
+          });
+
+      const allowDeny = [
+        {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
+        {'optionId': 'deny', 'name': 'Deny', 'kind': 'reject_once'},
+      ];
+
+      test('StateSnapshot with /episutra/permissions/by-id produces an item',
           () {
         final r = ConversationReducer(namespace: 'episutra');
-        r.apply(const StateSnapshotEvent(snapshot: {
-          'episutra': {
-            'permissions': {
-              'by-id': {
-                'p1': {
-                  'requestId': 'p1',
-                  'status': 'pending',
-                  'options': [
-                    {
-                      'optionId': 'allow',
-                      'name': 'Allow',
-                      'kind': 'allow_once'
-                    },
-                    {'optionId': 'deny', 'name': 'Deny', 'kind': 'reject_once'},
-                  ],
-                }
-              }
-            }
-          }
-        }));
+        r.apply(snapshot({'p1': entry('p1', options: allowDeny)}));
         expect(r.current.timeline, hasLength(1));
         final item = r.current.timeline.single as PermissionRequestTimelineItem;
         expect(item.requestId, 'p1');
-        expect(item.toolTitle,
-            isNull); // episutra doesn't send this yet (Phase 2, Task 9)
+        expect(item.toolTitle, isNull);
         expect(item.description, isNull); // never an ACP wire field
         expect(item.options, hasLength(2));
         expect(item.options[0].optionId, 'allow');
@@ -583,30 +596,10 @@ void main() {
         expect(item.options[0].kind, 'allow_once');
       });
 
-      test(
-          'once episutra forwards title/kind (Phase 2), the adapter reads them',
-          () {
+      test('the request\'s tool call title and kind are read', () {
         final r = ConversationReducer(namespace: 'episutra');
-        r.apply(const StateSnapshotEvent(snapshot: {
-          'episutra': {
-            'permissions': {
-              'by-id': {
-                'p2': {
-                  'requestId': 'p2',
-                  'status': 'pending',
-                  'title': 'Run shell command',
-                  'kind': 'execute',
-                  'options': [
-                    {
-                      'optionId': 'allow',
-                      'name': 'Allow',
-                      'kind': 'allow_once'
-                    },
-                  ],
-                }
-              }
-            }
-          }
+        r.apply(snapshot({
+          'p2': entry('p2', title: 'Run shell command', kind: 'execute'),
         }));
         final item = r.current.timeline.single as PermissionRequestTimelineItem;
         expect(item.toolTitle, 'Run shell command');
@@ -621,27 +614,7 @@ void main() {
               const ToolCallStartEvent(toolCallId: 't1', toolCallName: 'shell'))
           ..apply(const ToolCallArgsEvent(
               toolCallId: 't1', delta: '{"command":"echo hi"}'));
-        r.apply(const StateSnapshotEvent(snapshot: {
-          'episutra': {
-            'permissions': {
-              'by-id': {
-                'p3': {
-                  'requestId': 'p3',
-                  'status': 'pending',
-                  'toolCallId': 't1',
-                  'kind': 'execute',
-                  'options': [
-                    {
-                      'optionId': 'allow',
-                      'name': 'Allow',
-                      'kind': 'allow_once'
-                    },
-                  ],
-                }
-              }
-            }
-          }
-        }));
+        r.apply(snapshot({'t1': entry('t1', kind: 'execute')}));
         final item = r.current.timeline
             .whereType<PermissionRequestTimelineItem>()
             .single;
@@ -649,22 +622,9 @@ void main() {
         expect(item.toolArgs, '{"command":"echo hi"}');
       });
 
-      test('toolArgs is null when toolCallId has no correlated tool call', () {
+      test('toolArgs is null when there is no tool call and no rawInput', () {
         final r = ConversationReducer(namespace: 'episutra');
-        r.apply(const StateSnapshotEvent(snapshot: {
-          'episutra': {
-            'permissions': {
-              'by-id': {
-                'p4': {
-                  'requestId': 'p4',
-                  'status': 'pending',
-                  'toolCallId': 'does-not-exist',
-                  'options': [],
-                }
-              }
-            }
-          }
-        }));
+        r.apply(snapshot({'p4': entry('p4')}));
         final item = r.current.timeline.single as PermissionRequestTimelineItem;
         expect(item.toolArgs, isNull);
       });
@@ -676,19 +636,23 @@ void main() {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(const ToolCallStartEvent(
             toolCallId: 't1', toolCallName: 'write_file'))
-        ..apply(_delta('/episutra/permissions/by-id/p1',
-            value: {'requestId': 'p1', 'toolCallId': 't1'}));
+        ..apply(_delta('/episutra/permissions/by-id/t1', value: {
+          'requestId': 'rpc-1',
+          'request': {
+            'toolCall': {'toolCallId': 't1'},
+          },
+        }));
 
       expect(r.current.timeline, hasLength(2));
       expect(r.current.timeline[0], isA<ToolCallTimelineItem>());
       final marker = r.current.timeline[1] as PermissionRequestTimelineItem;
-      expect(marker.requestId, 'p1');
+      expect(marker.requestId, 't1');
     });
 
     test('elicitation sub-path add appends a marker at the end', () {
       final r = ConversationReducer(namespace: 'episutra')
         ..apply(_delta('/episutra/elicitations/by-id/e1',
-            value: {'elicitationId': 'e1'}));
+            value: {'requestId': 'e1', 'request': {'message': 'hi'}}));
 
       expect(r.current.timeline, hasLength(1));
       expect(

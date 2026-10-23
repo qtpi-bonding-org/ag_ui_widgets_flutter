@@ -17,6 +17,10 @@ mixin _$ToolResultPart {
   String get messageId;
   String get content;
 
+  /// The result's AG-UI content parts as sent (text, image, document ...), when
+  /// the backend sent a list; [content] is the text of its text parts.
+  List<Map<String, dynamic>>? get parts;
+
   /// Create a copy of ToolResultPart
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -32,15 +36,17 @@ mixin _$ToolResultPart {
             other is ToolResultPart &&
             (identical(other.messageId, messageId) ||
                 other.messageId == messageId) &&
-            (identical(other.content, content) || other.content == content));
+            (identical(other.content, content) || other.content == content) &&
+            const DeepCollectionEquality().equals(other.parts, parts));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, messageId, content);
+  int get hashCode => Object.hash(runtimeType, messageId, content,
+      const DeepCollectionEquality().hash(parts));
 
   @override
   String toString() {
-    return 'ToolResultPart(messageId: $messageId, content: $content)';
+    return 'ToolResultPart(messageId: $messageId, content: $content, parts: $parts)';
   }
 }
 
@@ -50,7 +56,8 @@ abstract mixin class $ToolResultPartCopyWith<$Res> {
           ToolResultPart value, $Res Function(ToolResultPart) _then) =
       _$ToolResultPartCopyWithImpl;
   @useResult
-  $Res call({String messageId, String content});
+  $Res call(
+      {String messageId, String content, List<Map<String, dynamic>>? parts});
 }
 
 /// @nodoc
@@ -68,6 +75,7 @@ class _$ToolResultPartCopyWithImpl<$Res>
   $Res call({
     Object? messageId = null,
     Object? content = null,
+    Object? parts = freezed,
   }) {
     return _then(_self.copyWith(
       messageId: null == messageId
@@ -78,6 +86,10 @@ class _$ToolResultPartCopyWithImpl<$Res>
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      parts: freezed == parts
+          ? _self.parts
+          : parts // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>?,
     ));
   }
 }
@@ -175,13 +187,15 @@ extension ToolResultPartPatterns on ToolResultPart {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String messageId, String content)? $default, {
+    TResult Function(String messageId, String content,
+            List<Map<String, dynamic>>? parts)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _ToolResultPart() when $default != null:
-        return $default(_that.messageId, _that.content);
+        return $default(_that.messageId, _that.content, _that.parts);
       case _:
         return orElse();
     }
@@ -202,12 +216,14 @@ extension ToolResultPartPatterns on ToolResultPart {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String messageId, String content) $default,
+    TResult Function(
+            String messageId, String content, List<Map<String, dynamic>>? parts)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ToolResultPart():
-        return $default(_that.messageId, _that.content);
+        return $default(_that.messageId, _that.content, _that.parts);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -227,12 +243,14 @@ extension ToolResultPartPatterns on ToolResultPart {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String messageId, String content)? $default,
+    TResult? Function(String messageId, String content,
+            List<Map<String, dynamic>>? parts)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ToolResultPart() when $default != null:
-        return $default(_that.messageId, _that.content);
+        return $default(_that.messageId, _that.content, _that.parts);
       case _:
         return null;
     }
@@ -242,12 +260,31 @@ extension ToolResultPartPatterns on ToolResultPart {
 /// @nodoc
 
 class _ToolResultPart implements ToolResultPart {
-  const _ToolResultPart({required this.messageId, required this.content});
+  const _ToolResultPart(
+      {required this.messageId,
+      required this.content,
+      final List<Map<String, dynamic>>? parts})
+      : _parts = parts;
 
   @override
   final String messageId;
   @override
   final String content;
+
+  /// The result's AG-UI content parts as sent (text, image, document ...), when
+  /// the backend sent a list; [content] is the text of its text parts.
+  final List<Map<String, dynamic>>? _parts;
+
+  /// The result's AG-UI content parts as sent (text, image, document ...), when
+  /// the backend sent a list; [content] is the text of its text parts.
+  @override
+  List<Map<String, dynamic>>? get parts {
+    final value = _parts;
+    if (value == null) return null;
+    if (_parts is EqualUnmodifiableListView) return _parts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   /// Create a copy of ToolResultPart
   /// with the given fields replaced by the non-null parameter values.
@@ -264,15 +301,17 @@ class _ToolResultPart implements ToolResultPart {
             other is _ToolResultPart &&
             (identical(other.messageId, messageId) ||
                 other.messageId == messageId) &&
-            (identical(other.content, content) || other.content == content));
+            (identical(other.content, content) || other.content == content) &&
+            const DeepCollectionEquality().equals(other._parts, _parts));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, messageId, content);
+  int get hashCode => Object.hash(runtimeType, messageId, content,
+      const DeepCollectionEquality().hash(_parts));
 
   @override
   String toString() {
-    return 'ToolResultPart(messageId: $messageId, content: $content)';
+    return 'ToolResultPart(messageId: $messageId, content: $content, parts: $parts)';
   }
 }
 
@@ -284,7 +323,8 @@ abstract mixin class _$ToolResultPartCopyWith<$Res>
       __$ToolResultPartCopyWithImpl;
   @override
   @useResult
-  $Res call({String messageId, String content});
+  $Res call(
+      {String messageId, String content, List<Map<String, dynamic>>? parts});
 }
 
 /// @nodoc
@@ -302,6 +342,7 @@ class __$ToolResultPartCopyWithImpl<$Res>
   $Res call({
     Object? messageId = null,
     Object? content = null,
+    Object? parts = freezed,
   }) {
     return _then(_ToolResultPart(
       messageId: null == messageId
@@ -312,6 +353,10 @@ class __$ToolResultPartCopyWithImpl<$Res>
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      parts: freezed == parts
+          ? _self._parts
+          : parts // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>?,
     ));
   }
 }

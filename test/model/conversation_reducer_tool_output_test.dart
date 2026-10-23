@@ -55,39 +55,6 @@ void main() {
           name: '$_ns:tool', value: {'toolCallId': 'tc1', 'title': ''}));
     expect(_tool(r).name, 'bash');
   });
-
-  test('partial tool text is kept, then replaced by the final result', () {
-    final r = _r()
-      ..apply(const CustomEvent(
-          name: '$_ns:tool_text',
-          value: {'toolCallId': 'tc1', 'text': 'partial'}));
-    expect(_tool(r).partialText, 'partial');
-    expect(_tool(r).result, isNull);
-
-    r.apply(const ToolCallResultEvent(
-        messageId: 'm1', toolCallId: 'tc1', content: 'final'));
-    final t = _tool(r);
-    expect(t.result, 'final');
-    expect(t.resultParts, hasLength(1),
-        reason: 'partial text is not a result part');
-    expect(t.partialText, isNull,
-        reason: 'the final result replaces partial text');
-  });
-
-  test('partial text of a call that never completes stays available', () {
-    final r = _r()
-      ..apply(const CustomEvent(
-          name: '$_ns:tool_text',
-          value: {'toolCallId': 'tc1', 'text': 'half done'}))
-      ..apply(const ToolCallEndEvent(toolCallId: 'tc1'));
-    expect(_tool(r).partialText, 'half done');
-  });
-
-  test('a malformed tool_text payload is a diagnostic, not a crash', () {
-    final r = _r()
-      ..apply(const CustomEvent(name: '$_ns:tool_text', value: 'junk'));
-    expect(r.current.diagnostics, isNotEmpty);
-  });
 }
 
 void _resolutionTests() {
@@ -96,25 +63,32 @@ void _resolutionTests() {
     final r = ConversationReducer(namespace: _ns)
       ..apply(const CustomEvent(name: '$_ns:permission_resolved', value: {
         'toolCallId': 'tc1',
-        'resolution': {
-          'kind': 'user_selected',
-          'optionId': 'allow',
-          'approved': true
+        'response': {
+          'outcome': {'outcome': 'selected', 'optionId': 'allow'},
         },
+        'approved': true,
       }))
       ..apply(const CustomEvent(name: '$_ns:permission_resolved', value: {
         'toolCallId': 'tc2',
-        'resolution': {'kind': 'cancelled'},
+        'response': {
+          'outcome': {'outcome': 'cancelled'},
+        },
       }))
       ..apply(const CustomEvent(name: '$_ns:elicitation_resolved', value: {
-        'elicitationId': 'e1',
-        'resolution': {'kind': 'declined'},
+        'requestId': 'e1',
+        'action': 'decline',
       }));
     final res = r.current.sessionState.resolutions;
-    expect(res['permission:tc1'],
-        {'kind': 'user_selected', 'optionId': 'allow', 'approved': true});
-    expect(res['permission:tc2'], {'kind': 'cancelled'});
-    expect(res['elicitation:e1'], {'kind': 'declined'});
+    expect(res['permission:tc1'], {
+      'kind': 'user_selected',
+      'optionId': 'allow',
+      'approved': true,
+      'response': {
+        'outcome': {'outcome': 'selected', 'optionId': 'allow'},
+      },
+    });
+    expect(res['permission:tc2']!['kind'], 'cancelled');
+    expect(res['elicitation:e1'], {'action': 'decline'});
     expect(r.current.diagnostics, isEmpty);
   });
 
@@ -123,7 +97,9 @@ void _resolutionTests() {
     for (var i = 0; i < 130; i++) {
       r.apply(CustomEvent(name: '$_ns:permission_resolved', value: {
         'toolCallId': 'tc$i',
-        'resolution': {'kind': 'cancelled'},
+        'response': {
+          'outcome': {'outcome': 'cancelled'},
+        },
       }));
     }
     final res = r.current.sessionState.resolutions;
@@ -163,34 +139,26 @@ void _runResultTests() {
 }
 
 void _runInfoTests() {
-  test('<ns>:run info is merged per run and cleared by the next run', () {
+  test('run info comes from RUN_STARTED and RUN_FINISHED, and the next run '
+      'replaces it', () {
     final r = ConversationReducer(namespace: _ns)
-      ..apply(RunStartedEvent(threadId: 't', runId: 'r1'))
-      ..apply(const CustomEvent(name: '$_ns:run', value: {
-        'phase': 'started',
-        'runId': 'r1',
-        'startedAt': '2026-10-10T00:00:00Z',
-        'message': {'id': 'm'},
-      }))
-      ..apply(const CustomEvent(name: '$_ns:run', value: {
-        'phase': 'error',
-        'runId': 'r1',
-        'durationMs': 99,
-      }));
+      ..apply(RunStartedEvent(
+          threadId: 't', runId: 'r1', timestamp: 1700000000000))
+      ..apply(RunFinishedEvent(
+          threadId: 't', runId: 'r1', result: {'durationMs': 99}));
     expect(r.current.sessionState.runInfo, {
       'runId': 'r1',
-      'startedAt': '2026-10-10T00:00:00Z',
-      'message': {'id': 'm'},
+      'startedAt': '2023-11-14T22:13:20.000Z',
       'durationMs': 99,
     });
     r.apply(RunStartedEvent(threadId: 't', runId: 'r2'));
-    expect(r.current.sessionState.runInfo, isEmpty);
+    expect(r.current.sessionState.runInfo, {'runId': 'r2'});
   });
 
-  test('a <ns>:run payload without a phase is a diagnostic', () {
+  test('a <ns>:run event is no longer folded', () {
     final r = ConversationReducer(namespace: _ns)
-      ..apply(const CustomEvent(name: '$_ns:run', value: {'runId': 'r'}));
-    expect(r.current.diagnostics, isNotEmpty);
+      ..apply(const CustomEvent(name: '$_ns:run', value: {'phase': 'started'}));
+    expect(r.current.diagnostics.single.kind, DiagnosticKind.unknownCustom);
     expect(r.current.sessionState.runInfo, isEmpty);
   });
 }

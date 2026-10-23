@@ -7,8 +7,14 @@ const _ns = 'episutra';
 
 StateDeltaEvent _op(Map<String, dynamic> op) => StateDeltaEvent(delta: [op]);
 
-Map<String, dynamic> _permission(String id) =>
-    {'requestId': 'r-$id', 'toolCallId': id, 'options': <dynamic>[]};
+Map<String, dynamic> _permission(String id) => {
+      'requestId': 'r-$id',
+      'status': 'pending',
+      'request': {
+        'toolCall': {'toolCallId': id},
+        'options': <dynamic>[],
+      },
+    };
 
 List<PermissionRequestTimelineItem> _cards(ConversationReducer r) =>
     r.current.timeline.whereType<PermissionRequestTimelineItem>().toList();
@@ -24,7 +30,7 @@ void main() {
         'path': '/$_ns/permissions/by-id/tc9',
         'value': _permission('tc9'),
       }));
-    expect(_cards(r).single.requestId, 'r-tc9');
+    expect(_cards(r).single.requestId, 'tc9');
   });
 
   test('a deep remove removes the entry', () {

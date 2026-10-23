@@ -16,28 +16,32 @@ void main() {
           'by-id': {
             'tc1': {
               'requestId': 'req-1',
-              'sessionId': 's1',
-              'toolCallId': 'tc1',
               'status': 'pending',
-              'title': 'Edit a.txt',
-              'options': [
-                {
-                  'optionId': 'ok',
-                  'name': 'Allow',
-                  'kind': 'allow_once',
-                  'meta': {'o': 1}
-                },
-              ],
-              'content': [
-                {
+              'request': {
+                'sessionId': 's1',
+                'toolCall': {
                   'toolCallId': 'tc1',
-                  'path': 'a.txt',
-                  'oldText': 'x',
-                  'newText': 'y'
+                  'title': 'Edit a.txt',
+                  'content': [
+                    {
+                      'toolCallId': 'tc1',
+                      'path': 'a.txt',
+                      'oldText': 'x',
+                      'newText': 'y'
+                    },
+                    {'toolCallId': 'tc1', 'terminalId': 't1'},
+                  ],
                 },
-                {'toolCallId': 'tc1', 'terminalId': 't1'},
-              ],
-              'meta': {'m': 1},
+                'options': [
+                  {
+                    'optionId': 'ok',
+                    'name': 'Allow',
+                    'kind': 'allow_once',
+                    '_meta': {'o': 1}
+                  },
+                ],
+                '_meta': {'m': 1},
+              },
               'futureKey': 7,
             },
           },
@@ -51,62 +55,54 @@ void main() {
     expect(p.content.first, isA<ToolContentDiff>());
     expect(p.content.last, isA<ToolContentTerminal>());
     expect(p.options.single.extras, {
-      'meta': {'o': 1}
+      '_meta': {'o': 1}
     });
-    expect(p.extras, {'status': 'pending', 'futureKey': 7});
+    expect(p.extras, {'requestId': 'req-1', 'futureKey': 7});
   });
 
-  test('an elicitation keeps scope, meta and an unknown mode', () {
+  test('an elicitation keeps its scope, meta and unknown request keys', () {
     final r = ConversationReducer(namespace: _ns)
       ..apply(_snap({
         'elicitations': {
           'by-id': {
             'e1': {
-              'elicitationId': 'e1',
-              'message': 'm',
-              'mode': {
-                'kind': 'other',
+              'requestId': 'e1',
+              'request': {
                 'mode': 'weird',
-                'raw': {'a': 1}
+                'message': 'm',
+                'sessionId': 's',
+                'toolCallId': 'tc',
+                '_meta': {'z': 1},
+                'futureKey': 3,
               },
-              'scope': {
-                'kind': 'session',
-                'session_id': 's',
-                'tool_call_id': 'tc'
-              },
-              'meta': {'z': 1},
             },
           },
         },
       }));
     final e =
         r.current.timeline.whereType<ElicitationRequestTimelineItem>().single;
-    expect(e.mode, 'other');
-    expect(e.rawMode, {
-      'kind': 'other',
-      'mode': 'weird',
-      'raw': {'a': 1}
-    });
-    expect(e.scope!.kind, 'session');
+    expect(e.mode, 'weird');
+    expect(e.scope!.kind, 'tool');
     expect(e.scope!.sessionId, 's');
     expect(e.scope!.toolCallId, 'tc');
     expect(e.meta, {'z': 1});
+    expect(e.extras, {'requestId': 'e1', 'futureKey': 3});
   });
 
-  test('a url elicitation keeps its elicitation_id in rawMode', () {
+  test('a url elicitation keeps its elicitationId in extras', () {
     final r = ConversationReducer(namespace: _ns)
       ..apply(_snap({
         'elicitations': {
           'by-id': {
             'e2': {
-              'elicitationId': 'e2',
-              'message': 'Sign in',
-              'mode': {
-                'kind': 'url',
+              'requestId': 'e2',
+              'request': {
+                'mode': 'url',
+                'message': 'Sign in',
                 'url': 'https://example.com/auth',
-                'elicitation_id': 'e2',
+                'elicitationId': 'e2',
+                'requestId': 'r2',
               },
-              'scope': {'kind': 'request', 'request_id': 'r2'},
             },
           },
         },
@@ -114,7 +110,8 @@ void main() {
     final e =
         r.current.timeline.whereType<ElicitationRequestTimelineItem>().single;
     expect(e.url, 'https://example.com/auth');
-    expect(e.rawMode!['elicitation_id'], 'e2');
+    expect(e.extras['elicitationId'], 'e2');
+    expect(e.scope!.requestId, 'r2');
   });
 
   test('a content entry that is not a map is kept as a diagnostic, once', () {
@@ -123,12 +120,16 @@ void main() {
         'by-id': {
           'tc1': {
             'requestId': 'r',
-            'toolCallId': 'tc1',
-            'options': [],
-            'content': [
-              'junk',
-              {'terminalId': 't'}
-            ],
+            'request': {
+              'toolCall': {
+                'toolCallId': 'tc1',
+                'content': [
+                  'junk',
+                  {'terminalId': 't'}
+                ],
+              },
+              'options': [],
+            },
           },
         },
       },

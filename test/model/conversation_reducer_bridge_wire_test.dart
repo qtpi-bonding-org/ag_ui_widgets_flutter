@@ -286,5 +286,36 @@ void main() {
           {'k': 1});
       expect(r.current.sessionState.responseMeta['session/new'], {'a': 1});
     });
+
+    test('tool_text sets the tool call partialText', () {
+      final r = _reducer();
+      r.apply(_e({
+        'type': 'TOOL_CALL_START',
+        'toolCallId': 't1',
+        'toolCallName': 'search',
+      }));
+      r.apply(_e({
+        'type': 'CUSTOM',
+        'name': 'episutra:tool_text',
+        'value': {
+          'toolCallId': 't1',
+          'type': 'content',
+          'content': {'type': 'text', 'text': 'Tool: mcp__episutra-tools__search'},
+        },
+      }));
+      expect(r.current.timeline.whereType<ToolCallTimelineItem>().single.partialText,
+          'Tool: mcp__episutra-tools__search');
+      expect(r.current.diagnostics, isEmpty);
+    });
+
+    test('a tool_text without text is a malformedPayload diagnostic', () {
+      final r = _reducer();
+      r.apply(_e({
+        'type': 'CUSTOM',
+        'name': 'episutra:tool_text',
+        'value': {'toolCallId': 't1', 'content': {'type': 'image'}},
+      }));
+      expect(r.current.diagnostics.single.kind, DiagnosticKind.malformedPayload);
+    });
   });
 }

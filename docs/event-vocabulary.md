@@ -39,7 +39,7 @@ be decoded with `decodeAgUiWire` (not `BaseEvent.fromJson`): `ag_ui` 0.3.0 reads
 | `acp.client_execute_request` | `{callId, toolName, args}` | `ToolRequestTimelineItem` (key `req:<callId>`) | Locally produced. Skipped (marked resolved) when `autoResolveToolRequest(toolName)` is true. A non-map payload or missing `callId` is `malformedPayload`. |
 | `acp.session_phase` | `{phase: starting\|ready}` | `SessionState.isStarting` | Locally produced. An unknown phase is `unknownCustom`; a non-map payload is `malformedPayload`. |
 | `acp:source` | wire record map | `Conversation.sourceRecords` (bounded) | Not emitted by the adapter any more (envelope ids ride in each event's `metadata.acpEnvelope`); still folded when a host sends it. Non-map payload is `malformedPayload`. |
-| any other CUSTOM | any | `Diagnostic(unknownCustom)` | `<ns>:run` and `<ns>:tool_text` (removed) land here. |
+| any other CUSTOM | any | `Diagnostic(unknownCustom)` | `<ns>:run` (removed) lands here. |
 
 ## Standard AG-UI events
 

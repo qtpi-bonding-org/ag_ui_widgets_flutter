@@ -1,3 +1,9 @@
+## 0.9.1
+
+- `<ns>:tool_text` is handled again (`{toolCallId, type: 'content', content: {type: 'text', text}}`):
+  it sets `ToolCallTimelineItem.partialText`. 0.9.0 dropped the handler on the
+  wrong assumption that the adapter no longer emits the event; it does.
+
 ## 0.9.0
 
 Reads the AG-UI stream `acp-agui-adapter`'s `ProtocolBridge` emits (adapter

@@ -644,6 +644,19 @@ class ConversationReducer {
               (t) => t.copyWith(terminals: [...t.terminals, terminal]));
         }
       case ag_ui.CustomEvent(name: final name)
+          when name == '$namespace:tool_text':
+        // `{toolCallId, type: 'content', content: {type: 'text', text}}`: a text
+        // item on a progress update. The latest one is the tool's partial text.
+        final value = asJsonMap(event.value);
+        final toolCallId = asString(value?['toolCallId']);
+        final content = asJsonMap(value?['content']);
+        final text = asString(content?['text']);
+        if (toolCallId == null || text == null) {
+          _diagnose(DiagnosticKind.malformedPayload, name, event.value);
+        } else {
+          _updateTool(toolCallId, (t) => t.copyWith(partialText: text));
+        }
+      case ag_ui.CustomEvent(name: final name)
           when name == '$namespace:media':
         // `{turnId, messageId, channel, content}`: `content` is the ACP content
         // block (`type`, `uri`, `mimeType`, ...); a `toolCallId` beside it

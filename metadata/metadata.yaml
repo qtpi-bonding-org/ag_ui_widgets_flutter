@@ -1,0 +1,104 @@
+id: ag-ui-widgets-flutter
+verified_at: 5aa1f63e8b06fc4310355fd3f4072545489e7985
+public:
+  name: ag_ui_widgets_flutter
+  summary: Flutter chat UI that renders AG-UI protocol agent sessions as a typed transcript.
+  status: active
+  stage: beta
+  stack:
+  - Flutter
+  - ag_ui
+  - flutter_chat_ui
+  - freezed
+  - provider
+  links:
+  - type: repo
+    url: https://github.com/qtpi-bonding-org/ag_ui_widgets_flutter
+private:
+  started: 2026-07
+  visibility: public
+  license: none
+  ownership: designed and directed; code written with AI assistance
+  build: agentic
+facts:
+- id: agui-wire-decoder
+  assertion: decodeAgUiWire turns a list-valued TOOL_CALL_RESULT content into the newline-joined text
+    of its type 'text' parts, drops non-text parts from content, keeps the full list at rawEvent['parts'],
+    and passes every other event to BaseEvent.fromJson unchanged.
+  evidence:
+  - lib/src/transport/wire_decoder.dart
+  - test/transport/wire_decoder_test.dart
+  - test/model/adapter_contract_test.dart
+- id: conversation-reducer-namespaced-state
+  assertion: STATE_DELTA ops are applied only under /<namespace>. add, replace and remove work at any
+    depth through maps. A path outside the namespace is recorded as an unknownStateKey diagnostic and
+    not applied. An unsupported op, a non-string path, or a descent through a non-map value is recorded
+    as malformedPayload and changes nothing.
+  evidence:
+  - lib/src/model/conversation_reducer.dart
+  - test/model/conversation_reducer_patch_test.dart
+  - docs/event-vocabulary.md
+- id: replay-reset-on-sync-replace
+  assertion: Only a CUSTOM event named <ns>:sync with value {mode "replace"} resets the reducer. The
+    reset clears the timeline, state tree, typed session state, run state, resolutions and open streams,
+    and keeps diagnostics, acp:source records and the resolved-request id set. Any other <ns>:sync mode
+    is recorded as unknownCustom and changes nothing else.
+  evidence:
+  - lib/src/model/conversation_reducer.dart
+  - test/model/conversation_reducer_bridge_wire_test.dart
+  - test/model/conversation_reducer_diagnostics_test.dart
+  - test/model/conversation_reducer_test.dart
+- id: synthetic-run-guard
+  assertion: RUN_STARTED and RUN_FINISHED events whose runId starts with synthetic- leave run state
+    untouched, though RUN_STARTED still sets threadId. RUN_ERROR has no such guard.
+  evidence:
+  - lib/src/model/conversation_reducer.dart
+  - test/model/conversation_reducer_bridge_wire_test.dart
+  - test/model/adapter_contract_test.dart
+- id: reducer-bounded-stores
+  assertion: The reducer keeps at most 200 diagnostics, dropping the oldest, and at most 100 SessionState
+    resolutions entries, evicting the oldest recorded.
+  evidence:
+  - lib/src/model/conversation_reducer.dart
+  - test/model/conversation_reducer_diagnostics_test.dart
+  - test/model/conversation_reducer_tool_output_test.dart
+- id: permission-resolution-recorded
+  assertion: <ns>:permission_resolved records SessionState.resolutions['permission:<toolCallId>'] with
+    kind cancelled when the outcome is cancelled, auto_approved when the event has no approved key, and
+    user_selected otherwise. The value of approved does not change the kind.
+  evidence:
+  - lib/src/model/conversation_reducer.dart
+  - test/model/conversation_reducer_bridge_wire_test.dart
+- id: transcript-composer-placement
+  assertion: AgUiTranscript takes a ComposerPlacement that defaults to pinned, a fixed region below the
+    scroll viewport. inline places the composer after the messages inside the same scroll view. AgUiChat
+    has no placement option.
+  evidence:
+  - lib/src/widgets/ag_ui_transcript.dart
+  - lib/src/widgets/composer_placement.dart
+  - test/widgets/ag_ui_transcript_inline_test.dart
+  - test/widgets/ag_ui_transcript_test.dart
+- id: streaming-markdown-opt-in
+  assertion: StackedChatStyle and BubbleChatStyle default markdownWhileStreaming to false. When false,
+    streaming text renders through FlyerChatTextStreamMessage as plain text; when true, it renders through
+    the package's markdown body. The package emits only StreamStateStreaming states.
+  evidence:
+  - lib/src/style/stacked_chat_style.dart
+  - lib/src/style/bubble_chat_style.dart
+  - lib/src/widgets/streaming_markdown_content.dart
+  - lib/src/widgets/timeline_to_messages.dart
+  - test/widgets/stacked_chat_builders_test.dart
+  - test/widgets/bubble_chat_builders_test.dart
+  - test/widgets/streaming_markdown_content_test.dart
+- id: tool-result-prettify
+  assertion: prettifyToolResult joins the text of a JSON list of type 'text' blocks with newlines. Any
+    other input, including invalid JSON, is returned unchanged, and it does not throw.
+  evidence:
+  - lib/src/widgets/chat_action_cards.dart
+  - test/widgets/chat_action_cards_test.dart
+- id: elicitation-card-untyped-submit
+  assertion: The elicitation form submits boolean properties as bool and every other property as the
+    raw text string, with no numeric parsing or schema validation.
+  evidence:
+  - lib/src/widgets/chat_action_cards.dart
+  - test/widgets/chat_action_cards_test.dart

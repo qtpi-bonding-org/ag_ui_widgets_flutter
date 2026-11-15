@@ -14,12 +14,6 @@ public:
   links:
   - type: repo
     url: https://github.com/qtpi-bonding-org/ag_ui_widgets_flutter
-private:
-  started: 2026-07
-  visibility: public
-  license: none
-  ownership: designed and directed; code written with AI assistance
-  build: agentic
 facts:
 - id: agui-wire-decoder
   assertion: decodeAgUiWire turns a list-valued TOOL_CALL_RESULT content into the newline-joined text

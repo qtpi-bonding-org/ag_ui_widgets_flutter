@@ -46,17 +46,23 @@ class TranscriptScrollController {
   int _settleAttempts = 0;
   bool _userScrollActive = false;
 
+  /// Text is selected: do not move it away from under the pointer.
+  bool selecting = false;
+
   bool get isArmed => _armed;
 
   /// Call on submit: the user just acted, so follow the output again.
   /// Schedules a stick itself — the caller may not trigger a rebuild.
   void rearm() {
     _armed = true;
+    selecting = false;
     _settleAttempts = 0;
     scheduleStick();
   }
 
   void handleNotification(ScrollNotification notification) {
+    // A scroll view inside the transcript (a long code line, a table).
+    if (notification.depth != 0) return;
     final metrics = notification.metrics;
     if (!metrics.hasContentDimensions) return;
 
@@ -110,7 +116,7 @@ class TranscriptScrollController {
   void _stickIfArmed() {
     // Every path that ends a chase must clear the counter. A leftover count
     // from an abandoned chase would truncate an unrelated later one.
-    if (!_armed || !controller.hasClients) {
+    if (!_armed || selecting || !controller.hasClients) {
       _settleAttempts = 0;
       return;
     }

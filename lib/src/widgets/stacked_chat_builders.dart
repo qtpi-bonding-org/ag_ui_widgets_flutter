@@ -10,6 +10,7 @@ import 'card_builders.dart';
 import 'chat_action_cards.dart';
 import 'markdown_body.dart';
 import 'streaming_markdown_content.dart';
+import 'transcript_selection.dart';
 
 /// Full-width, vertically-alternating builder family for [AgUiTranscript]'s
 /// five builder slots. Sender is differentiated by background tint and
@@ -59,14 +60,16 @@ class StackedChatBuilders {
                       context,
                       message.text,
                       styleSheetBuilder: styleSheetBuilder,
-            copyButtonBuilder: callbacks.copyButtonBuilder,
+                      copyButtonBuilder: isReasoning ? null : callbacks.copyButtonBuilder,
+                      messageId: message.id,
                     ),
                   ),
                 ],
               ),
-              if (callbacks.copyButtonBuilder case final copy?)
-                SelectionContainer.disabled(
-                  child: copy(context, message.text, isCode: false),
+              if (callbacks.copyButtonBuilder case final copy?
+                  when !isReasoning && message.text.trim().isNotEmpty)
+                TranscriptControl(
+                  child: copy(context, message.text, id: message.id, isCode: false),
                 ),
             ],
           ),
@@ -124,7 +127,8 @@ class StackedChatBuilders {
                             markdownStyleSheetFromTheme(Theme.of(ctx)).copyWith(p: effectiveStyle)
                         : null),
                 loadingBuilder: style.streamingLoadingBuilder,
-            copyButtonBuilder: callbacks.copyButtonBuilder,
+                copyButtonBuilder: isReasoning ? null : callbacks.copyButtonBuilder,
+                messageId: message.id,
               ),
             ],
           ),

@@ -61,7 +61,7 @@ Widget defaultToolCallBuilder(
 /// Plain streaming-text renderer used when the caller doesn't supply a
 /// `textStreamMessageBuilder`. Explicitly passes `sentTextStyle`/
 /// `receivedTextStyle` derived from `Theme.of(context)` — left unset,
-/// `FlyerChatTextStreamMessage` falls back to `flutter_chat_ui`'s ambient
+/// `FlyerChatTextStreamMessage` falls back to its ambient
 /// `ChatTheme.light()` default instead, causing a visible color pop when
 /// streaming ends and rendering switches to `textMessageBuilder`.
 Widget defaultTextStreamMessageBuilder(

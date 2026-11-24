@@ -12,6 +12,7 @@ import 'default_builders.dart';
 import 'timeline_request_index.dart';
 import 'timeline_to_messages.dart';
 import 'transcript_scroll_controller.dart';
+import 'transcript_selection.dart';
 
 class AgUiTranscript extends StatefulWidget {
   const AgUiTranscript({
@@ -126,8 +127,15 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
         final message = messages[index];
         return KeyedSubtree(
           key: ValueKey<String>(message.id),
-          child: RepaintBoundary(child: _buildMessage(
-            context, message, index, streamStates, requests)),
+          child: RepaintBoundary(
+            child: message is chat_core.CustomMessage
+                ? TranscriptControl(
+                    child: _buildMessage(context, message, index, streamStates, requests),
+                  )
+                : MessageSelection(
+                    child: _buildMessage(context, message, index, streamStates, requests),
+                  ),
+          ),
         );
       },
     );
@@ -137,8 +145,10 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
             _scroll.handleNotification(notification);
             return false; // never consume — let it keep bubbling.
           },
-          // Transcript only: the composer keeps its own text selection.
-          child: SelectionArea(child: scrollView),
+          child: TranscriptSelection(
+            onActiveChanged: (active) => _scroll.selecting = active,
+            child: scrollView,
+          ),
         );
 
     final Widget child;
@@ -160,7 +170,10 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
           controller: _scroll.controller,
           slivers: [
             list,
-            SliverToBoxAdapter(child: widget.composerBuilder(context)),
+            SliverToBoxAdapter(
+              // The composer keeps its own text selection.
+              child: TranscriptControl(child: widget.composerBuilder(context)),
+            ),
             SliverFillRemaining(
               hasScrollBody: false,
               child: GestureDetector(

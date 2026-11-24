@@ -1,3 +1,13 @@
+## 0.10.0
+
+- **Breaking:** `AgUiChat` and the `flutter_chat_ui` dependency are removed. Use
+  `AgUiTranscript` (the `onSendMessage` callback becomes your own composer, through `composerBuilder`).
+- **Breaking:** on `material_ui` instead of `package:flutter/material.dart`; needs Flutter 3.47 or newer.
+- Transcript text can be selected and copied, with line breaks between blocks and messages.
+- `ChatActionCallbacks.copyButtonBuilder`: copy control on messages (stacked family) and code blocks.
+- `markdownStyleSheetFromTheme`.
+- Scrolling inside a code block or table no longer stops the transcript following new output.
+
 ## 0.9.1
 
 - `<ns>:tool_text` is handled again (`{toolCallId, type: 'content', content: {type: 'text', text}}`):

@@ -27,10 +27,13 @@ typedef TextStreamCardBuilder = Widget Function(
 });
 
 /// Builds the control that copies [text]: a whole message's markdown, or one
-/// code block ([isCode]). The app supplies it, because the package has no
-/// buttons, labels or clipboard of its own.
+/// code block ([isCode]). [id] is the message id, or the message id plus the
+/// block's content hash. Never called for blank text or for reasoning. The app
+/// supplies it, because the package has no buttons, labels or clipboard of its
+/// own.
 typedef CopyButtonBuilder = Widget Function(
   BuildContext context,
   String text, {
+  required String id,
   required bool isCode,
 });

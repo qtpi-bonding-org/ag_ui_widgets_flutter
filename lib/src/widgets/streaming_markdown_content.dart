@@ -35,6 +35,7 @@ Widget buildStreamingMarkdownContent(
   MarkdownStyleSheet Function(BuildContext)? styleSheetBuilder,
   Widget Function(BuildContext context, TextStyle? paragraphStyle)? loadingBuilder,
   CopyButtonBuilder? copyButtonBuilder,
+  String messageId = '',
 }) {
   Widget loading() =>
       loadingBuilder?.call(context, paragraphStyle) ??
@@ -49,14 +50,15 @@ Widget buildStreamingMarkdownContent(
     chat_stream.StreamStateLoading() => loading(),
     chat_stream.StreamStateStreaming(:final accumulatedText) => accumulatedText.isEmpty
         ? loading()
-        : chatMarkdownBody(context, accumulatedText, styleSheetBuilder: styleSheetBuilder, copyButtonBuilder: copyButtonBuilder),
+        : chatMarkdownBody(context, accumulatedText, styleSheetBuilder: styleSheetBuilder, copyButtonBuilder: copyButtonBuilder, messageId: messageId),
     chat_stream.StreamStateCompleted(:final finalText) =>
-      chatMarkdownBody(context, finalText, styleSheetBuilder: styleSheetBuilder, copyButtonBuilder: copyButtonBuilder),
+      chatMarkdownBody(context, finalText, styleSheetBuilder: styleSheetBuilder, copyButtonBuilder: copyButtonBuilder, messageId: messageId),
     chat_stream.StreamStateError(:final accumulatedText, :final error) => chatMarkdownBody(
         context,
         '${accumulatedText ?? ''}\n\nError: $error',
         styleSheetBuilder: styleSheetBuilder,
         copyButtonBuilder: copyButtonBuilder,
+        messageId: messageId,
       ),
   };
 }

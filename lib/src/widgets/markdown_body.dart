@@ -4,6 +4,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import 'card_builders.dart';
+import 'transcript_selection.dart';
 
 /// Renders [text] as GFM markdown, shared by every builder family's
 /// text-message rendering. `selectable: false`: selection comes from the
@@ -14,6 +15,7 @@ Widget chatMarkdownBody(
   String text, {
   MarkdownStyleSheet Function(BuildContext)? styleSheetBuilder,
   CopyButtonBuilder? copyButtonBuilder,
+  String messageId = '',
 }) {
   final styleSheet =
       styleSheetBuilder?.call(context) ?? markdownStyleSheetFromTheme(Theme.of(context));
@@ -22,16 +24,17 @@ Widget chatMarkdownBody(
     selectable: false,
     styleSheet: styleSheet,
     builders: {
-      if (copyButtonBuilder != null) 'pre': _CodeBlockBuilder(styleSheet, copyButtonBuilder),
+      if (copyButtonBuilder != null) 'pre': _CodeBlockBuilder(styleSheet, copyButtonBuilder, messageId),
     },
   );
 }
 
 class _CodeBlockBuilder extends MarkdownElementBuilder {
-  _CodeBlockBuilder(this.styleSheet, this.copyButtonBuilder);
+  _CodeBlockBuilder(this.styleSheet, this.copyButtonBuilder, this.messageId);
 
   final MarkdownStyleSheet styleSheet;
   final CopyButtonBuilder copyButtonBuilder;
+  final String messageId;
 
   @override
   Widget? visitElementAfterWithContext(
@@ -41,22 +44,53 @@ class _CodeBlockBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final code = element.textContent.replaceFirst(RegExp(r'\n$'), '');
+    if (code.trim().isEmpty) return _CodeScroll(styleSheet: styleSheet, code: code);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: styleSheet.codeblockPadding,
-            child: Text(code, style: styleSheet.code),
+        Expanded(child: _CodeScroll(styleSheet: styleSheet, code: code)),
+        TranscriptControl(
+          child: copyButtonBuilder(
+            context,
+            code,
+            id: '$messageId.${code.hashCode}',
+            isCode: true,
           ),
-        ),
-        SelectionContainer.disabled(
-          child: copyButtonBuilder(context, code, isCode: true),
         ),
       ],
     );
   }
+}
+
+class _CodeScroll extends StatefulWidget {
+  const _CodeScroll({required this.styleSheet, required this.code});
+
+  final MarkdownStyleSheet styleSheet;
+  final String code;
+
+  @override
+  State<_CodeScroll> createState() => _CodeScrollState();
+}
+
+class _CodeScrollState extends State<_CodeScroll> {
+  final _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scrollbar(
+        controller: _controller,
+        child: SingleChildScrollView(
+          controller: _controller,
+          scrollDirection: Axis.horizontal,
+          padding: widget.styleSheet.codeblockPadding,
+          child: Text(widget.code, style: widget.styleSheet.code),
+        ),
+      );
 }
 
 /// Same values as [MarkdownStyleSheet.fromTheme], from a material_ui

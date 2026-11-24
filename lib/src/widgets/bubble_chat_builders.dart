@@ -60,7 +60,8 @@ class BubbleChatBuilders {
                       context,
                       message.text,
                       styleSheetBuilder: styleSheetBuilder,
-            copyButtonBuilder: callbacks.copyButtonBuilder,
+                      copyButtonBuilder: isReasoning ? null : callbacks.copyButtonBuilder,
+                      messageId: message.id,
                     ),
                   ),
                 ],
@@ -95,7 +96,8 @@ class BubbleChatBuilders {
                   paragraphStyle: style.textStyle,
                   styleSheetBuilder: style.markdownStyleSheetBuilder,
                   loadingBuilder: style.streamingLoadingBuilder,
-            copyButtonBuilder: callbacks.copyButtonBuilder,
+                  copyButtonBuilder: message.metadata?['kind'] == 'reasoning' ? null : callbacks.copyButtonBuilder,
+                  messageId: message.id,
                 ),
               )
             : chat_stream.FlyerChatTextStreamMessage(

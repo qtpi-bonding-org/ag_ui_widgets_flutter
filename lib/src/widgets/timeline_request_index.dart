@@ -1,6 +1,6 @@
 // lib/src/widgets/timeline_request_index.dart
 // Pure projection: the three payload-carrying TimelineItem variants, keyed by
-// requestId. Both AgUiChat and AgUiTranscript dispatch their permission /
+// requestId. AgUiTranscript dispatches its permission /
 // elicitation / toolRequest builders through this, rather than embedding the
 // full item in flutter_chat_core's untyped Message.custom metadata.
 import '../model/conversation.dart';

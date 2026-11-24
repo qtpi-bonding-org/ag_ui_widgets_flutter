@@ -4,6 +4,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
     as chat_stream;
 
+import 'card_builders.dart';
 import 'markdown_body.dart';
 
 /// Renders a [chat_stream.StreamState] via [chatMarkdownBody] instead of
@@ -33,6 +34,7 @@ Widget buildStreamingMarkdownContent(
   required TextStyle? paragraphStyle,
   MarkdownStyleSheet Function(BuildContext)? styleSheetBuilder,
   Widget Function(BuildContext context, TextStyle? paragraphStyle)? loadingBuilder,
+  CopyButtonBuilder? copyButtonBuilder,
 }) {
   Widget loading() =>
       loadingBuilder?.call(context, paragraphStyle) ??
@@ -47,13 +49,14 @@ Widget buildStreamingMarkdownContent(
     chat_stream.StreamStateLoading() => loading(),
     chat_stream.StreamStateStreaming(:final accumulatedText) => accumulatedText.isEmpty
         ? loading()
-        : chatMarkdownBody(context, accumulatedText, styleSheetBuilder: styleSheetBuilder),
+        : chatMarkdownBody(context, accumulatedText, styleSheetBuilder: styleSheetBuilder, copyButtonBuilder: copyButtonBuilder),
     chat_stream.StreamStateCompleted(:final finalText) =>
-      chatMarkdownBody(context, finalText, styleSheetBuilder: styleSheetBuilder),
+      chatMarkdownBody(context, finalText, styleSheetBuilder: styleSheetBuilder, copyButtonBuilder: copyButtonBuilder),
     chat_stream.StreamStateError(:final accumulatedText, :final error) => chatMarkdownBody(
         context,
         '${accumulatedText ?? ''}\n\nError: $error',
         styleSheetBuilder: styleSheetBuilder,
+        copyButtonBuilder: copyButtonBuilder,
       ),
   };
 }

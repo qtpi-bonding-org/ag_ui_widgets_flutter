@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../model/conversation.dart';
-import 'ag_ui_chat.dart' show CustomCardBuilder, TextStreamCardBuilder;
+import 'card_builders.dart';
 import 'composer_placement.dart';
 import 'default_builders.dart';
 import 'timeline_request_index.dart';
@@ -137,7 +137,8 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
             _scroll.handleNotification(notification);
             return false; // never consume — let it keep bubbling.
           },
-          child: scrollView,
+          // Transcript only: the composer keeps its own text selection.
+          child: SelectionArea(child: scrollView),
         );
 
     final Widget child;
@@ -172,14 +173,7 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
         ));
     }
 
-    // AgUiChat gets these for free from flutter_chat_ui's Chat widget, which
-    // wraps its whole subtree in Provider<ChatTheme>, Provider<UserID>, and
-    // Provider<DateFormat>. AgUiTranscript bypasses Chat entirely, so
-    // builders that construct flutter_chat_ui-family widgets directly (e.g.
-    // FlyerChatTextStreamMessage, which reads all three via
-    // context.select/context.read) need the same providers here. AgUiChat
-    // itself has no timeFormat override parameter, so this mirrors that by
-    // hardcoding Chat's own default rather than adding new surface area.
+    // FlyerChatTextStreamMessage reads all three through provider.
     return MultiProvider(
       providers: [
         Provider<chat_core.ChatTheme>.value(

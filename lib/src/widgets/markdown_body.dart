@@ -1,22 +1,62 @@
 // lib/src/widgets/markdown_body.dart
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:markdown/markdown.dart' as md;
+
+import 'card_builders.dart';
 
 /// Renders [text] as GFM markdown, shared by every builder family's
-/// text-message rendering. `selectable: false` matches plain-`Text`
-/// behavior (chat bubbles aren't currently selectable anywhere this
-/// package is consumed) — revisit only if a future spec asks for
-/// text selection.
+/// text-message rendering. `selectable: false`: selection comes from the
+/// transcript's own `SelectionArea`, so it can span paragraphs and messages.
+/// A [copyButtonBuilder] adds a copy control to every code block.
 Widget chatMarkdownBody(
   BuildContext context,
   String text, {
   MarkdownStyleSheet Function(BuildContext)? styleSheetBuilder,
+  CopyButtonBuilder? copyButtonBuilder,
 }) {
+  final styleSheet =
+      styleSheetBuilder?.call(context) ?? markdownStyleSheetFromTheme(Theme.of(context));
   return MarkdownBody(
     data: text,
     selectable: false,
-    styleSheet: styleSheetBuilder?.call(context) ?? markdownStyleSheetFromTheme(Theme.of(context)),
+    styleSheet: styleSheet,
+    builders: {
+      if (copyButtonBuilder != null) 'pre': _CodeBlockBuilder(styleSheet, copyButtonBuilder),
+    },
   );
+}
+
+class _CodeBlockBuilder extends MarkdownElementBuilder {
+  _CodeBlockBuilder(this.styleSheet, this.copyButtonBuilder);
+
+  final MarkdownStyleSheet styleSheet;
+  final CopyButtonBuilder copyButtonBuilder;
+
+  @override
+  Widget? visitElementAfterWithContext(
+    BuildContext context,
+    md.Element element,
+    TextStyle? preferredStyle,
+    TextStyle? parentStyle,
+  ) {
+    final code = element.textContent.replaceFirst(RegExp(r'\n$'), '');
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: styleSheet.codeblockPadding,
+            child: Text(code, style: styleSheet.code),
+          ),
+        ),
+        SelectionContainer.disabled(
+          child: copyButtonBuilder(context, code, isCode: true),
+        ),
+      ],
+    );
+  }
 }
 
 /// Same values as [MarkdownStyleSheet.fromTheme], from a material_ui

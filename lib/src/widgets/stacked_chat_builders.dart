@@ -1,18 +1,17 @@
 // lib/src/widgets/stacked_chat_builders.dart
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
     as chat_stream;
 import '../model/conversation.dart';
 import '../style/chat_action_callbacks.dart';
 import '../style/stacked_chat_style.dart';
-import 'ag_ui_chat.dart' show CustomCardBuilder, TextStreamCardBuilder;
+import 'card_builders.dart';
 import 'chat_action_cards.dart';
 import 'markdown_body.dart';
 import 'streaming_markdown_content.dart';
 
-/// Full-width, vertically-alternating builder family for [AgUiChat]'s
+/// Full-width, vertically-alternating builder family for [AgUiTranscript]'s
 /// five builder slots. Sender is differentiated by background tint and
 /// an optional leading icon — no left/right alignment.
 class StackedChatBuilders {
@@ -60,10 +59,15 @@ class StackedChatBuilders {
                       context,
                       message.text,
                       styleSheetBuilder: styleSheetBuilder,
+            copyButtonBuilder: callbacks.copyButtonBuilder,
                     ),
                   ),
                 ],
               ),
+              if (callbacks.copyButtonBuilder case final copy?)
+                SelectionContainer.disabled(
+                  child: copy(context, message.text, isCode: false),
+                ),
             ],
           ),
         );
@@ -120,6 +124,7 @@ class StackedChatBuilders {
                             markdownStyleSheetFromTheme(Theme.of(ctx)).copyWith(p: effectiveStyle)
                         : null),
                 loadingBuilder: style.streamingLoadingBuilder,
+            copyButtonBuilder: callbacks.copyButtonBuilder,
               ),
             ],
           ),

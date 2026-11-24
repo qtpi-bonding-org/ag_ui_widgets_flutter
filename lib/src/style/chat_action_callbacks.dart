@@ -2,6 +2,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import '../model/conversation.dart';
+import '../widgets/card_builders.dart';
 
 /// Action hooks a builder-family caller supplies so shared card content
 /// (permission/elicitation/toolRequest) can call back into whichever
@@ -15,6 +16,7 @@ class ChatActionCallbacks {
     this.toolCallOverrides = const {},
     this.permissionCardBuilder,
     this.elicitationCardBuilder,
+    this.copyButtonBuilder,
   });
 
   /// Signature-compatible with IAgUiTransport.respondPermission(callId,
@@ -50,4 +52,9 @@ class ChatActionCallbacks {
   /// Full override for a pending elicitation request's card. Same
   /// null-means-generic semantics as [permissionCardBuilder].
   final Widget Function(BuildContext, ElicitationRequestTimelineItem)? elicitationCardBuilder;
+
+  /// Copy control on each code block, and under each finished message in the
+  /// stacked family.
+  /// `null` (the default) shows none.
+  final CopyButtonBuilder? copyButtonBuilder;
 }

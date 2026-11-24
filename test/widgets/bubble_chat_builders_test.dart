@@ -18,10 +18,10 @@ void main() {
   Widget host(Conversation conversation, BubbleChatBuilders builders) {
     return MaterialApp(
       home: Scaffold(
-        body: AgUiChat(
+        body: AgUiTranscript(
           conversation: conversation,
           currentUserId: 'user',
-          onSendMessage: (_) {},
+          composerBuilder: (_) => const SizedBox.shrink(),
           textMessageBuilder: builders.textMessageBuilder,
           toolCallBuilder: builders.toolCallBuilder,
           permissionBuilder: builders.permissionBuilder,

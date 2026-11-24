@@ -91,14 +91,14 @@ void main() {
     _ignore(callbacks.elicitationCardBuilder);
   });
 
-  test('barrel exposes AgUiChat.textStreamMessageBuilder', () {
+  test('barrel exposes AgUiTranscript.textStreamMessageBuilder', () {
     // No rendering here — just confirm the constructor accepts the new
     // slot and the field is readable. The widget itself is exercised
-    // end-to-end in test/widgets/ag_ui_chat_test.dart.
-    AgUiChat(
+    // end-to-end in test/widgets/ag_ui_transcript_test.dart.
+    AgUiTranscript(
       conversation: const Conversation(timeline: []),
       currentUserId: 'user',
-      onSendMessage: (_) {},
+      composerBuilder: (_) => const SizedBox.shrink(),
       textStreamMessageBuilder: (context, message, index, {required isSentByMe, groupStatus, required streamState}) =>
           Text('stream ${message.id}'),
     );

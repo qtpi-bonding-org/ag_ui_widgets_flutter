@@ -3,37 +3,42 @@
 // Text selection for a transcript. Flutter joins selected pieces with nothing
 // between them, so paragraphs, list items and messages would copy as one run
 // of text; these containers put the line breaks back.
+import 'dart:math';
+
 import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Wraps the whole transcript (outside its scroll view).
 class TranscriptSelection extends StatefulWidget {
-  const TranscriptSelection({super.key, required this.onActiveChanged, required this.child});
+  const TranscriptSelection({super.key, required this.child});
 
-  /// Whether any text is selected.
-  final ValueChanged<bool> onActiveChanged;
   final Widget child;
 
   @override
-  State<TranscriptSelection> createState() => _TranscriptSelectionState();
+  State<TranscriptSelection> createState() => TranscriptSelectionState();
 }
 
-class _TranscriptSelectionState extends State<TranscriptSelection> {
+class TranscriptSelectionState extends State<TranscriptSelection> {
   // Ours, so TranscriptControl can tell when the region took focus.
   final _focus = FocusNode(debugLabel: 'transcript selection');
+
+  late final _delegate = _TranscriptDelegate();
+
+  /// Whether any text is selected right now. Asked, not stored: when the
+  /// selected row is replaced the selection ends without a notification.
+  bool get hasSelection => _delegate.getSelectedContent()?.plainText.isNotEmpty ?? false;
 
   @override
   void dispose() {
     _focus.dispose();
+    _delegate.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => SelectionArea(
         focusNode: _focus,
-        onSelectionChanged: (content) =>
-            widget.onActiveChanged(content != null && content.plainText.isNotEmpty),
-        child: _Container(create: _TranscriptDelegate.new, child: widget.child),
+        child: SelectionContainer(delegate: _delegate, child: widget.child),
       );
 }
 
@@ -45,7 +50,7 @@ class MessageSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _Container(create: _MessageDelegate.new, child: child);
+      _MessageContainer(child: child);
 }
 
 /// A control inside the transcript: not part of the selection, and pressing it
@@ -84,18 +89,17 @@ class _TranscriptControlState extends State<TranscriptControl> {
       );
 }
 
-class _Container extends StatefulWidget {
-  const _Container({required this.create, required this.child});
+class _MessageContainer extends StatefulWidget {
+  const _MessageContainer({required this.child});
 
-  final StaticSelectionContainerDelegate Function() create;
   final Widget child;
 
   @override
-  State<_Container> createState() => _ContainerState();
+  State<_MessageContainer> createState() => _MessageContainerState();
 }
 
-class _ContainerState extends State<_Container> {
-  late final _delegate = widget.create();
+class _MessageContainerState extends State<_MessageContainer> {
+  final _delegate = _MessageDelegate();
 
   @override
   void dispose() {
@@ -122,7 +126,7 @@ class _TranscriptDelegate extends StaticSelectionContainerDelegate {
 /// and nothing otherwise. Ends with a blank line, because the scroll view
 /// between this and [_TranscriptDelegate] joins messages with nothing.
 class _MessageDelegate extends StaticSelectionContainerDelegate {
-  static final _marker = RegExp(r'^(•|\d+\.)$');
+  static final _marker = RegExp(r'^(•|\d+[.)])$');
 
   @override
   SelectedContent? getSelectedContent() {
@@ -135,7 +139,8 @@ class _MessageDelegate extends StaticSelectionContainerDelegate {
       final rect = _rectOf(selectable);
       final before = previousRect;
       if (before != null) {
-        final sameRow = rect.top < before.center.dy && rect.bottom > before.center.dy;
+        final overlap = min(rect.bottom, before.bottom) - max(rect.top, before.top);
+        final sameRow = overlap > min(rect.height, before.height) / 2;
         if (!sameRow) {
           out.write('\n');
         } else if (_marker.hasMatch(previousText.trim())) {
@@ -154,6 +159,8 @@ class _MessageDelegate extends StaticSelectionContainerDelegate {
   Rect _rectOf(Selectable selectable) {
     final boxes = selectable.boundingBoxes;
     final local = boxes.isEmpty ? Offset.zero & selectable.size : boxes.first;
-    return MatrixUtils.transformRect(selectable.getTransformTo(null), local);
+    // Relative to the message: a row kept alive off screen has no usable
+    // position in the window.
+    return MatrixUtils.transformRect(getTransformFrom(selectable), local);
   }
 }

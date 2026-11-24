@@ -49,7 +49,10 @@ class AgUiTranscript extends StatefulWidget {
 }
 
 class AgUiTranscriptState extends State<AgUiTranscript> {
-  final _scroll = TranscriptScrollController();
+  final _selection = GlobalKey<TranscriptSelectionState>();
+  late final _scroll = TranscriptScrollController(
+    isSelecting: () => _selection.currentState?.hasSelection ?? false,
+  );
 
   @override
   void dispose() {
@@ -146,7 +149,7 @@ class AgUiTranscriptState extends State<AgUiTranscript> {
             return false; // never consume — let it keep bubbling.
           },
           child: TranscriptSelection(
-            onActiveChanged: (active) => _scroll.selecting = active,
+            key: _selection,
             child: scrollView,
           ),
         );

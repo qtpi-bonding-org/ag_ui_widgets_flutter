@@ -292,4 +292,124 @@ void main() {
     await mouse.up();
     await tester.pumpAndSettle();
   });
+
+  testWidgets('following resumes when the selected row is replaced',
+      (tester) async {
+    Conversation conv(int n, {required bool open}) => Conversation(timeline: [
+          for (var i = 0; i < n; i++)
+            TimelineItem.text(
+              id: 'm$i',
+              kind: ChatMessageKind.text,
+              role: 'assistant',
+              text: 'message $i',
+              order: OrderKey(i),
+            ),
+          if (open)
+            const TimelineItem.text(
+              id: 'gone',
+              kind: ChatMessageKind.text,
+              role: 'assistant',
+              text: 'SELECTED',
+              order: OrderKey(999),
+            ),
+        ]);
+    Widget app(Conversation c) => MaterialApp(
+          home: Scaffold(
+            body: AgUiTranscript(
+              conversation: c,
+              currentUserId: 'user',
+              composerBuilder: (_) => const SizedBox.shrink(),
+            ),
+          ),
+        );
+    await tester.pumpWidget(app(conv(40, open: true)));
+    await tester.pumpAndSettle();
+    final text = tester.getRect(find.text('SELECTED'));
+    final mouse = await tester.startGesture(
+      text.centerLeft + const Offset(1, 0),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pump();
+    await mouse.moveTo(text.centerRight - const Offset(1, 0));
+    await tester.pump();
+    await mouse.up();
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(app(conv(41, open: false)));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(app(conv(60, open: false)));
+    await tester.pumpAndSettle();
+    final position = tester
+        .state<ScrollableState>(find
+            .byWidgetPredicate((w) =>
+                w is Scrollable && w.axisDirection == AxisDirection.down)
+            .first)
+        .position;
+    expect(position.pixels, closeTo(position.maxScrollExtent, 1));
+  });
+
+  testWidgets('rows scrolled out of view keep their line breaks',
+      (tester) async {
+    await tester.pumpWidget(_chat([
+      ('assistant', '- one\n- two\n\n| a | b |\n|---|---|\n| c | d |'),
+      for (var i = 0; i < 60; i++) ('assistant', 'message $i'),
+    ]));
+    await tester.pumpAndSettle();
+    final scrollable = find
+        .byWidgetPredicate(
+            (w) => w is Scrollable && w.axisDirection == AxisDirection.down)
+        .first;
+    tester.state<ScrollableState>(scrollable).position.jumpTo(0);
+    await tester.pumpAndSettle();
+    final from = tester.getTopLeft(find.text('•').first);
+    final box = tester.getRect(scrollable);
+    final mouse = await tester.startGesture(
+      from + const Offset(0, 2),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pump();
+    await mouse.moveTo(box.bottomCenter - const Offset(0, 20));
+    await tester.pump();
+    await mouse.moveTo(box.bottomCenter + const Offset(0, 40));
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    await mouse.up();
+    await tester.pumpAndSettle();
+    expect(tester.state<ScrollableState>(scrollable).position.pixels,
+        greaterThan(300));
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String;
+        }
+        return null;
+      },
+    );
+    tester
+        .state<SelectableRegionState>(find.byType(SelectableRegion))
+        .copySelection(SelectionChangedCause.toolbar);
+    await tester.pump();
+    expect(copied, startsWith('• one\n• two\na\tb\nc\td\n\nmessage 0'));
+  });
+
+  testWidgets('numbered items keep the number on their line', (tester) async {
+    await tester.pumpWidget(_chat([('assistant', '3. three\n4. four')]));
+    await tester.pumpAndSettle();
+    expect(await selectAllAndCopy(tester), '3. three\n4. four');
+  });
+
+  testWidgets('identical code blocks have different ids', (tester) async {
+    final ids = <String>[];
+    await tester.pumpWidget(_chat(
+      [('assistant', '```\na\n```\n\n```\na\n```')],
+      copy: (context, text, {required id, required isCode}) {
+        if (isCode) ids.add(id);
+        return const SizedBox(width: 10, height: 10);
+      },
+    ));
+    await tester.pumpAndSettle();
+    expect(ids.toSet(), hasLength(2));
+  });
 }

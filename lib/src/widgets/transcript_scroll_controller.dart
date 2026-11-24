@@ -29,7 +29,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class TranscriptScrollController {
-  TranscriptScrollController();
+  TranscriptScrollController({this.isSelecting});
 
   /// Tolerance for "is at the end". Generous on purpose — this only needs to
   /// catch "basically at the bottom", and a single message easily exceeds it.
@@ -46,8 +46,8 @@ class TranscriptScrollController {
   int _settleAttempts = 0;
   bool _userScrollActive = false;
 
-  /// Text is selected: do not move it away from under the pointer.
-  bool selecting = false;
+  /// Whether text is selected: do not move it away from under the pointer.
+  final bool Function()? isSelecting;
 
   bool get isArmed => _armed;
 
@@ -55,7 +55,6 @@ class TranscriptScrollController {
   /// Schedules a stick itself — the caller may not trigger a rebuild.
   void rearm() {
     _armed = true;
-    selecting = false;
     _settleAttempts = 0;
     scheduleStick();
   }
@@ -116,7 +115,7 @@ class TranscriptScrollController {
   void _stickIfArmed() {
     // Every path that ends a chase must clear the counter. A leftover count
     // from an abandoned chase would truncate an unrelated later one.
-    if (!_armed || selecting || !controller.hasClients) {
+    if (!_armed || (isSelecting?.call() ?? false) || !controller.hasClients) {
       _settleAttempts = 0;
       return;
     }

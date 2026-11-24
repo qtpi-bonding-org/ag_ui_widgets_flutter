@@ -4,6 +4,7 @@
   `AgUiTranscript` (the `onSendMessage` callback becomes your own composer, through `composerBuilder`).
 - **Breaking:** on `material_ui` instead of `package:flutter/material.dart`; needs Flutter 3.47 or newer.
 - Transcript text can be selected and copied, with line breaks between blocks and messages.
+  Tool, permission and elicitation cards are not part of that selection.
 - `ChatActionCallbacks.copyButtonBuilder`: copy control on messages (stacked family) and code blocks.
 - `markdownStyleSheetFromTheme`.
 - Scrolling inside a code block or table no longer stops the transcript following new output.

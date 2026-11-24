@@ -1,4 +1,6 @@
 // lib/src/widgets/markdown_body.dart
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -36,6 +38,15 @@ class _CodeBlockBuilder extends MarkdownElementBuilder {
   final CopyButtonBuilder copyButtonBuilder;
   final String messageId;
 
+  /// Position of the next code block. One parse is synchronous, so the
+  /// microtask starts the next parse at zero again.
+  int _next = 0;
+
+  int _takeIndex() {
+    if (_next == 0) scheduleMicrotask(() => _next = 0);
+    return _next++;
+  }
+
   @override
   Widget? visitElementAfterWithContext(
     BuildContext context,
@@ -44,6 +55,7 @@ class _CodeBlockBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final code = element.textContent.replaceFirst(RegExp(r'\n$'), '');
+    final index = _takeIndex();
     if (code.trim().isEmpty) return _CodeScroll(styleSheet: styleSheet, code: code);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +65,7 @@ class _CodeBlockBuilder extends MarkdownElementBuilder {
           child: copyButtonBuilder(
             context,
             code,
-            id: '$messageId.${code.hashCode}',
+            id: '$messageId.$index',
             isCode: true,
           ),
         ),

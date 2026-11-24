@@ -1,5 +1,5 @@
 // test/widgets/chat_action_cards_test.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/src/model/conversation.dart';
 import 'package:ag_ui_widgets_flutter/src/widgets/chat_action_cards.dart';

@@ -1,5 +1,5 @@
 // lib/src/style/chat_action_callbacks.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import '../model/conversation.dart';
 

@@ -1,7 +1,7 @@
 // lib/src/widgets/ag_ui_chat.dart
 import 'dart:async' show unawaited;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart' as chat_ui;
 import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'

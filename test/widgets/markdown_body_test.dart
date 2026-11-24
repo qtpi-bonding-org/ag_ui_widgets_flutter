@@ -1,5 +1,5 @@
 // test/widgets/markdown_body_test.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/src/widgets/markdown_body.dart';

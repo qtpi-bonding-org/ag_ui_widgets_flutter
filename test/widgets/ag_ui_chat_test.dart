@@ -1,5 +1,5 @@
 // test/widgets/ag_ui_chat_test.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
 import 'package:ag_ui/ag_ui.dart' as ag_ui;

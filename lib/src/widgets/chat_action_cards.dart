@@ -1,7 +1,7 @@
 // lib/src/widgets/chat_action_cards.dart
 import 'dart:convert' show jsonDecode;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../model/conversation.dart';
 import 'diff_lines_view.dart';
 

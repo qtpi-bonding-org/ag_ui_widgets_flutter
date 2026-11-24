@@ -1,5 +1,5 @@
 // lib/src/widgets/bubble_chat_builders.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart' as chat_core;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flyer_chat_text_stream_message/flyer_chat_text_stream_message.dart'
@@ -35,7 +35,7 @@ class BubbleChatBuilders {
             : style.textStyle;
         final styleSheetBuilder = style.markdownStyleSheetBuilder ??
             (isReasoning
-                ? (ctx) => MarkdownStyleSheet.fromTheme(Theme.of(ctx)).copyWith(p: effectiveStyle)
+                ? (ctx) => markdownStyleSheetFromTheme(Theme.of(ctx)).copyWith(p: effectiveStyle)
                 : null);
         return Align(
           alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,

@@ -1,5 +1,5 @@
 // test/style/bubble_chat_style_test.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/src/style/bubble_chat_style.dart';
 

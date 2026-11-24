@@ -1,5 +1,5 @@
 // lib/src/widgets/diff_lines_view.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../model/diff_stats.dart';
 
 const int kDiffLineCap = 300;

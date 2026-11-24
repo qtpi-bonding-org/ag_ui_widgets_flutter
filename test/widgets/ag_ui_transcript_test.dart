@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/ag_ui_widgets_flutter.dart';
 // StreamState is NOT re-exported by the barrel file — import it directly or

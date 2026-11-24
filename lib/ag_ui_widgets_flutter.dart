@@ -17,4 +17,4 @@ export 'src/style/bubble_chat_style.dart';
 export 'src/style/chat_action_callbacks.dart';
 export 'src/widgets/stacked_chat_builders.dart';
 export 'src/widgets/bubble_chat_builders.dart';
-export 'src/widgets/markdown_body.dart' show chatMarkdownBody;
+export 'src/widgets/markdown_body.dart' show chatMarkdownBody, markdownStyleSheetFromTheme;

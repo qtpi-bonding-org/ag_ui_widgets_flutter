@@ -1,5 +1,5 @@
 // test/widgets/diff_lines_view_test.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ag_ui_widgets_flutter/src/widgets/diff_lines_view.dart';
 
